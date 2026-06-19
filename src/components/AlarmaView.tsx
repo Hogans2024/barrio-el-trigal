@@ -123,10 +123,10 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
 
       {/* Eslogan */}
-      <div className="text-left mt-0">
+      <div className="text-left -mt-3 tall:mt-0">
         <h1 className="text-white text-lg tall:text-xl sm:text-2xl font-bold tracking-tight">Construyamos juntos</h1>
         <h2 className="text-brand-yellow text-lg tall:text-xl sm:text-2xl font-bold tracking-tight">un mejor barrio.</h2>
-        <p className="text-gray-400 text-[9px] tall:text-[10px] sm:text-xs mt-0.5 font-mono">Barrio El Trigal • Tarija, Bolivia</p>
+        <p className="hidden tall:block text-gray-400 text-[9px] tall:text-[10px] sm:text-xs mt-0.5 font-mono">Barrio El Trigal • Tarija, Bolivia</p>
       </div>
 
       {/* Buscador */}
