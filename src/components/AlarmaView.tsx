@@ -137,49 +137,49 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
       </div>
 
       {/* Quick Navigation Cards Grid */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <div className="grid grid-cols-4 sm:grid-cols-2 gap-1.5 sm:gap-3">
         <button
           onClick={() => onNavigate('eventos')}
-          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-green/10 text-brand-green p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition">
+          <div className="bg-brand-green/10 text-brand-green p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition shrink-0">
             <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Eventos Barrio</span>
-          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Actividades y reuniones</span>
+          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Eventos</span>
+          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Actividades y reuniones</span>
         </button>
 
         <button
           onClick={() => onNavigate('farmacias')}
-          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-yellow/10 text-brand-yellow p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-brand-yellow/20 group-hover:scale-110 transition">
+          <div className="bg-brand-yellow/10 text-brand-yellow p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-brand-yellow/20 group-hover:scale-110 transition shrink-0">
             <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Farmacias Turno</span>
-          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Farmacias abiertas hoy</span>
+          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Farmacias</span>
+          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Farmacias abiertas hoy</span>
         </button>
 
         <button
           onClick={() => onNavigate('mascotas')}
-          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-rose-500/10 text-rose-400 p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-rose-500/20 group-hover:scale-110 transition">
+          <div className="bg-rose-500/10 text-rose-400 p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-rose-500/20 group-hover:scale-110 transition shrink-0">
             <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Mascotas</span>
-          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Encuentra tu mascota</span>
+          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Mascotas</span>
+          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Encuentra a tu mascota</span>
         </button>
 
         <button
           onClick={() => onNavigate('negocios')}
-          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-green/10 text-brand-green p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition">
+          <div className="bg-brand-green/10 text-brand-green p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition shrink-0">
             <Store className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Negocios Locales</span>
-          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Guía comercial local</span>
+          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Negocios</span>
+          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Guía comercial local</span>
         </button>
       </div>
 
