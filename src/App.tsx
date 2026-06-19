@@ -188,46 +188,46 @@ export default function App() {
       </div>
 
       {/* -------------------- BOTTOM NAVIGATION BAR (MOBILE ONLY) -------------------- */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-3 flex justify-around items-center z-40">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-1.5 tall:py-3 flex justify-around items-center z-40">
         <div className="w-full max-w-md mx-auto flex justify-around items-center">
           <button
             onClick={() => setActiveTab('alarma')}
-            className={`flex flex-col items-center p-2 focus:outline-none transition cursor-pointer select-none ${
+            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
               activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
-            <Siren className="h-6 w-6 mb-1" />
-            <span className="text-[10px] font-bold tracking-tight">Alarma</span>
+            <Siren className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
+            <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Alarma</span>
           </button>
 
           <button
             onClick={() => setActiveTab('proyectos')}
-            className={`flex flex-col items-center p-2 focus:outline-none transition cursor-pointer select-none ${
+            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
               activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
-            <LayoutGrid className="h-6 w-6 mb-1" />
-            <span className="text-[10px] font-bold tracking-tight">Proyectos</span>
+            <LayoutGrid className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
+            <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Proyectos</span>
           </button>
 
           <button
             onClick={() => setActiveTab('eventos')}
-            className={`flex flex-col items-center p-2 focus:outline-none transition cursor-pointer select-none ${
+            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
               activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
-            <Calendar className="h-6 w-6 mb-1" />
-            <span className="text-[10px] font-bold tracking-tight">Eventos</span>
+            <Calendar className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
+            <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Eventos</span>
           </button>
 
           <button
             onClick={() => setActiveTab('afiliacion')}
-            className={`flex flex-col items-center p-2 focus:outline-none transition cursor-pointer select-none ${
+            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
               activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
-            <LogIn className="h-6 w-6 mb-1" />
-            <span className="text-[10px] font-bold tracking-tight">Afiliación</span>
+            <LogIn className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
+            <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Afiliación</span>
           </button>
         </div>
       </nav>
