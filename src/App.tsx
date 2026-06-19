@@ -92,9 +92,11 @@ export default function App() {
       <aside className="hidden md:flex flex-col w-72 bg-black/40 border-r border-gray-900/80 p-6 z-40 relative backdrop-blur-xl shrink-0">
         <div className="flex-1 space-y-8">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full bg-brand-yellow flex items-center justify-center font-black text-gray-950 border border-yellow-200 shadow-lg shadow-brand-yellow/20">
-              <span className="text-lg">BET</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Logo Barrio El Trigal" 
+              className="w-16 h-16 object-contain drop-shadow-md"
+            />
             <div>
               <span className="text-gray-500 text-[10px] uppercase font-mono block tracking-widest">ZONA SUR TARIJA</span>
               <h2 className="text-white text-xl font-extrabold tracking-tight">El Trigal</h2>
@@ -142,9 +144,11 @@ export default function App() {
           
           {/* Left part varies between mobile and desktop */}
           <div className="flex items-center space-x-3 md:hidden">
-            <div className="w-10 h-10 rounded-full bg-brand-yellow flex items-center justify-center p-1 font-black text-gray-950 border border-yellow-200 shadow-lg shadow-brand-yellow/20">
-              <span className="text-sm">BET</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Logo Barrio El Trigal" 
+              className="w-12 h-12 object-contain drop-shadow-md"
+            />
             <div>
               <span className="text-gray-500 text-[11px] uppercase font-mono block tracking-widest">BARRIO</span>
               <h2 className="text-white text-base font-extrabold tracking-tight">El Trigal</h2>
