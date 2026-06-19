@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Siren, LayoutGrid, Calendar, LogIn, Heart, Store, PlusSquare,
   Bell, Menu, X, Info, Activity
@@ -23,6 +23,14 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
+  const mainScrollRef = useRef<HTMLElement>(null);
+
+  // Auto-scroll al inicio al cambiar de pestaña
+  useEffect(() => {
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
   
   // Custom states for toast alerts
   const [toasts, setToasts] = useState<NotificationToast[]>([]);
@@ -174,7 +182,7 @@ export default function App() {
         </header>
 
         {/* Central scrolling panel area */}
-        <main className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8">
+        <main ref={mainScrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8">
           <div className="relative z-10 w-full max-w-5xl mx-auto">
             {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
             {activeTab === 'proyectos' && <ProyectosView />}
