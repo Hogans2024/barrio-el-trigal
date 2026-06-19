@@ -1,0 +1,6 @@
+{
+  "name": "Barrio El Trigal",
+  "description": "Aplicación comunitaria y de seguridad vecinal para el Barrio El Trigal en Tarija. Incluye alarma vecinal, proyectos, eventos locales, farmacias de turno, negocios y reportes de mascotas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
