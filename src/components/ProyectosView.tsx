@@ -19,7 +19,7 @@ export default function ProyectosView() {
   });
   const [newComment, setNewComment] = useState('');
 
-  const categories = ['Todos', 'Infraestructura', 'Servicios', 'Seguridad'];
+  const categories = ['Todos', 'Infraestructura', 'Servicios', 'Seguridad', 'Espacios'];
 
   const filteredProjects = PROJECTS_DATA.filter((project) => {
     const matchesSearch = project.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -52,14 +52,14 @@ export default function ProyectosView() {
       {/* Title & Introduction */}
       <div>
         <h2 className="text-white text-2xl font-bold tracking-tight">Proyectos del Barrio</h2>
-        <p className="text-gray-400 text-xs mt-1">
+        <p className="text-gray-300 text-[13px] mt-1.5 leading-snug max-w-[90%]">
           Conoce los proyectos realizados por la directiva y participa en los que vienen en camino.
         </p>
       </div>
 
       {/* Search Input */}
       <div className="relative">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
           <Search className="h-4 w-4 text-gray-500" />
         </span>
         <input
@@ -67,20 +67,20 @@ export default function ProyectosView() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar proyectos..."
-          className="w-full bg-[#1c1b1b] text-white pl-10 pr-4 py-2.5 rounded-lg border border-gray-800 text-sm focus:outline-none focus:border-brand-yellow transition"
+          className="w-full bg-[#0d0d0d] text-white pl-11 pr-4 py-3 rounded-full border border-gray-800/60 text-sm focus:outline-none focus:border-brand-green transition"
         />
       </div>
 
       {/* Category Chips */}
-      <div className="flex space-x-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex space-x-2.5 overflow-x-auto pb-1 scrollbar-none">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer border ${
+            className={`px-4 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-[#2ECC71] text-gray-950 border-[#2ECC71]'
-                : 'bg-transparent text-gray-400 border-gray-800 hover:text-white'
+                ? 'bg-[#00E676] text-gray-950 shadow-md shadow-green-500/20'
+                : 'bg-[#161616] text-gray-300 hover:text-white hover:bg-[#1f1f1f]'
             }`}
           >
             {cat}
@@ -88,76 +88,48 @@ export default function ProyectosView() {
         ))}
       </div>
 
-      {/* Projects List Matches Exact Images */}
+      {/* Projects List - Horizontal Card Design matching image */}
       <div className="space-y-4">
         {filteredProjects.map((proj) => (
           <div
             key={proj.id}
             onClick={() => setActiveProject(proj)}
-            className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden hover:border-brand-yellow/50 transition cursor-pointer flex flex-col group"
+            className="bg-[#121212] rounded-2xl border border-gray-800/80 overflow-hidden hover:border-brand-yellow/50 transition cursor-pointer flex h-[165px] group"
           >
-            {/* Image banner */}
-            <div className="relative h-44 w-full bg-gray-950 overflow-hidden">
+            {/* Image (Left Side) */}
+            <div className="w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
               <img
                 src={proj.imageUrl}
                 alt={proj.title}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
               />
-              <div className="absolute top-3 right-3">
-                <span className="bg-brand-green text-gray-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                  {proj.category}
-                </span>
-              </div>
-              <div className="absolute top-3 left-3">
-                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 uppercase tracking-wide backdrop-blur-md ${
-                  proj.status === 'Completado' 
-                    ? 'bg-emerald-500/20 border border-emerald-500 text-emerald-400' 
-                    : 'bg-orange-500/20 border border-orange-500 text-orange-400'
-                }`}>
-                  {proj.status === 'Completado' ? (
-                    <CheckCircle className="h-3 w-3 inline" />
-                  ) : (
-                    <Clock className="h-3 w-3 inline" />
-                  )}
-                  {proj.status}
-                </span>
-              </div>
             </div>
 
-            {/* Project Specs */}
-            <div className="p-4 flex flex-col space-y-2">
-              <h3 className="text-white text-lg font-bold tracking-tight group-hover:text-brand-yellow transition">
-                {proj.title}
-              </h3>
-              <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
-                {proj.description}
-              </p>
-
-              <div className="flex items-center space-x-2 text-brand-green font-mono text-[11px] pt-1">
-                <MapPin className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{proj.location}</span>
+            {/* Content (Right Side) */}
+            <div className="w-[62%] p-3.5 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start gap-1.5 mb-1.5">
+                  <h3 className="text-white text-[15px] font-bold leading-tight group-hover:text-brand-yellow transition line-clamp-2">
+                    {proj.title}
+                  </h3>
+                  <span className="border border-[#00E676]/30 text-[#00E676] bg-[#00E676]/5 text-[9px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wide whitespace-nowrap mt-0.5 shrink-0">
+                    {proj.category}
+                  </span>
+                </div>
+                <p className="text-gray-300 text-[11px] leading-[1.4] line-clamp-4">
+                  {proj.description}
+                </p>
               </div>
 
-              {/* Action and feedback */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-900 mt-2">
-                <div className="flex items-center space-x-3 text-xs text-gray-400">
-                  <button 
-                    onClick={(e) => handleLike(proj.id, e)} 
-                    className="flex items-center space-x-1 hover:text-brand-yellow transition cursor-pointer"
-                  >
-                    <ThumbsUp className="h-4 w-4" />
-                    <span>{likes[proj.id] || 0}</span>
-                  </button>
-                  <div className="flex items-center space-x-1">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>{comments[proj.id]?.length || 0}</span>
-                  </div>
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center space-x-1 text-[#00E676] text-[10px]">
+                  <MapPin className="h-3 w-3 shrink-0" />
+                  <span className="truncate max-w-[90px]">{proj.location}</span>
                 </div>
 
-                <span className="bg-brand-yellow text-gray-950 text-xs font-bold px-4 py-1.5 rounded-lg hover:bg-yellow-400 transition flex items-center space-x-1">
-                  <span>Ver Detalles</span>
-                  <ChevronRight className="h-3 w-3" />
+                <span className="bg-brand-yellow text-gray-950 text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition shadow-sm cursor-pointer shrink-0">
+                  Ver Detalles
                 </span>
               </div>
             </div>
@@ -165,8 +137,8 @@ export default function ProyectosView() {
         ))}
 
         {filteredProjects.length === 0 && (
-          <div className="text-center py-12 text-gray-500 text-sm">
-            No se encontraron proyectos para esta búsqueda.
+          <div className="text-center py-12 text-gray-500 text-sm bg-[#121212] rounded-2xl border border-gray-800/80">
+            No se encontraron proyectos para esta categoría.
           </div>
         )}
       </div>
@@ -233,12 +205,12 @@ export default function ProyectosView() {
 
                 <div className="space-y-2.5 max-h-36 overflow-y-auto pr-1 mb-3">
                   {comments[activeProject.id]?.map((cmt, idx) => (
-                    <div key={idx} className="bg-black/40 p-2.5 rounded-lg border border-gray-900 text-xs">
-                      <p className="text-gray-300 line-clamp-3">{cmt}</p>
-                      <div className="text-right mt-1">
-                        <span className="text-[9px] text-gray-500 font-mono">Vecino Verificado</span>
-                      </div>
-                    </div>
+                     <div key={idx} className="bg-black/40 p-2.5 rounded-lg border border-gray-900 text-xs">
+                       <p className="text-gray-300 line-clamp-3">{cmt}</p>
+                       <div className="text-right mt-1">
+                         <span className="text-[9px] text-gray-500 font-mono">Vecino Verificado</span>
+                       </div>
+                     </div>
                   ))}
                   {(!comments[activeProject.id] || comments[activeProject.id].length === 0) && (
                     <p className="text-gray-500 text-xs italic">Sé el primero en comentar este proyecto...</p>
