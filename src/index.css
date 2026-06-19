@@ -9,5 +9,8 @@
   --color-brand-red: #e74c3c;
   --color-surface-charcoal: #1a1a1a;
   --color-bg-dark: #131313;
+  /* Breakpoint personalizado para celulares pequeños vs grandes */
+  --breakpoint-xs: 480px;
 }
+
 

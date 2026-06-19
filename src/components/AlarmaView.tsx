@@ -114,15 +114,22 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
   }, []);
 
   return (
-    <div className="flex flex-col space-y-3.5 sm:space-y-6">
-      {/* Dynamic Slogan and Greeting Banner */}
-      <div className="text-left mt-0 sm:mt-2">
-        <h1 className="text-white text-xl sm:text-2xl font-bold tracking-tight">Construyamos juntos</h1>
-        <h2 className="text-brand-yellow text-xl sm:text-2xl font-bold tracking-tight">un mejor barrio.</h2>
-        <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 font-mono">Barrio El Trigal • Tarija, Bolivia</p>
+    /*
+      BREAKPOINTS:
+      - sin prefijo (default): pantallas MUY pequeñas < 480px (ej: 480x960 CSS px)
+      - xs: (≥ 480px): celulares grandes normales
+      - sm: (≥ 640px): tablets / desktop (sidebar layout)
+    */
+    <div className="flex flex-col space-y-2.5 xs:space-y-4 sm:space-y-6">
+
+      {/* Eslogan */}
+      <div className="text-left mt-0">
+        <h1 className="text-white text-lg xs:text-xl sm:text-2xl font-bold tracking-tight">Construyamos juntos</h1>
+        <h2 className="text-brand-yellow text-lg xs:text-xl sm:text-2xl font-bold tracking-tight">un mejor barrio.</h2>
+        <p className="text-gray-400 text-[9px] xs:text-[10px] sm:text-xs mt-0.5 font-mono">Barrio El Trigal • Tarija, Bolivia</p>
       </div>
 
-      {/* Search Input Custom Design */}
+      {/* Buscador */}
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <Search className="h-3.5 w-3.5 text-gray-500" />
@@ -132,59 +139,68 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar servicios, eventos, tiendas..."
-          className="w-full bg-[#1c1b1b] text-white pl-9 pr-4 py-2.5 sm:py-3 rounded-lg border border-gray-800 text-[13px] sm:text-sm focus:outline-none focus:border-brand-yellow transition"
+          className="w-full bg-[#1c1b1b] text-white pl-9 pr-4 py-2 xs:py-2.5 sm:py-3 rounded-lg border border-gray-800 text-[12px] xs:text-[13px] sm:text-sm focus:outline-none focus:border-brand-yellow transition"
         />
       </div>
 
-      {/* Quick Navigation Cards Grid */}
-      <div className="grid grid-cols-4 sm:grid-cols-2 gap-1.5 sm:gap-3">
+      {/*
+        Tarjetas de navegación:
+        - Pantallas pequeñas (<480px): 4 columnas en 1 FILA, icono pequeño, sin descripción
+        - Celulares grandes (xs: ≥480px): 2x2 columnas, con descripción
+      */}
+      <div className="grid grid-cols-4 xs:grid-cols-2 gap-1.5 xs:gap-2 sm:gap-3">
         <button
           onClick={() => onNavigate('eventos')}
-          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 xs:p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start xs:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-green/10 text-brand-green p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition shrink-0">
-            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+          <div className="bg-brand-green/10 text-brand-green p-1.5 xs:p-2 sm:p-3 rounded-full mb-1 xs:mb-1.5 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition shrink-0">
+            <Calendar className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Eventos</span>
-          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Actividades y reuniones</span>
+          <span className="text-white text-[8px] xs:text-[11px] sm:text-xs font-semibold leading-tight xs:mb-0.5 sm:mb-1">Eventos</span>
+          <span className="hidden xs:block text-gray-500 text-[9px] xs:text-[10px] line-clamp-1">Actividades y reuniones</span>
         </button>
 
         <button
           onClick={() => onNavigate('farmacias')}
-          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 xs:p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start xs:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-yellow/10 text-brand-yellow p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-brand-yellow/20 group-hover:scale-110 transition shrink-0">
-            <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+          <div className="bg-brand-yellow/10 text-brand-yellow p-1.5 xs:p-2 sm:p-3 rounded-full mb-1 xs:mb-1.5 sm:mb-2 group-hover:bg-brand-yellow/20 group-hover:scale-110 transition shrink-0">
+            <PlusCircle className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Farmacias</span>
-          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Farmacias abiertas hoy</span>
+          <span className="text-white text-[8px] xs:text-[11px] sm:text-xs font-semibold leading-tight xs:mb-0.5 sm:mb-1">Farmacias</span>
+          <span className="hidden xs:block text-gray-500 text-[9px] xs:text-[10px] line-clamp-1">Farmacias abiertas hoy</span>
         </button>
 
         <button
           onClick={() => onNavigate('mascotas')}
-          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 xs:p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start xs:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-rose-500/10 text-rose-400 p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-rose-500/20 group-hover:scale-110 transition shrink-0">
-            <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+          <div className="bg-rose-500/10 text-rose-400 p-1.5 xs:p-2 sm:p-3 rounded-full mb-1 xs:mb-1.5 sm:mb-2 group-hover:bg-rose-500/20 group-hover:scale-110 transition shrink-0">
+            <Heart className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Mascotas</span>
-          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Encuentra a tu mascota</span>
+          <span className="text-white text-[8px] xs:text-[11px] sm:text-xs font-semibold leading-tight xs:mb-0.5 sm:mb-1">Mascotas</span>
+          <span className="hidden xs:block text-gray-500 text-[9px] xs:text-[10px] line-clamp-1">Encuentra tu mascota</span>
         </button>
 
         <button
           onClick={() => onNavigate('negocios')}
-          className="bg-[#1a1a1a] p-2 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start sm:justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-2 xs:p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-start xs:justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-green/10 text-brand-green p-1.5 sm:p-3 rounded-full mb-1 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition shrink-0">
-            <Store className="h-4 w-4 sm:h-5 sm:w-5" />
+          <div className="bg-brand-green/10 text-brand-green p-1.5 xs:p-2 sm:p-3 rounded-full mb-1 xs:mb-1.5 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition shrink-0">
+            <Store className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-[9px] sm:text-xs font-semibold leading-tight line-clamp-2 sm:mb-0.5">Negocios</span>
-          <span className="hidden sm:block text-gray-500 text-[10px] line-clamp-1">Guía comercial local</span>
+          <span className="text-white text-[8px] xs:text-[11px] sm:text-xs font-semibold leading-tight xs:mb-0.5 sm:mb-1">Negocios</span>
+          <span className="hidden xs:block text-gray-500 text-[9px] xs:text-[10px] line-clamp-1">Guía comercial local</span>
         </button>
       </div>
 
-      {/* Main Interactive Alarm Circular Button Panel */}
-      <div className="bg-[#1a1a1a] rounded-2xl p-4 sm:p-6 border border-gray-800 flex flex-col items-center text-center relative overflow-hidden">
+      {/*
+        Panel de Alarma:
+        - Pantallas pequeñas (<480px): contenedor compacto p-3, círculo reducido w-36 h-36
+        - Celulares grandes (xs: ≥480px): círculo original w-48 h-48
+        - Desktop (sm:): igual que celular grande pero con más padding
+      */}
+      <div className="bg-[#1a1a1a] rounded-2xl p-3 xs:p-4 sm:p-6 border border-gray-800 flex flex-col items-center text-center relative overflow-hidden">
         {alarmActive && (
           <div className="absolute inset-0 bg-brand-yellow/5 animate-pulse pointer-events-none" />
         )}
@@ -197,63 +213,62 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
             if (!next) stopSiren();
             else if (alarmActive) playSiren();
           }}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-white transition p-1.5 focus:outline-none z-20"
+          className="absolute top-2.5 right-2.5 xs:top-3 xs:right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-white transition p-1.5 focus:outline-none z-20"
           title={audioEnabled ? "Silenciar" : "Activar Sonido"}
         >
           {audioEnabled ? <Volume2 className="h-4 w-4 text-brand-yellow" /> : <VolumeX className="h-4 w-4" />}
         </button>
 
-        {/* Outer pulsing ring for active alarm */}
-        <div className="relative flex justify-center items-center my-4 sm:my-6 scale-[0.85] sm:scale-100 origin-center">
+        {/* Círculo de alarma con anillos */}
+        <div className="relative flex justify-center items-center my-2 xs:my-4 sm:my-6">
           <div
             onClick={handleActivateAlarm}
-            className={`cursor-pointer w-48 h-48 rounded-full flex flex-col justify-center items-center p-4 text-center select-none transition-all duration-300 relative z-10 ${
+            className={`cursor-pointer w-36 h-36 xs:w-48 xs:h-48 rounded-full flex flex-col justify-center items-center p-3 xs:p-4 text-center select-none transition-all duration-300 relative z-10 ${
               alarmActive
                 ? 'bg-brand-red text-white shadow-lg shadow-red-500/40 scale-105 border-4 border-orange-400'
                 : 'bg-brand-yellow text-gray-950 shadow-lg shadow-yellow-500/20 hover:scale-[1.03] border-4 border-yellow-200'
             }`}
           >
-            <Siren className={`h-12 w-12 mb-1 sm:mb-2 ${alarmActive ? 'animate-bounce' : ''}`} />
-            <span className="font-extrabold text-sm tracking-wider uppercase leading-tight">
+            <Siren className={`h-8 w-8 xs:h-12 xs:w-12 mb-1 ${alarmActive ? 'animate-bounce' : ''}`} />
+            <span className="font-extrabold text-[10px] xs:text-sm tracking-wider uppercase leading-tight">
               {alarmActive ? 'APAGAR ALARMA' : 'ACTIVAR ALARMA'}
             </span>
-            <span className="font-bold text-lg uppercase tracking-tight mt-0.5 sm:mt-1">
+            <span className="font-bold text-sm xs:text-lg uppercase tracking-tight mt-0.5">
               VECINAL
             </span>
             {alarmActive && countdown > 0 && (
-              <span className="text-xl font-mono mt-1 animate-pulse bg-black/30 px-3 py-0.5 rounded-full text-white">
+              <span className="text-base xs:text-xl font-mono mt-1 animate-pulse bg-black/30 px-2 xs:px-3 py-0.5 rounded-full text-white">
                 {countdown}s
               </span>
             )}
           </div>
 
-          {/* Dynamic ripple rings */}
+          {/* Anillos de pulso */}
           <div
-            className={`absolute rounded-full w-56 h-56 border-2 transition-all duration-1000 ${
+            className={`absolute rounded-full w-44 h-44 xs:w-56 xs:h-56 border-2 transition-all duration-1000 ${
               alarmActive ? 'border-brand-red animate-ping opacity-75' : 'border-brand-yellow/20'
             }`}
           />
           <div
-            className={`absolute rounded-full w-64 h-64 border transition-all duration-1000 ${
+            className={`absolute rounded-full w-52 h-52 xs:w-64 xs:h-64 border transition-all duration-1000 ${
               alarmActive ? 'border-brand-red animate-pulse opacity-40' : 'border-transparent'
             }`}
           />
         </div>
 
-        {/* Emergency Call Options */}
-        <div className="w-full space-y-2 sm:space-y-3 mt-1 sm:mt-2">
+        {/* Botón de llamada y aviso legal */}
+        <div className="w-full space-y-1.5 xs:space-y-2 sm:space-y-3 mt-0.5 xs:mt-1 sm:mt-2">
           <a
             href="tel:110"
-            className="w-full bg-[#2ECC71] text-gray-950 hover:bg-[#27ae60] py-2.5 sm:py-3.5 px-4 rounded-xl font-bold flex items-center justify-center space-x-2 transition text-xs sm:text-sm cursor-pointer shadow-md shadow-emerald-500/15"
+            className="w-full bg-[#2ECC71] text-gray-950 hover:bg-[#27ae60] py-2 xs:py-2.5 sm:py-3.5 px-4 rounded-xl font-bold flex items-center justify-center space-x-2 transition text-[11px] xs:text-xs sm:text-sm cursor-pointer shadow-md shadow-emerald-500/15"
           >
-            <PhoneCall className="h-4 w-4" />
+            <PhoneCall className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
             <span>Llamar a Emergencias (110)</span>
           </a>
 
-          {/* Compliance Info box */}
-          <div className="bg-black/30 border border-gray-800 rounded-xl p-2.5 sm:p-3 flex items-start space-x-2 text-left">
-            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-brand-green shrink-0 mt-0.5" />
-            <p className="text-[10px] sm:text-[11px] text-gray-400 leading-tight sm:leading-normal">
+          <div className="bg-black/30 border border-gray-800 rounded-xl p-2 xs:p-2.5 sm:p-3 flex items-start space-x-2 text-left">
+            <CheckCircle2 className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-brand-green shrink-0 mt-0.5" />
+            <p className="text-[9px] xs:text-[10px] sm:text-[11px] text-gray-400 leading-tight sm:leading-normal">
               La alarma se enviará a todos los vecinos registrados y emitirá una alerta visual instantánea en la central de seguridad.
             </p>
           </div>
@@ -262,4 +277,3 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
     </div>
   );
 }
-
