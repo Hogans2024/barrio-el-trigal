@@ -94,10 +94,10 @@ export default function ProyectosView() {
           <div
             key={proj.id}
             onClick={() => setActiveProject(proj)}
-            className="bg-[#121212] rounded-2xl border border-gray-800/80 overflow-hidden hover:border-brand-yellow/50 transition cursor-pointer flex h-[165px] group"
+            className="bg-[#121212] rounded-2xl border border-gray-800/80 overflow-hidden hover:border-brand-yellow/50 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
           >
             {/* Image (Left Side) */}
-            <div className="w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
+            <div className="w-[45%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
               <img
                 src={proj.imageUrl}
                 alt={proj.title}
@@ -107,28 +107,30 @@ export default function ProyectosView() {
             </div>
 
             {/* Content (Right Side) */}
-            <div className="w-[62%] p-3.5 flex flex-col justify-between">
+            <div className="w-[55%] tall:w-[62%] p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start gap-1.5 mb-1.5">
-                  <h3 className="text-white text-[15px] font-bold leading-tight group-hover:text-brand-yellow transition line-clamp-2">
+                  <h3 className="text-white text-[14px] tall:text-[15px] font-bold leading-tight group-hover:text-brand-yellow transition line-clamp-2">
                     {proj.title}
                   </h3>
-                  <span className="border border-[#00E676]/30 text-[#00E676] bg-[#00E676]/5 text-[9px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wide whitespace-nowrap mt-0.5 shrink-0">
+                  <span className="hidden tall:inline-block border border-[#00E676]/30 text-[#00E676] bg-[#00E676]/5 text-[9px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wide whitespace-nowrap mt-0.5 shrink-0">
                     {proj.category}
                   </span>
                 </div>
-                <p className="text-gray-300 text-[11px] leading-[1.4] line-clamp-4">
+                <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">
                   {proj.description}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center space-x-1 text-[#00E676] text-[10px]">
+              <div className="flex items-center justify-center tall:justify-between mt-2 w-full">
+                {/* Oculto en celulares pequeños, visible en tall (celulares grandes) */}
+                <div className="hidden tall:flex items-center space-x-1 text-[#00E676] text-[10px]">
                   <MapPin className="h-3 w-3 shrink-0" />
                   <span className="truncate max-w-[90px]">{proj.location}</span>
                 </div>
 
-                <span className="bg-brand-yellow text-gray-950 text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition shadow-sm cursor-pointer shrink-0">
+                {/* Botón centrado ocupando todo el ancho en pequeños, tamaño normal alineado a la derecha en grandes */}
+                <span className="bg-brand-yellow text-gray-950 text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition shadow-sm cursor-pointer shrink-0 w-full tall:w-auto text-center">
                   Ver Detalles
                 </span>
               </div>
