@@ -97,7 +97,7 @@ export default function ProyectosView() {
             className="bg-[#121212] rounded-2xl border border-gray-800/80 overflow-hidden hover:border-brand-yellow/50 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
           >
             {/* Image (Left Side) */}
-            <div className="w-[50%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
+            <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
               <img
                 src={proj.imageUrl}
                 alt={proj.title}
@@ -107,7 +107,7 @@ export default function ProyectosView() {
             </div>
 
             {/* Content (Right Side) */}
-            <div className="w-[50%] tall:w-[62%] p-2.5 tall:p-3.5 flex flex-col justify-between">
+            <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start gap-1.5 mb-1.5">
                   <h3 className="text-white text-[14px] tall:text-[15px] font-bold leading-tight group-hover:text-brand-yellow transition line-clamp-2">
@@ -129,8 +129,8 @@ export default function ProyectosView() {
                   <span className="truncate max-w-[90px]">{proj.location}</span>
                 </div>
 
-                {/* Botón centrado pero sin abarcar todo el ancho en pequeños, tamaño normal alineado a la derecha en grandes */}
-                <span className="bg-brand-yellow text-gray-950 text-[10px] tall:text-[11px] font-bold px-4 py-1.5 rounded-lg hover:bg-yellow-400 transition shadow-sm cursor-pointer shrink-0 text-center">
+                {/* Botón centrado pero con padding muy reducido (5px) en pequeños, tamaño normal alineado a la derecha en grandes */}
+                <span className="bg-brand-yellow text-gray-950 text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-yellow-400 transition shadow-sm cursor-pointer shrink-0 text-center inline-block">
                   Ver Detalles
                 </span>
               </div>
