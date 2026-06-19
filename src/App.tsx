@@ -93,7 +93,7 @@ export default function App() {
         <div className="flex-1 space-y-8">
           <div className="flex items-center space-x-3">
             <img 
-              src="/logo.png" 
+              src={`${import.meta.env.BASE_URL}logo.png`} 
               alt="Logo Barrio El Trigal" 
               className="w-16 h-16 object-contain drop-shadow-md"
             />
@@ -145,7 +145,7 @@ export default function App() {
           {/* Left part varies between mobile and desktop */}
           <div className="flex items-center space-x-3 md:hidden">
             <img 
-              src="/logo.png" 
+              src={`${import.meta.env.BASE_URL}logo.png`} 
               alt="Logo Barrio El Trigal" 
               className="w-12 h-12 object-contain drop-shadow-md"
             />
