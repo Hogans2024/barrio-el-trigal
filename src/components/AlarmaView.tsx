@@ -114,77 +114,77 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
   }, []);
 
   return (
-    <div className="flex flex-col space-y-6">
+    <div className="flex flex-col space-y-3.5 sm:space-y-6">
       {/* Dynamic Slogan and Greeting Banner */}
-      <div className="text-left mt-2">
-        <h1 className="text-white text-2xl font-bold tracking-tight">Construyamos juntos</h1>
-        <h2 className="text-brand-yellow text-2xl font-bold tracking-tight">un mejor barrio.</h2>
-        <p className="text-gray-400 text-xs mt-1 font-mono">Barrio El Trigal • Tarija, Bolivia</p>
+      <div className="text-left mt-0 sm:mt-2">
+        <h1 className="text-white text-xl sm:text-2xl font-bold tracking-tight">Construyamos juntos</h1>
+        <h2 className="text-brand-yellow text-xl sm:text-2xl font-bold tracking-tight">un mejor barrio.</h2>
+        <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 font-mono">Barrio El Trigal • Tarija, Bolivia</p>
       </div>
 
       {/* Search Input Custom Design */}
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Search className="h-4 w-4 text-gray-500" />
+          <Search className="h-3.5 w-3.5 text-gray-500" />
         </span>
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar servicios, eventos, tiendas..."
-          className="w-full bg-[#1c1b1b] text-white pl-10 pr-4 py-3 rounded-lg border border-gray-800 text-sm focus:outline-none focus:border-brand-yellow transition"
+          className="w-full bg-[#1c1b1b] text-white pl-9 pr-4 py-2.5 sm:py-3 rounded-lg border border-gray-800 text-[13px] sm:text-sm focus:outline-none focus:border-brand-yellow transition"
         />
       </div>
 
       {/* Quick Navigation Cards Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <button
           onClick={() => onNavigate('eventos')}
-          className="bg-[#1a1a1a] p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-green/10 text-brand-green p-3 rounded-full mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition">
-            <Calendar className="h-5 w-5" />
+          <div className="bg-brand-green/10 text-brand-green p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-xs font-semibold mb-1">Eventos Barrio</span>
-          <span className="text-gray-500 text-[10px] line-clamp-1">Actividades y reuniones</span>
+          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Eventos Barrio</span>
+          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Actividades y reuniones</span>
         </button>
 
         <button
           onClick={() => onNavigate('farmacias')}
-          className="bg-[#1a1a1a] p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-yellow/10 text-brand-yellow p-3 rounded-full mb-2 group-hover:bg-brand-yellow/20 group-hover:scale-110 transition">
-            <PlusCircle className="h-5 w-5" />
+          <div className="bg-brand-yellow/10 text-brand-yellow p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-brand-yellow/20 group-hover:scale-110 transition">
+            <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-xs font-semibold mb-1">Farmacias de Turno</span>
-          <span className="text-gray-500 text-[10px] line-clamp-1">Farmacias abiertas hoy</span>
+          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Farmacias Turno</span>
+          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Farmacias abiertas hoy</span>
         </button>
 
         <button
           onClick={() => onNavigate('mascotas')}
-          className="bg-[#1a1a1a] p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-rose-500/10 text-rose-400 p-3 rounded-full mb-2 group-hover:bg-rose-500/20 group-hover:scale-110 transition">
-            <Heart className="h-5 w-5" />
+          <div className="bg-rose-500/10 text-rose-400 p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-rose-500/20 group-hover:scale-110 transition">
+            <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-xs font-semibold mb-1">Animales Perdidos</span>
-          <span className="text-gray-500 text-[10px] line-clamp-1">Encuentra a tu mascota</span>
+          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Mascotas</span>
+          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Encuentra tu mascota</span>
         </button>
 
         <button
           onClick={() => onNavigate('negocios')}
-          className="bg-[#1a1a1a] p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
+          className="bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-gray-800 hover:border-brand-yellow hover:scale-[1.02] flex flex-col items-center justify-center text-center transition group cursor-pointer"
         >
-          <div className="bg-brand-green/10 text-brand-green p-3 rounded-full mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition">
-            <Store className="h-5 w-5" />
+          <div className="bg-brand-green/10 text-brand-green p-2 sm:p-3 rounded-full mb-1.5 sm:mb-2 group-hover:bg-brand-green/20 group-hover:scale-110 transition">
+            <Store className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <span className="text-white text-xs font-semibold mb-1">Negocios y Emprendedores</span>
-          <span className="text-gray-500 text-[10px] line-clamp-1">Guía comercial local</span>
+          <span className="text-white text-[11px] sm:text-xs font-semibold mb-0.5 sm:mb-1">Negocios Locales</span>
+          <span className="text-gray-500 text-[9px] sm:text-[10px] line-clamp-1">Guía comercial local</span>
         </button>
       </div>
 
       {/* Main Interactive Alarm Circular Button Panel */}
-      <div className="bg-[#1a1a1a] rounded-2xl p-6 border border-gray-800 flex flex-col items-center text-center relative overflow-hidden">
+      <div className="bg-[#1a1a1a] rounded-2xl p-4 sm:p-6 border border-gray-800 flex flex-col items-center text-center relative overflow-hidden">
         {alarmActive && (
           <div className="absolute inset-0 bg-brand-yellow/5 animate-pulse pointer-events-none" />
         )}
@@ -197,14 +197,14 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
             if (!next) stopSiren();
             else if (alarmActive) playSiren();
           }}
-          className="absolute top-4 right-4 text-gray-500 hover:text-white transition p-1.5 focus:outline-none"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-white transition p-1.5 focus:outline-none z-20"
           title={audioEnabled ? "Silenciar" : "Activar Sonido"}
         >
           {audioEnabled ? <Volume2 className="h-4 w-4 text-brand-yellow" /> : <VolumeX className="h-4 w-4" />}
         </button>
 
         {/* Outer pulsing ring for active alarm */}
-        <div className="relative flex justify-center items-center my-6">
+        <div className="relative flex justify-center items-center my-4 sm:my-6 scale-[0.85] sm:scale-100 origin-center">
           <div
             onClick={handleActivateAlarm}
             className={`cursor-pointer w-48 h-48 rounded-full flex flex-col justify-center items-center p-4 text-center select-none transition-all duration-300 relative z-10 ${
@@ -213,11 +213,11 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
                 : 'bg-brand-yellow text-gray-950 shadow-lg shadow-yellow-500/20 hover:scale-[1.03] border-4 border-yellow-200'
             }`}
           >
-            <Siren className={`h-12 w-12 mb-2 ${alarmActive ? 'animate-bounce' : ''}`} />
+            <Siren className={`h-12 w-12 mb-1 sm:mb-2 ${alarmActive ? 'animate-bounce' : ''}`} />
             <span className="font-extrabold text-sm tracking-wider uppercase leading-tight">
               {alarmActive ? 'APAGAR ALARMA' : 'ACTIVAR ALARMA'}
             </span>
-            <span className="font-bold text-lg uppercase tracking-tight mt-1">
+            <span className="font-bold text-lg uppercase tracking-tight mt-0.5 sm:mt-1">
               VECINAL
             </span>
             {alarmActive && countdown > 0 && (
@@ -241,20 +241,20 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
         </div>
 
         {/* Emergency Call Options */}
-        <div className="w-full space-y-3 mt-2">
+        <div className="w-full space-y-2 sm:space-y-3 mt-1 sm:mt-2">
           <a
             href="tel:110"
-            className="w-full bg-[#2ECC71] text-gray-950 hover:bg-[#27ae60] py-3.5 px-4 rounded-xl font-bold flex items-center justify-center space-x-2 transition text-sm cursor-pointer shadow-md shadow-emerald-500/15"
+            className="w-full bg-[#2ECC71] text-gray-950 hover:bg-[#27ae60] py-2.5 sm:py-3.5 px-4 rounded-xl font-bold flex items-center justify-center space-x-2 transition text-xs sm:text-sm cursor-pointer shadow-md shadow-emerald-500/15"
           >
             <PhoneCall className="h-4 w-4" />
-            <span>Llamar para activar Alarma Vecinal (110)</span>
+            <span>Llamar a Emergencias (110)</span>
           </a>
 
           {/* Compliance Info box */}
-          <div className="bg-black/30 border border-gray-800 rounded-xl p-3 flex items-start space-x-2.5 text-left">
-            <CheckCircle2 className="h-5 w-5 text-brand-green shrink-0 mt-0.5" />
-            <p className="text-[11px] text-gray-400 leading-normal">
-              La alarma se enviará a todos los vecinos registrados, la directiva del barrio El Trigal y emitirá una alerta visual instantánea en la central de seguridad coordinada.
+          <div className="bg-black/30 border border-gray-800 rounded-xl p-2.5 sm:p-3 flex items-start space-x-2 text-left">
+            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-brand-green shrink-0 mt-0.5" />
+            <p className="text-[10px] sm:text-[11px] text-gray-400 leading-tight sm:leading-normal">
+              La alarma se enviará a todos los vecinos registrados y emitirá una alerta visual instantánea en la central de seguridad.
             </p>
           </div>
         </div>
@@ -262,3 +262,4 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
     </div>
   );
 }
+
