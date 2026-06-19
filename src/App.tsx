@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Siren, LayoutGrid, Calendar, LogIn, Heart, Store,
-  Bell, Menu, X, Info
+  Siren, LayoutGrid, Calendar, LogIn, Heart, Store, PlusSquare,
+  Bell, Menu, X, Info, Activity
 } from 'lucide-react';
 
 // Sub-views
@@ -60,63 +60,135 @@ export default function App() {
     }, 6000);
   };
 
+  const currentTabTitle = () => {
+    switch (activeTab) {
+      case 'alarma': return 'Central de Alarmas';
+      case 'proyectos': return 'Proyectos del Barrio';
+      case 'eventos': return 'Eventos y Limpiezas';
+      case 'farmacias': return 'Farmacias de Turno';
+      case 'negocios': return 'Negocios Locales';
+      case 'mascotas': return 'Mascotas Perdidas';
+      case 'afiliacion': return 'Registro de Afiliados';
+      default: return 'Barrio El Trigal';
+    }
+  };
+
   return (
-    <div className="h-[100dvh] bg-[#070707] text-white flex flex-col antialiased selection:bg-brand-yellow selection:text-black overflow-hidden relative">
+    <div className="h-[100dvh] bg-[#070707] text-white flex flex-col md:flex-row antialiased selection:bg-brand-yellow selection:text-black overflow-hidden relative">
       
       {/* Ambient colored background lights for aesthetic pairs */}
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-yellow/5 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#2ECC71]/5 rounded-full blur-[150px] pointer-events-none" />
 
-      {/* App Status Header */}
-      <header className="bg-[#111] border-b border-gray-900/60 px-5 py-4 flex justify-between items-center shrink-0 z-40 relative">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-brand-yellow flex items-center justify-center p-1 font-black text-gray-950 border border-yellow-200 shadow-lg shadow-brand-yellow/20">
-            <span className="text-sm">BET</span>
+      {/* -------------------- SIDEBAR (DESKTOP ONLY) -------------------- */}
+      <aside className="hidden md:flex flex-col w-72 bg-black/40 border-r border-gray-900/80 p-6 z-40 relative backdrop-blur-xl shrink-0">
+        <div className="flex-1 space-y-8">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 rounded-full bg-brand-yellow flex items-center justify-center font-black text-gray-950 border border-yellow-200 shadow-lg shadow-brand-yellow/20">
+              <span className="text-lg">BET</span>
+            </div>
+            <div>
+              <span className="text-gray-500 text-[10px] uppercase font-mono block tracking-widest">ZONA SUR TARIJA</span>
+              <h2 className="text-white text-xl font-extrabold tracking-tight">El Trigal</h2>
+            </div>
           </div>
-          <div>
-            <span className="text-gray-500 text-[11px] uppercase font-mono block tracking-widest">BARRIO</span>
-            <h2 className="text-white text-base font-extrabold tracking-tight">El Trigal</h2>
+
+          <nav className="space-y-2 text-sm font-semibold">
+            {[
+              { id: 'alarma', icon: Siren, label: 'Central Alarma Vecinal' },
+              { id: 'proyectos', icon: LayoutGrid, label: 'Proyectos del Barrio' },
+              { id: 'eventos', icon: Calendar, label: 'Eventos Programados' },
+              { id: 'farmacias', icon: PlusSquare, label: 'Farmacias de Turno' },
+              { id: 'negocios', icon: Store, label: 'Negocios Locales' },
+              { id: 'mascotas', icon: Heart, label: 'Mascotas Perdidas' },
+              { id: 'afiliacion', icon: LogIn, label: 'Registro Afiliados' }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition cursor-pointer ${
+                  activeTab === item.id 
+                    ? 'bg-brand-yellow text-gray-950 font-bold shadow-md' 
+                    : 'text-gray-400 hover:bg-[#1a1a1a] hover:text-white'
+                }`}
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Developer footer */}
+        <div className="bg-black/40 border border-gray-900 rounded-2xl p-4 text-[11px] text-gray-500 font-mono tracking-wide leading-relaxed mt-6">
+          <span className="text-white font-semibold block">Tarija Unida • 2026</span>
+          <p className="mt-1">Control de vecindad certificado bajo padrón nacional.</p>
+        </div>
+      </aside>
+
+      {/* -------------------- MAIN CONTENT AREA -------------------- */}
+      <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
+        
+        {/* APP STATUS HEADER (Mobile & Desktop) */}
+        <header className="bg-black/30 border-b border-gray-900/60 px-5 py-4 flex justify-between items-center shrink-0 backdrop-blur-md">
+          
+          {/* Left part varies between mobile and desktop */}
+          <div className="flex items-center space-x-3 md:hidden">
+            <div className="w-10 h-10 rounded-full bg-brand-yellow flex items-center justify-center p-1 font-black text-gray-950 border border-yellow-200 shadow-lg shadow-brand-yellow/20">
+              <span className="text-sm">BET</span>
+            </div>
+            <div>
+              <span className="text-gray-500 text-[11px] uppercase font-mono block tracking-widest">BARRIO</span>
+              <h2 className="text-white text-base font-extrabold tracking-tight">El Trigal</h2>
+            </div>
           </div>
-        </div>
 
-        {/* Right controls */}
-        <div className="flex items-center space-x-3">
-          {/* Notifications bell */}
-          <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="relative p-2.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
-              2
-            </span>
-          </button>
+          <div className="hidden md:flex items-center space-x-2">
+            <Activity className="h-5 w-5 text-brand-green animate-pulse" />
+            <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
+            <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
+          </div>
 
-          {/* Hamburger menu */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600"
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </header>
+          {/* Right controls */}
+          <div className="flex items-center space-x-3">
+            {/* Notifications bell */}
+            <button
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="relative p-2.5 md:px-4 md:py-2 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 flex items-center gap-2"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
+              <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
+                2
+              </span>
+            </button>
 
-      {/* Central scrolling panel area */}
-      <main className="flex-1 overflow-y-auto px-4 py-6 scrollbar-none relative z-10 w-full max-w-4xl mx-auto pb-28">
-        <div className="relative z-10 w-full">
-          {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
-          {activeTab === 'proyectos' && <ProyectosView />}
-          {activeTab === 'eventos' && <EventosView onShowNotification={addToast} />}
-          {activeTab === 'farmacias' && <FarmaciasView onShowNotification={addToast} />}
-          {activeTab === 'negocios' && <NegociosView onShowNotification={addToast} />}
-          {activeTab === 'mascotas' && <MascotasView onShowNotification={addToast} />}
-          {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
-        </div>
-      </main>
+            {/* Hamburger menu (Mobile Only) */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden p-2.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </header>
 
-      {/* Bottom Sticky Tab Navigation Bar */}
-      <nav className="fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-3 flex justify-around items-center z-40">
+        {/* Central scrolling panel area */}
+        <main className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8">
+          <div className="relative z-10 w-full max-w-5xl mx-auto">
+            {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
+            {activeTab === 'proyectos' && <ProyectosView />}
+            {activeTab === 'eventos' && <EventosView onShowNotification={addToast} />}
+            {activeTab === 'farmacias' && <FarmaciasView onShowNotification={addToast} />}
+            {activeTab === 'negocios' && <NegociosView onShowNotification={addToast} />}
+            {activeTab === 'mascotas' && <MascotasView onShowNotification={addToast} />}
+            {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
+          </div>
+        </main>
+      </div>
+
+      {/* -------------------- BOTTOM NAVIGATION BAR (MOBILE ONLY) -------------------- */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-3 flex justify-around items-center z-40">
         <div className="w-full max-w-md mx-auto flex justify-around items-center">
           <button
             onClick={() => setActiveTab('alarma')}
@@ -204,9 +276,9 @@ export default function App() {
         </div>
       )}
 
-      {/* 4. HAMBURGER MENU DRAWER OVERLAY */}
+      {/* 4. HAMBURGER MENU DRAWER OVERLAY (MOBILE ONLY) */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-start">
+        <div className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-start">
           <div className="bg-[#121212] border-r border-gray-800 w-full max-w-xs p-6 overflow-y-auto space-y-6 animate-in slide-in-from-left duration-200">
             <div className="flex justify-between items-center pb-3 border-b border-gray-900">
               <h3 className="text-brand-yellow font-extrabold text-sm tracking-widest uppercase">BARRIO EL TRIGAL</h3>
@@ -274,7 +346,7 @@ export default function App() {
       )}
 
       {/* 5. TOAST NOTIFICATION CONTAINER */}
-      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 max-w-xs w-full font-sans select-none pointer-events-none">
+      <div className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 flex flex-col gap-3 max-w-xs md:max-w-sm w-full font-sans select-none pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -285,7 +357,7 @@ export default function App() {
             </div>
             <div>
               <p className="font-extrabold text-xs text-brand-yellow uppercase tracking-wider">{t.title}</p>
-              <p className="text-xs text-gray-300 mt-1 leading-relaxed">{t.message}</p>
+              <p className="text-xs md:text-sm text-gray-300 mt-1 leading-relaxed">{t.message}</p>
             </div>
           </div>
         ))}
