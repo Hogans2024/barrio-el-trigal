@@ -12,6 +12,7 @@ import FarmaciasView from './components/FarmaciasView';
 import NegociosView from './components/NegociosView';
 import MascotasView from './components/MascotasView';
 import AfiliacionView from './components/AfiliacionView';
+import { useSheetData } from './hooks/useSheetData';
 
 interface NotificationToast {
   id: string;
@@ -20,6 +21,7 @@ interface NotificationToast {
 }
 
 export default function App() {
+  const { proyectos, eventos, farmacias, negocios, mascotas, loading } = useSheetData();
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
@@ -189,11 +191,11 @@ export default function App() {
         <main ref={mainScrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8">
           <div className="relative z-10 w-full max-w-5xl mx-auto">
             {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
-            {activeTab === 'proyectos' && <ProyectosView />}
-            {activeTab === 'eventos' && <EventosView onShowNotification={addToast} />}
-            {activeTab === 'farmacias' && <FarmaciasView onShowNotification={addToast} />}
-            {activeTab === 'negocios' && <NegociosView onShowNotification={addToast} />}
-            {activeTab === 'mascotas' && <MascotasView onShowNotification={addToast} />}
+            {activeTab === 'proyectos' && <ProyectosView projects={proyectos} />}
+            {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} />}
+            {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} />}
+            {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} />}
+            {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} />}
             {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
           </div>
         </main>
@@ -202,49 +204,26 @@ export default function App() {
       {/* -------------------- BOTTOM NAVIGATION BAR (MOBILE ONLY) -------------------- */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-1.5 tall:py-3 flex justify-around items-center z-40">
         <div className="w-full max-w-md mx-auto flex justify-around items-center">
-          <button
-            onClick={() => setActiveTab('alarma')}
-            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
-              activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
-            }`}
-          >
+          <button onClick={() => setActiveTab('alarma')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
             <Siren className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Alarma</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab('proyectos')}
-            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
-              activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
-            }`}
-          >
+          <button onClick={() => setActiveTab('proyectos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
             <LayoutGrid className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Proyectos</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab('eventos')}
-            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
-              activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
-            }`}
-          >
+          <button onClick={() => setActiveTab('eventos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
             <Calendar className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Eventos</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab('afiliacion')}
-            className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${
-              activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'
-            }`}
-          >
+          <button onClick={() => setActiveTab('afiliacion')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
             <LogIn className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Afiliación</span>
           </button>
         </div>
       </nav>
 
-      {/* 3. NOTIFICATION DRAWER / OVERLAY PANEL */}
+      {/* 3. NOTIFICATION DRAWER */}
       {notificationsOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-end">
           <div className="bg-[#121212] border-l border-gray-800 w-full max-w-sm p-6 overflow-y-auto space-y-6 animate-in slide-in-from-right duration-200">
@@ -253,20 +232,13 @@ export default function App() {
                 <Bell className="h-5 w-5 text-brand-yellow" />
                 <span>Mensajes Colectivos</span>
               </h3>
-              <button
-                onClick={() => setNotificationsOpen(false)}
-                className="bg-black/50 hover:bg-black/80 text-gray-400 hover:text-white rounded-full p-2 border border-gray-800 transition focus:outline-none cursor-pointer"
-              >
+              <button onClick={() => setNotificationsOpen(false)} className="bg-black/50 hover:bg-black/80 text-gray-400 hover:text-white rounded-full p-2 border border-gray-800 transition focus:outline-none cursor-pointer">
                 <X className="h-5 w-5" />
               </button>
             </div>
-
             <div className="space-y-4">
               {mockAlerts.map((alt) => (
-                <div
-                  key={alt.id}
-                  className="bg-[#181818] border border-gray-800/80 rounded-xl p-4 space-y-2 hover:border-gray-700 transition shadow-lg"
-                >
+                <div key={alt.id} className="bg-[#181818] border border-gray-800/80 rounded-xl p-4 space-y-2 hover:border-gray-700 transition shadow-lg">
                   <div className="flex justify-between items-start">
                     <span className="text-white font-bold text-sm">{alt.title}</span>
                     <span className="text-[10px] font-mono text-gray-500 shrink-0">{alt.time}</span>
@@ -275,7 +247,6 @@ export default function App() {
                 </div>
               ))}
             </div>
-
             <div className="bg-brand-yellow/5 border border-brand-yellow/15 p-5 rounded-xl space-y-3 mt-8">
               <span className="text-brand-yellow text-sm font-bold leading-normal block">🚨 Canales de Emergencia</span>
               <ul className="text-xs text-gray-400 space-y-2 list-disc pl-4 leading-normal">
@@ -288,66 +259,21 @@ export default function App() {
         </div>
       )}
 
-      {/* 4. HAMBURGER MENU DRAWER OVERLAY (MOBILE ONLY) */}
+      {/* 4. HAMBURGER MENU DRAWER (MOBILE ONLY) */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-start">
           <div className="bg-[#121212] border-r border-gray-800 w-full max-w-xs p-6 overflow-y-auto space-y-6 animate-in slide-in-from-left duration-200">
             <div className="flex justify-between items-center pb-3 border-b border-gray-900">
               <h3 className="text-brand-yellow font-extrabold text-sm tracking-widest uppercase">BARRIO EL TRIGAL</h3>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="bg-black/50 hover:bg-black/80 text-gray-400 hover:text-white rounded-full p-2 border border-gray-800 transition focus:outline-none cursor-pointer"
-              >
+              <button onClick={() => setMenuOpen(false)} className="bg-black/50 hover:bg-black/80 text-gray-400 hover:text-white rounded-full p-2 border border-gray-800 transition focus:outline-none cursor-pointer">
                 <X className="h-5 w-5" />
               </button>
             </div>
-
-            {/* Secondary navigation for mobile drawers */}
             <div className="space-y-2 text-sm font-semibold">
-              <button
-                onClick={() => { setActiveTab('alarma'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                🚨 Central Alarma Vecinal
-              </button>
-              <button
-                onClick={() => { setActiveTab('proyectos'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                🧱 Proyectos del Barrio
-              </button>
-              <button
-                onClick={() => { setActiveTab('eventos'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                📆 Eventos programados
-              </button>
-              <button
-                onClick={() => { setActiveTab('farmacias'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                💊 Farmacias de Turno
-              </button>
-              <button
-                onClick={() => { setActiveTab('negocios'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                🍔 Negocios Locales
-              </button>
-              <button
-                onClick={() => { setActiveTab('mascotas'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                🐾 Mascotas Perdidas
-              </button>
-              <button
-                onClick={() => { setActiveTab('afiliacion'); setMenuOpen(false); }}
-                className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer"
-              >
-                📝 Registro de Afiliados
-              </button>
+              {[['alarma','🚨 Central Alarma Vecinal'],['proyectos','🧱 Proyectos del Barrio'],['eventos','📆 Eventos programados'],['farmacias','💊 Farmacias de Turno'],['negocios','🍔 Negocios Locales'],['mascotas','🐾 Mascotas Perdidas'],['afiliacion','📝 Registro de Afiliados']].map(([id,label]) => (
+                <button key={id} onClick={() => { setActiveTab(id); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">{label}</button>
+              ))}
             </div>
-
             <div className="bg-black/40 border border-gray-900 rounded-2xl p-5 space-y-2 text-xs text-gray-500 font-mono mt-8">
               <span className="text-white font-bold block">Contacto Directiva</span>
               <p>Presidente: Don Omar Castro</p>
@@ -360,10 +286,7 @@ export default function App() {
       {/* 5. TOAST NOTIFICATION CONTAINER */}
       <div className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 flex flex-col gap-3 max-w-xs md:max-w-sm w-full font-sans select-none pointer-events-none">
         {toasts.map((t) => (
-          <div
-            key={t.id}
-            className="pointer-events-auto bg-[#1a1a1a] border border-brand-yellow/30 text-white rounded-2xl p-4 shadow-2xl flex items-start space-x-3 animate-in slide-in-from-bottom-4 fade-in duration-300"
-          >
+          <div key={t.id} className="pointer-events-auto bg-[#1a1a1a] border border-brand-yellow/30 text-white rounded-2xl p-4 shadow-2xl flex items-start space-x-3 animate-in slide-in-from-bottom-4 fade-in duration-300">
             <div className="bg-brand-yellow/10 text-brand-yellow p-2 rounded-full shrink-0">
               <Info className="h-5 w-5" />
             </div>
