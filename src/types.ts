@@ -81,7 +81,8 @@ export interface AffiliateForm {
   numeroCasa: string;
   manzano: string;
   tiempoResidencia: string;
-  zonaReferencia: string;
+  zona: string;
+  referencia: string;
   // Participación Vecinal
   participaReuniones: boolean;
   deseaComisiones: boolean;

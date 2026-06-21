@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  User, Calendar, FileText, Smartphone, Mail, Settings, MapPin, Home,
-  Clock, CheckSquare, Shield, Send, Users, Sparkles, Trash2, CheckCircle2, Award
+  User, Calendar, FileText, Smartphone, Mail, MapPin, Home,
+  Clock, Users, Send, Award, LogOut
 } from 'lucide-react';
 import { AffiliateForm } from '../types';
 
@@ -9,7 +9,33 @@ interface AfiliacionViewProps {
   onShowNotification: (title: string, message: string) => void;
 }
 
+const CLIENT_ID = "778103287737-no8f38pn830lrrqodr5qdlrfulmqk4iq.apps.googleusercontent.com";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWMU9bKHzy5SQoUP5p5rxSsH2KCx4ujVZ2Beh-M_LyY3UN1pYOFt8xKVHjOxsxz0mG/exec";
+
+function decodificarJWT(token: string) {
+  try {
+    const partes = token.split(".");
+    if (partes.length !== 3) return null;
+    const base64Url = partes[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Error al decodificar el token JWT:", e);
+    return null;
+  }
+}
+
 export default function AfiliacionView({ onShowNotification }: AfiliacionViewProps) {
+  const [tokenUsuario, setTokenUsuario] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<{name: string, email: string} | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [form, setForm] = useState<Partial<AffiliateForm>>({
     fechaRegistro: new Date().toISOString().split('T')[0],
     nombres: '',
@@ -30,26 +56,61 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
     direccion: '',
     numeroCasa: '',
     manzano: '',
+    zona: '',
+    referencia: '',
     tiempoResidencia: '',
-    zonaReferencia: '',
     participaReuniones: true,
     deseaComisiones: false,
     interesSeguridad: 'Medio',
     observaciones: ''
   });
 
-  const [registeredList, setRegisteredList] = useState<AffiliateForm[]>([]);
   const [lastRegistered, setLastRegistered] = useState<AffiliateForm | null>(null);
-  const [showListView, setShowListView] = useState(false);
 
   useEffect(() => {
-    const list = localStorage.getItem('barrio_afiliados');
-    if (list) {
-      try {
-        setRegisteredList(JSON.parse(list));
-      } catch (e) {}
+    // Configurar callback global para Google Auth
+    (window as any).manejarRespuestaGoogle = (response: any) => {
+      const token = response.credential;
+      setTokenUsuario(token);
+      const payload = decodificarJWT(token);
+      if (payload) {
+        setUserProfile({ name: payload.name || "Usuario", email: payload.email || "" });
+      } else {
+        onShowNotification('⚠️ Error de Sesión', 'No se pudo leer la información del usuario.');
+        setTokenUsuario(null);
+      }
+    };
+
+    if (!tokenUsuario) {
+      if ((window as any).google && (window as any).google.accounts) {
+        (window as any).google.accounts.id.initialize({
+          client_id: CLIENT_ID,
+          callback: (window as any).manejarRespuestaGoogle,
+          auto_select: false
+        });
+
+        const btnContainer = document.getElementById("g_id_signin");
+        if (btnContainer) {
+          (window as any).google.accounts.id.renderButton(btnContainer, {
+            theme: "outline",
+            size: "large",
+            text: "signin_with",
+            shape: "rectangular",
+            width: 280
+          });
+        }
+      }
     }
-  }, []);
+  }, [tokenUsuario, onShowNotification]);
+
+  const handleLogout = () => {
+    setTokenUsuario(null);
+    setUserProfile(null);
+    if ((window as any).google && (window as any).google.accounts && (window as any).google.accounts.id) {
+      (window as any).google.accounts.id.disableAutoSelect();
+    }
+    setLastRegistered(null);
+  };
 
   const handleChange = (field: keyof AffiliateForm, value: any) => {
     setForm(prev => ({
@@ -58,65 +119,111 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!tokenUsuario) {
+      onShowNotification('⚠️ Acceso Denegado', 'Por favor, inicie sesión con Google antes de enviar.');
+      return;
+    }
+
     if (!form.nombres || !form.apellidos || !form.ci) {
       onShowNotification('⚠️ Error de Validación', 'Los campos Nombres, Apellidos y C.I. son obligatorios.');
       return;
     }
 
-    const newFormRecord = form as AffiliateForm;
-    const updatedList = [newFormRecord, ...registeredList];
-    setRegisteredList(updatedList);
-    localStorage.setItem('barrio_afiliados', JSON.stringify(updatedList));
+    setIsSubmitting(true);
 
-    setLastRegistered(newFormRecord);
-    onShowNotification(
-      '✅ Registro Exitoso',
-      `¡Muchos éxitos! Vecino ${newFormRecord.nombres} registrado como afiliado en Barrio El Trigal.`
-    );
-  };
-
-  const handleClearRecords = () => {
-    setRegisteredList([]);
-    localStorage.removeItem('barrio_afiliados');
-    onShowNotification('🧹 Registros Borrados', 'Se vació el listado local de afiliados para fines de prueba.');
-  };
-
-  const handleAddNewTestUser = () => {
-    const sampleRecord: AffiliateForm = {
-      fechaRegistro: '2026-06-18',
-      nombres: 'José Gabriel',
-      apellidos: 'Condori',
-      ci: '7412891',
-      fechaNacimiento: '1988-11-20',
-      sexo: 'Masculino',
-      estadoCivil: 'Casado',
-      profesion: 'Médico',
-      telefono: '+591 7 42191024',
-      correo: 'gabriel.condori@gmail.com',
-      fechaAfiliacion: '2026-06-18',
-      estadoAfiliacion: 'Activo',
-      numeroAfiliado: '104',
-      tipoAfiliado: 'Vecino Titular',
-      numeroRecibo: 'REC-230',
-      montoPagado: 'Bs. 50.00',
-      direccion: 'Av. Las Gardenias esq. Sauce',
-      numeroCasa: '94',
-      manzano: 'MZ-12',
-      tiempoResidencia: '8 años',
-      zonaReferencia: 'Frente a panadería central',
-      participaReuniones: true,
-      deseaComisiones: true,
-      interesSeguridad: 'Alto',
-      observaciones: 'Listo para colaborar con brigadas vecinales.'
+    const datos = {
+      nombres: form.nombres,
+      apellidos: form.apellidos,
+      ci: form.ci,
+      fechaNacimiento: form.fechaNacimiento,
+      sexo: form.sexo,
+      estadoCivil: form.estadoCivil,
+      profesion: form.profesion,
+      telefono: form.telefono,
+      correo: form.correo,
+      fechaAfiliacion: form.fechaAfiliacion,
+      numeroAfiliado: form.numeroAfiliado,
+      estadoAfiliacion: form.estadoAfiliacion,
+      tipoAfiliado: form.tipoAfiliado || '',
+      montoPagado: form.montoPagado,
+      numeroRecibo: form.numeroRecibo,
+      observaciones: form.observaciones || "Ninguna",
+      direccion: form.direccion,
+      numeroCasa: form.numeroCasa,
+      manzano: form.manzano,
+      zona: form.zona,
+      referencia: form.referencia,
+      tiempoResidencia: form.tiempoResidencia,
+      participaReuniones: form.participaReuniones ? "Sí" : "No",
+      deseaComisiones: form.deseaComisiones ? "Sí" : "No",
+      interesSeguridad: form.interesSeguridad
     };
 
-    const next = [sampleRecord, ...registeredList];
-    setRegisteredList(next);
-    localStorage.setItem('barrio_afiliados', JSON.stringify(next));
-    onShowNotification('⚡ Registro Demo Añadido', 'Añadido un afiliado de muestra para fines de demostración de reportes.');
+    const cuerpoRequest = JSON.stringify({
+      token: tokenUsuario,
+      datos: datos
+    });
+
+    try {
+      const respuesta = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: cuerpoRequest
+      });
+
+      const json = await respuesta.json();
+
+      if (json.exito === true) {
+        onShowNotification('✅ Registro Exitoso', json.mensaje || `Vecino ${form.nombres} registrado correctamente en la base de datos.`);
+        setLastRegistered(form as AffiliateForm);
+        setForm(prev => ({
+          ...prev,
+          nombres: '',
+          apellidos: '',
+          ci: '',
+          telefono: '',
+          correo: '',
+          numeroCasa: '',
+          observaciones: ''
+        }));
+      } else {
+        onShowNotification('⚠️ Error del Servidor', json.mensaje || 'El servidor rechazó la solicitud.');
+      }
+    } catch (errorRed) {
+      console.error("Error de red al enviar el formulario:", errorRed);
+      onShowNotification('⚠️ Error de Conexión', 'Verifique su acceso a internet e intente nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (!tokenUsuario) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-6 py-12 px-4 animate-in fade-in duration-200">
+        <div className="bg-[#1a1a1a] rounded-2xl border border-gray-800 p-8 text-center max-w-md w-full shadow-2xl space-y-6">
+          <div className="mx-auto bg-blue-500/10 text-blue-400 p-4 rounded-full border-2 border-blue-500/30 w-16 h-16 flex items-center justify-center">
+            <User className="h-8 w-8" />
+          </div>
+          <div>
+            <h2 className="text-white text-2xl font-bold tracking-tight">Formulario de Afiliación</h2>
+            <p className="text-gray-400 text-sm mt-3 leading-relaxed">
+              Acceso exclusivo para personal administrativo autorizado.<br/>Inicie sesión con su cuenta de Google institucional.
+            </p>
+          </div>
+          <div className="flex justify-center pt-4 pb-2">
+            <div id="g_id_signin"></div>
+          </div>
+          <p className="text-gray-500 text-xs">
+            Solo las cuentas habilitadas por el administrador pueden acceder a este sistema.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (lastRegistered) {
     return (
@@ -128,16 +235,14 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
         <div>
           <h3 className="text-white text-xl font-bold tracking-tight">¡Afiliación Registrada con éxito!</h3>
           <p className="text-gray-400 text-xs mt-1.5 leading-relaxed">
-            Te has incorporado de forma oficial al Barrio El Trigal. A continuación puedes visualizar tu credencial digital.
+            Los datos de {lastRegistered.nombres} han sido enviados correctamente a la base de datos central.
           </p>
         </div>
 
         {/* Digital ID Card */}
         <div className="bg-black/80 rounded-2xl border border-brand-yellow/30 p-5 w-full text-left font-sans max-w-sm relative overflow-hidden shadow-2xl">
-          {/* Decorative watermarks */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand-yellow/5 rounded-bl-full pointer-events-none" />
 
-          {/* Header */}
           <div className="flex justify-between items-center pb-3 border-b border-gray-800/60 mb-4">
             <div>
               <h4 className="text-brand-yellow text-xs font-black tracking-widest uppercase">CREDENCIAL DE AFILIADO</h4>
@@ -148,7 +253,6 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
             </div>
           </div>
 
-          {/* Body specs */}
           <div className="space-y-3 text-xs">
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -184,12 +288,10 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
             </div>
           </div>
 
-          {/* CSS QR Code simulation */}
           <div className="mt-5 flex justify-between items-end">
             <div className="text-[10px] font-mono text-gray-500">
               <span>Habilitado • 2026/2027</span>
             </div>
-            {/* Fake stylized QR code */}
             <div className="w-12 h-12 bg-white p-1 rounded-sm grid grid-cols-2 gap-0.5 shrink-0 opacity-90 select-none">
               <div className="bg-black rounded-sm border-[1.5px] border-white" />
               <div className="bg-black rounded-sm border-[1.5px] border-white" />
@@ -199,548 +301,498 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex gap-3 w-full">
-          <button
-            onClick={() => setLastRegistered(null)}
-            className="flex-1 bg-black text-gray-400 border border-gray-800 py-3 rounded-xl font-bold text-xs cursor-pointer hover:text-white"
-          >
-            Registrar Otro
-          </button>
-          <button
-            onClick={() => {
-              setLastRegistered(null);
-              setShowListView(true);
-            }}
-            className="flex-1 bg-brand-yellow text-gray-950 hover:bg-yellow-400 py-3 rounded-xl font-bold text-xs cursor-pointer"
-          >
-            Ver Registrados ({registeredList.length})
-          </button>
-        </div>
+        <button
+          onClick={() => setLastRegistered(null)}
+          className="w-full bg-black text-gray-400 border border-gray-800 hover:border-gray-600 py-3 rounded-xl font-bold text-xs cursor-pointer hover:text-white transition"
+        >
+          Registrar Otro Afiliado
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col space-y-5">
-      {/* Selector of table / form */}
-      <div className="flex justify-between items-center">
+    <div className="flex flex-col space-y-5 animate-in fade-in duration-200">
+      <div className="flex flex-col space-y-4">
+        <div className="flex justify-between items-center bg-[#1a1a1a] rounded-xl border border-gray-800 px-4 py-3">
+          <div className="flex items-center space-x-3">
+            <div className="bg-blue-500/10 p-2 rounded-full border border-blue-500/20">
+              <User className="h-4 w-4 text-blue-400" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Sesión activa</p>
+              <p className="text-white text-sm font-bold truncate max-w-[150px] sm:max-w-xs">{userProfile?.name}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 p-2 rounded-lg transition-colors flex items-center space-x-2"
+            title="Cerrar Sesión"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="text-xs font-bold hidden sm:block">Salir</span>
+          </button>
+        </div>
+
         <div>
           <h2 className="text-white text-2xl font-bold tracking-tight">Registro de Afiliados</h2>
           <p className="text-gray-400 text-xs mt-1">
-            Complete el formulario oficial para formar parte de nuestra comunidad organizada.
+            Complete el formulario oficial. La información se enviará directamente a la base de datos central.
           </p>
         </div>
-        <button
-          onClick={() => setShowListView(!showListView)}
-          className="bg-brand-green/10 text-brand-green border border-brand-green/30 px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-green hover:text-black transition cursor-pointer"
-        >
-          {showListView ? 'Ir a Formulario' : `Ver Afiliados (${registeredList.length})`}
-        </button>
       </div>
 
-      {showListView ? (
-        <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-4 space-y-4">
-          <div className="flex justify-between items-center pb-2 border-b border-gray-900">
-            <h3 className="text-white text-xs font-bold uppercase tracking-wider">Padrones Vecinales</h3>
-            <div className="flex space-x-2">
-              <button
-                onClick={handleAddNewTestUser}
-                className="bg-brand-yellow/10 text-brand-yellow border border-brand-yellow/20 hover:border-brand-yellow px-2.5 py-1 rounded-md text-[10px] font-bold"
-              >
-                + Cargar Demo
-              </button>
-              {registeredList.length > 0 && (
-                <button
-                  onClick={handleClearRecords}
-                  className="bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 px-2.5 py-1 rounded-md text-[10px] font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  <Trash2 className="h-3 w-3" />
-                  <span>Vaciar</span>
-                </button>
-              )}
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* 1. DATOS PERSONALES */}
+        <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
+          <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
+            <User className="h-4 w-4 text-brand-green" />
+            <span>DATOS PERSONALES</span>
+          </h3>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-gray-900 text-gray-500 uppercase font-mono">
-                  <th className="py-2 pr-2">Nombre</th>
-                  <th className="py-2 px-2">C.I.</th>
-                  <th className="py-2 px-2">Dirección</th>
-                  <th className="py-2 pl-2">Tipo</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-900">
-                {registeredList.map((afiliado, idx) => (
-                  <tr key={idx} className="hover:bg-black/20 text-gray-300">
-                    <td className="py-2.5 pr-2 font-semibold">
-                      {afiliado.nombres} {afiliado.apellidos}
-                    </td>
-                    <td className="py-2.5 px-2 font-mono">{afiliado.ci}</td>
-                    <td className="py-2.5 px-2 text-gray-400 truncate max-w-[120px]">{afiliado.direccion || 'No registrada'} Safe</td>
-                    <td className="py-2.5 pl-2 text-brand-green font-semibold whitespace-nowrap">{afiliado.tipoAfiliado || 'Vecino regular'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {registeredList.length === 0 && (
-              <div className="text-center py-10 text-gray-500">
-                <p>No se han registrado afiliados de momento.</p>
-                <button
-                  onClick={() => setShowListView(false)}
-                  className="mt-3 text-xs bg-brand-yellow text-gray-950 font-bold px-4 py-1.5 rounded-lg"
-                >
-                  Afiliarse Ahora
-                </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Nombres *</label>
+              <div className="relative">
+                <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.nombres}
+                  onChange={(e) => handleChange('nombres', e.target.value)}
+                  placeholder="Ej. Juan Carlos"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+                />
               </div>
-            )}
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Apellidos *</label>
+              <div className="relative">
+                <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.apellidos}
+                  onChange={(e) => handleChange('apellidos', e.target.value)}
+                  placeholder="Ej. Pérez García"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">C.I. Identidad *</label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.ci}
+                  onChange={(e) => handleChange('ci', e.target.value)}
+                  placeholder="Ej. 12345678"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Fecha de Nacimiento *</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="date"
+                  required
+                  value={form.fechaNacimiento}
+                  onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Sexo *</label>
+              <select
+                required
+                value={form.sexo}
+                onChange={(e) => handleChange('sexo', e.target.value)}
+                className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+              >
+                <option value="">-- Seleccionar --</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Estado Civil *</label>
+              <select
+                required
+                value={form.estadoCivil}
+                onChange={(e) => handleChange('estadoCivil', e.target.value)}
+                className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+              >
+                <option value="">-- Seleccionar --</option>
+                <option value="Soltero/a">Soltero/a</option>
+                <option value="Casado/a">Casado/a</option>
+                <option value="Divorciado/a">Divorciado/a</option>
+                <option value="Viudo/a">Viudo/a</option>
+                <option value="Unión Libre">Unión Libre</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Profesión / Ocupación *</label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.profesion}
+                  onChange={(e) => handleChange('profesion', e.target.value)}
+                  placeholder="Ej. Ingeniero Civil"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Fecha de Registro</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="date"
+                  required
+                  value={form.fechaRegistro}
+                  onChange={(e) => handleChange('fechaRegistro', e.target.value)}
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono opacity-60"
+                />
+              </div>
+            </div>
           </div>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 1. DATOS PERSONALES */}
-          <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
-            <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
-              <User className="h-4 w-4 text-brand-green" />
-              <span>DATOS PERSONALES</span>
-            </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Fecha Registro */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Fecha de Registro</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="date"
-                    required
-                    value={form.fechaRegistro}
-                    onChange={(e) => handleChange('fechaRegistro', e.target.value)}
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
-                  />
-                </div>
-              </div>
+        {/* 2. CONTACTO Y AFILIACIÓN */}
+        <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
+          <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
+            <Smartphone className="h-4 w-4 text-brand-green" />
+            <span>CONTACTO Y AFILIACIÓN</span>
+          </h3>
 
-              {/* Nombres */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Nombres</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    required
-                    value={form.nombres}
-                    onChange={(e) => handleChange('nombres', e.target.value)}
-                    placeholder="Ej. Juan"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                  />
-                </div>
-              </div>
-
-              {/* Apellidos */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Apellidos</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    required
-                    value={form.apellidos}
-                    onChange={(e) => handleChange('apellidos', e.target.value)}
-                    placeholder="Ej. Pérez"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                  />
-                </div>
-              </div>
-
-              {/* C.I. */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">C.I. (Documento)</label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    required
-                    value={form.ci}
-                    onChange={(e) => handleChange('ci', e.target.value)}
-                    placeholder="1234567"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
-                  />
-                </div>
-              </div>
-
-              {/* Fecha Nacimiento */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Fecha de Nacimiento</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="date"
-                    required
-                    value={form.fechaNacimiento}
-                    onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
-                  />
-                </div>
-              </div>
-
-              {/* Sexo */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Sexo</label>
-                <select
-                  value={form.sexo}
-                  onChange={(e) => handleChange('sexo', e.target.value)}
-                  className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Femenino">Femenino</option>
-                  <option value="Otro">Otro / Prefiero no decir</option>
-                </select>
-              </div>
-
-              {/* Estado civil */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Estado Civil</label>
-                <select
-                  value={form.estadoCivil}
-                  onChange={(e) => handleChange('estadoCivil', e.target.value)}
-                  className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="Soltero">Soltero/a</option>
-                  <option value="Casado">Casado/a</option>
-                  <option value="Conviviente">Conviviente</option>
-                  <option value="Divorciado">Divorciado/a</option>
-                  <option value="Viudo">Viudo/a</option>
-                </select>
-              </div>
-
-              {/* Profesión */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Profesión / Ocupación</label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    value={form.profesion}
-                    onChange={(e) => handleChange('profesion', e.target.value)}
-                    placeholder="Ej. Arquitecto, Comerciante..."
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                  />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Teléfono-Celular *</label>
+              <div className="relative">
+                <Smartphone className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="tel"
+                  required
+                  value={form.telefono}
+                  onChange={(e) => handleChange('telefono', e.target.value)}
+                  placeholder="Ej. 70012345"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
+                />
               </div>
             </div>
-          </div>
 
-          {/* 2. CONTACTO Y AFILIACIÓN */}
-          <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
-            <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
-              <Smartphone className="h-4 w-4 text-brand-green" />
-              <span>CONTACTO Y AFILIACIÓN</span>
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Teléfono */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Teléfono-Celular</label>
-                <div className="relative">
-                  <Smartphone className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="tel"
-                    required
-                    value={form.telefono}
-                    onChange={(e) => handleChange('telefono', e.target.value)}
-                    placeholder="+591 7 12345678"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
-                  />
-                </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Correo Electrónico *</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="email"
+                  required
+                  value={form.correo}
+                  onChange={(e) => handleChange('correo', e.target.value)}
+                  placeholder="ejemplo@mail.com"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+                />
               </div>
+            </div>
 
-              {/* Correo */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Correo Electrónico</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="email"
-                    value={form.correo}
-                    onChange={(e) => handleChange('correo', e.target.value)}
-                    placeholder="ejemplo@mail.com"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                  />
-                </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Fecha de Afiliación *</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="date"
+                  required
+                  value={form.fechaAfiliacion}
+                  onChange={(e) => handleChange('fechaAfiliacion', e.target.value)}
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
+                />
               </div>
+            </div>
 
-              {/* Fecha Afiliacion */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Fecha de Afiliación</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="date"
-                    required
-                    value={form.fechaAfiliacion}
-                    onChange={(e) => handleChange('fechaAfiliacion', e.target.value)}
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow font-mono"
-                  />
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Número de Afiliado *</label>
+              <input
+                type="text"
+                required
+                value={form.numeroAfiliado}
+                onChange={(e) => handleChange('numeroAfiliado', e.target.value)}
+                placeholder="Ej. AF-001"
+                className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
+              />
+            </div>
 
-              {/* Estado Afiliación */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Estado de Afiliación</label>
-                <select
-                  value={form.estadoAfiliacion}
-                  onChange={(e) => handleChange('estadoAfiliacion', e.target.value as any)}
-                  className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                </select>
-              </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Estado de Afiliación *</label>
+              <select
+                required
+                value={form.estadoAfiliacion}
+                onChange={(e) => handleChange('estadoAfiliacion', e.target.value as any)}
+                className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
+              >
+                <option value="">-- Seleccionar --</option>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="Suspendido">Suspendido</option>
+              </select>
+            </div>
 
-              {/* Número de Afiliado */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Número de Afiliado</label>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Tipo de Afiliado *</label>
+              <input
+                type="text"
+                required
+                value={form.tipoAfiliado}
+                onChange={(e) => handleChange('tipoAfiliado', e.target.value)}
+                placeholder="Ej. Titular, Dependiente"
+                className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Monto Pagado (Bs.) *</label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
                 <input
                   type="text"
-                  value={form.numeroAfiliado}
-                  onChange={(e) => handleChange('numeroAfiliado', e.target.value)}
-                  placeholder="000"
-                  className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
+                  required
+                  value={form.montoPagado}
+                  onChange={(e) => handleChange('montoPagado', e.target.value)}
+                  placeholder="Ej. 100"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
                 />
               </div>
+            </div>
 
-              {/* Tipo de Afiliado */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Tipo de Afiliado</label>
-                <select
-                  value={form.tipoAdherente || form.tipoAfiliado}
-                  onChange={(e) => handleChange('tipoAfiliado', e.target.value)}
-                  className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none"
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="Vecino Titular">Vecino Titular</option>
-                  <option value="Vecino Adherente">Vecino Adherente</option>
-                  <option value="Familiar">Familiar directo</option>
-                </select>
-              </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Número de Recibo *</label>
+              <input
+                type="text"
+                required
+                value={form.numeroRecibo}
+                onChange={(e) => handleChange('numeroRecibo', e.target.value)}
+                placeholder="Ej. REC-2024-001"
+                className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
+              />
+            </div>
 
-              {/* Recibo */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Número de Recibo</label>
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-gray-400 text-xs">Observaciones</label>
+              <textarea
+                rows={3}
+                value={form.observaciones}
+                onChange={(e) => handleChange('observaciones', e.target.value)}
+                placeholder="Ninguna"
+                className="w-full bg-black text-white p-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow resize-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 3. UBICACIÓN Y VIVIENDA */}
+        <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
+          <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
+            <MapPin className="h-4 w-4 text-brand-green" />
+            <span>UBICACIÓN Y VIVIENDA</span>
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-gray-400 text-xs">Dirección *</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
                 <input
                   type="text"
-                  value={form.numeroRecibo}
-                  onChange={(e) => handleChange('numeroRecibo', e.target.value)}
-                  placeholder="REC-000"
-                  className="w-full bg-black text-white px-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
+                  required
+                  value={form.direccion}
+                  onChange={(e) => handleChange('direccion', e.target.value)}
+                  placeholder="Ej. Av. Heroínas N° 456..."
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
                 />
               </div>
+            </div>
 
-              {/* Monto pagado */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Monto Pagado</label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    value={form.montoPagado}
-                    onChange={(e) => handleChange('montoPagado', e.target.value)}
-                    placeholder="Bs. 0.00"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
-                  />
-                </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Número de Casa *</label>
+              <div className="relative">
+                <Home className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.numeroCasa}
+                  onChange={(e) => handleChange('numeroCasa', e.target.value)}
+                  placeholder="Ej. 14-A"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
+                />
               </div>
             </div>
-          </div>
 
-          {/* 3. UBICACIÓN Y VIVIENDA */}
-          <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
-            <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
-              <MapPin className="h-4 w-4 text-brand-green" />
-              <span>UBICACIÓN Y VIVIENDA</span>
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Direccion */}
-              <div className="space-y-1 md:col-span-2">
-                <label className="text-gray-400 text-xs">Dirección</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    required
-                    value={form.direccion}
-                    onChange={(e) => handleChange('direccion', e.target.value)}
-                    placeholder="Calle, Avenida, Barrio, Referencia..."
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow"
-                  />
-                </div>
-              </div>
-
-              {/* Número Casa */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Número de Casa</label>
-                <div className="relative">
-                  <Home className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    required
-                    value={form.numeroCasa}
-                    onChange={(e) => handleChange('numeroCasa', e.target.value)}
-                    placeholder="Ej. N° 45"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
-                  />
-                </div>
-              </div>
-
-              {/* Manzano */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Manzano</label>
-                <div className="relative">
-                  <Home className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    value={form.manzano}
-                    onChange={(e) => handleChange('manzano', e.target.value)}
-                    placeholder="M-4"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
-                  />
-                </div>
-              </div>
-
-              {/* Tiempo residencia */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Tiempo de Residencia</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    value={form.tiempoResidencia}
-                    onChange={(e) => handleChange('tiempoResidencia', e.target.value)}
-                    placeholder="5 años"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
-                  />
-                </div>
-              </div>
-
-              {/* Zona referencia */}
-              <div className="space-y-1">
-                <label className="text-gray-400 text-xs">Zona Referencia</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
-                  <input
-                    type="text"
-                    value={form.zonaReferencia}
-                    onChange={(e) => handleChange('zonaReferencia', e.target.value)}
-                    placeholder="Ej. Cerca al parque central"
-                    className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none"
-                  />
-                </div>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Manzano *</label>
+              <div className="relative">
+                <Home className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.manzano}
+                  onChange={(e) => handleChange('manzano', e.target.value)}
+                  placeholder="Ej. B-3"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
+                />
               </div>
             </div>
-          </div>
 
-          {/* 4. PARTICIPACIÓN VECINAL */}
-          <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
-            <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
-              <Users className="h-4 w-4 text-brand-green" />
-              <span>PARTICIPACIÓN VECINAL</span>
-            </h3>
-
-            <div className="space-y-4 text-xs select-none">
-              {/* Toggle 1 */}
-              <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-gray-900">
-                <div className="space-y-0.5">
-                  <p className="text-white font-semibold">¿Participa en Reuniones?</p>
-                  <p className="text-gray-500 text-[11px]">Compromiso con asambleas ordinarias y zonales</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleChange('participaReuniones', !form.participaReuniones)}
-                  className={`w-12 h-6 rounded-full p-1 transition duration-200 focus:outline-none cursor-pointer ${
-                    form.participaReuniones ? 'bg-[#2ECC71]' : 'bg-gray-800'
-                  }`}
-                >
-                  <div
-                    className={`w-4 h-4 bg-gray-950 rounded-full shadow transition-all duration-200 ${
-                      form.participaReuniones ? 'translate-x-6' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Zona *</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.zona}
+                  onChange={(e) => handleChange('zona', e.target.value)}
+                  placeholder="Ej. Zona Norte"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none"
+                />
               </div>
+            </div>
 
-              {/* Toggle 2 */}
-              <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-gray-900">
-                <div className="space-y-0.5">
-                  <p className="text-white font-semibold">¿Desea formar parte de Comisiones?</p>
-                  <p className="text-gray-500 text-[11px]">Comisiones de seguridad, deportes u obras</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleChange('deseaComisiones', !form.deseaComisiones)}
-                  className={`w-12 h-6 rounded-full p-1 transition duration-200 focus:outline-none cursor-pointer ${
-                    form.deseaComisiones ? 'bg-[#2ECC71]' : 'bg-gray-800'
-                  }`}
-                >
-                  <div
-                    className={`w-4 h-4 bg-gray-950 rounded-full shadow transition-all duration-200 ${
-                      form.deseaComisiones ? 'translate-x-6' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
+            <div className="space-y-1">
+              <label className="text-gray-400 text-xs">Referencia *</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.referencia}
+                  onChange={(e) => handleChange('referencia', e.target.value)}
+                  placeholder="Ej. Frente al parque central"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none"
+                />
               </div>
+            </div>
 
-              {/* Interest in Security (Bajo, Medio, Alto) */}
-              <div className="space-y-1.5 pt-1">
-                <p className="text-gray-400 font-semibold mb-1">Interés en Seguridad Vecinal</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Bajo', 'Medio', 'Alto'].map((lvl) => (
-                    <button
-                      key={lvl}
-                      type="button"
-                      onClick={() => handleChange('interesSeguridad', lvl)}
-                      className={`py-2 rounded-lg font-bold text-xs border transition cursor-pointer text-center ${
-                        form.interesSeguridad === lvl
-                          ? 'bg-[#2ECC71]/15 text-brand-green border-[#2ECC71]'
-                          : 'bg-transparent text-gray-400 border-gray-800 hover:text-white'
-                      }`}
-                    >
-                      {lvl}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Observaciones */}
-              <div className="space-y-1 pt-1.5">
-                <label className="text-gray-400 font-semibold">Observaciones</label>
-                <textarea
-                  rows={3}
-                  value={form.observaciones}
-                  onChange={(e) => handleChange('observaciones', e.target.value)}
-                  placeholder="Información adicional relevante..."
-                  className="w-full bg-black text-white p-3 rounded-lg border border-gray-800 text-xs focus:outline-none focus:border-brand-yellow resize-none"
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-gray-400 text-xs">Tiempo de Residencia *</label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  required
+                  value={form.tiempoResidencia}
+                  onChange={(e) => handleChange('tiempoResidencia', e.target.value)}
+                  placeholder="Ej. 5 años, 8 meses"
+                  className="w-full bg-black text-white pl-10 pr-3 py-3 rounded-lg border border-gray-800 text-xs focus:outline-none font-mono"
                 />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-brand-yellow hover:bg-yellow-400 text-gray-950 py-3.5 rounded-xl font-bold text-sm tracking-wide uppercase flex items-center justify-center space-x-2.5 transition shadow-lg shadow-brand-yellow/15 cursor-pointer"
-          >
-            <Send className="h-4.5 w-4.5" />
-            <span>ENVIAR REGISTRO</span>
-          </button>
-        </form>
-      )}
+        {/* 4. PARTICIPACIÓN VECINAL */}
+        <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-5 space-y-4">
+          <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
+            <Users className="h-4 w-4 text-brand-green" />
+            <span>PARTICIPACIÓN COMUNITARIA</span>
+          </h3>
+
+          <div className="space-y-4 text-xs select-none">
+            <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-gray-900">
+              <div className="space-y-0.5">
+                <p className="text-white font-semibold">¿Participa en Reuniones? *</p>
+                <p className="text-gray-500 text-[11px]">Compromiso con asambleas ordinarias y zonales</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleChange('participaReuniones', !form.participaReuniones)}
+                className={`w-12 h-6 rounded-full p-1 transition duration-200 focus:outline-none cursor-pointer ${
+                  form.participaReuniones ? 'bg-[#2ECC71]' : 'bg-gray-800'
+                }`}
+              >
+                <div
+                  className={`w-4 h-4 bg-gray-950 rounded-full shadow transition-all duration-200 ${
+                    form.participaReuniones ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-gray-900">
+              <div className="space-y-0.5">
+                <p className="text-white font-semibold">¿Desea formar parte de Comisiones? *</p>
+                <p className="text-gray-500 text-[11px]">Comisiones de seguridad, deportes u obras</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleChange('deseaComisiones', !form.deseaComisiones)}
+                className={`w-12 h-6 rounded-full p-1 transition duration-200 focus:outline-none cursor-pointer ${
+                  form.deseaComisiones ? 'bg-[#2ECC71]' : 'bg-gray-800'
+                }`}
+              >
+                <div
+                  className={`w-4 h-4 bg-gray-950 rounded-full shadow transition-all duration-200 ${
+                    form.deseaComisiones ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <p className="text-gray-400 font-semibold mb-1">Interés en Comisión de Seguridad *</p>
+              <div className="grid grid-cols-3 gap-2">
+                {['Bajo', 'Medio', 'Alto'].map((lvl) => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => handleChange('interesSeguridad', lvl)}
+                    className={`py-2 rounded-lg font-bold text-xs border transition cursor-pointer text-center ${
+                      form.interesSeguridad === lvl
+                        ? 'bg-[#2ECC71]/15 text-brand-green border-[#2ECC71]'
+                        : 'bg-transparent text-gray-400 border-gray-800 hover:text-white'
+                    }`}
+                  >
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full py-3.5 rounded-xl font-bold text-sm tracking-wide uppercase flex items-center justify-center space-x-2.5 transition shadow-lg cursor-pointer ${
+            isSubmitting
+              ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+              : 'bg-brand-yellow hover:bg-yellow-400 text-gray-950 shadow-brand-yellow/15'
+          }`}
+        >
+          {isSubmitting ? (
+            <span>ENVIANDO REGISTRO...</span>
+          ) : (
+            <>
+              <Send className="h-4.5 w-4.5" />
+              <span>ENVIAR REGISTRO</span>
+            </>
+          )}
+        </button>
+      </form>
     </div>
   );
 }
