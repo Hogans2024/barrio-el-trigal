@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Backend Apps Script: contiene el Code.gs con el token de GitHub.
+# Vive solo en el disco local + Google Apps Script, NUNCA en GitHub
+# (para evitar exponer el token por accidente).
+apps-script/
