@@ -209,6 +209,10 @@
       "openHours": "Abierto desde 6:00 AM",
       "isFreeDelivery": true,
       "actionText": "Pedir Ya"
+    },
+    {
+      "name": "sssssss",
+      "isFreeDelivery": false
     }
   ],
   "mascotas": [
