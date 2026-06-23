@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Star, Clock, ShoppingCart, Sparkles, Store, X, PlusCircle, Bookmark, Check } from 'lucide-react';
-import { BUSINESSES_DATA } from '../data';
 import { LocalBusiness } from '../types';
 
 interface NegociosViewProps {
+  negocios: LocalBusiness[];
   onShowNotification: (title: string, message: string) => void;
 }
 
-export default function NegociosView({ onShowNotification }: NegociosViewProps) {
+export default function NegociosView({ negocios, onShowNotification }: NegociosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [businesses, setBusinesses] = useState<LocalBusiness[]>([]);
@@ -22,39 +22,35 @@ export default function NegociosView({ onShowNotification }: NegociosViewProps) 
   const [newImageUrl, setNewImageUrl] = useState('');
 
   useEffect(() => {
-    // Load from localStorage or default
-    const stored = localStorage.getItem('barrio_negocios');
+    // Merge cloud data with local additions stored in localStorage
+    const stored = localStorage.getItem('barrio_negocios_extra');
     if (stored) {
       try {
-        setBusinesses(JSON.parse(stored));
+        const extra: LocalBusiness[] = JSON.parse(stored);
+        setBusinesses([...extra, ...negocios]);
       } catch (e) {
-        setBusinesses(BUSINESSES_DATA);
+        setBusinesses(negocios);
       }
     } else {
-      setBusinesses(BUSINESSES_DATA);
+      setBusinesses(negocios);
     }
-  }, []);
+  }, [negocios]);
 
   const saveBusinessesList = (list: LocalBusiness[]) => {
+    // Only save the "extra" items added locally
+    const extraItems = list.filter(b => b.id.startsWith('custom_'));
     setBusinesses(list);
-    localStorage.setItem('barrio_negocios', JSON.stringify(list));
+    localStorage.setItem('barrio_negocios_extra', JSON.stringify(extraItems));
   };
 
-  const categories = ['Todos', 'Comida', 'Ropa', 'Plantas'];
+  const categories = ['Todos', 'Comida', 'Papa de comer', 'Ropa', 'Plantas'];
 
   const filteredBusinesses = businesses.filter((biz) => {
-    // Matches Comida, Ropa, Plantas or "Papa de comer"
+    // Coincide por nombre/descripción; las categorías respetan el tipo LocalBusiness
     const textMatches = biz.name.toLowerCase().includes(search.toLowerCase()) ||
                         biz.description.toLowerCase().includes(search.toLowerCase());
-    
-    let categoryMatches = false;
-    if (selectedCategory === 'Todos') {
-      categoryMatches = true;
-    } else if (selectedCategory === 'Comida') {
-      categoryMatches = biz.category === 'Comida' || biz.category === 'Papa de comer';
-    } else {
-      categoryMatches = biz.category === selectedCategory;
-    }
+
+    const categoryMatches = selectedCategory === 'Todos' || biz.category === selectedCategory;
 
     return textMatches && categoryMatches;
   });
@@ -259,7 +255,7 @@ export default function NegociosView({ onShowNotification }: NegociosViewProps) 
                 src={biz.imageUrl}
                 alt={biz.name}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-103 transition duration-300"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
               />
               <div className="absolute top-3 right-3 flex space-x-1.5">
                 <button

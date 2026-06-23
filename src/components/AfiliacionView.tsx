@@ -787,7 +787,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
             <span>ENVIANDO REGISTRO...</span>
           ) : (
             <>
-              <Send className="h-4.5 w-4.5" />
+              <Send className="h-5 w-5" />
               <span>ENVIAR REGISTRO</span>
             </>
           )}

@@ -2,7 +2,7 @@
   "proyectos": [
     {
       "id": "pr1",
-      "title": "zzzzzz",
+      "title": "Empedrado de Calles",
       "imageUrl": "https://images.unsplash.com/photo-1584947897103-68ea23f03b22?w=600&auto=format&fit=crop&q=80",
       "category": "INFRAESTRUCTURA",
       "description": "Mejoramiento de las calles del barrio para brindar mayor seguridad, durabilidad y una mejor calidad de vida para todos los vecinos.",
@@ -44,15 +44,6 @@
       "description": "Construcción de una plaza con juegos infantiles, bancas y áreas verdes para el esparcimiento de familias y niños del barrio.",
       "location": "Manzana Central Sector B",
       "status": "Planificado"
-    },
-    {
-      "id": "",
-      "title": "ssss",
-      "imageUrl": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&auto=format&fit=crop&q=80",
-      "category": "fdsfdsf",
-      "description": "fsdfd",
-      "location": "fdsf",
-      "status": "fdsf"
     }
   ],
   "eventos": [
@@ -118,9 +109,9 @@
     },
     {
       "id": "p2",
-      "name": "Farmacia LOS PUERCOS",
+      "name": "Farmacia San Roque",
       "imageUrl": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&auto=format&fit=crop&q=80",
-      "address": "LOS TRES chanchitos",
+      "address": "Calle Sucre N° 745",
       "phone": "4 665 5678",
       "neighborhood": "San Roque",
       "description": "Comprometidos con tu bienestar y tu economía. Servicio rápido y seguro para toda la vecindad.",
@@ -160,13 +151,12 @@
   "negocios": [
     {
       "id": "b1",
-      "name": "Lunaaaaa",
+      "name": "La Parrilla del Trigal",
       "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
       "category": "Comida",
-      "description": "ssssssssss",
+      "description": "Los mejores cortes de carne y asados tradicionales con el sabor auténtico del valle tarijeño.",
       "rating": "4.9",
       "reviewsCount": 120,
-      "isFreeDelivery": false,
       "actionText": "Ver Menú"
     },
     {
@@ -176,7 +166,6 @@
       "category": "Ropa",
       "description": "Moda contemporánea para dama y caballero. Encuentra las últimas tendencias internacionales.",
       "openHours": "Abierto hoy hasta 8:00 PM",
-      "isFreeDelivery": false,
       "actionText": "Explorar"
     },
     {
@@ -184,9 +173,8 @@
       "name": "Mercado El Campo",
       "imageUrl": "https://images.unsplash.com/photo-1573244514399-7448d3ab85ae?w=600&auto=format&fit=crop&q=80",
       "category": "Papa de comer",
-      "description": "dwwdwwddw",
+      "description": "Frutas, verduras y víveres frescos traídos directamente del campo a tu mesa todos los días.",
       "distanceInfo": "A 200m de la Plaza Central",
-      "isFreeDelivery": false,
       "actionText": "Pedir Ya"
     },
     {
@@ -200,7 +188,7 @@
     },
     {
       "id": "b5",
-      "name": "Panaderia y Repostería Doná Rosa",
+      "name": "Panadería y Repostería Doña Rosa",
       "imageUrl": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80",
       "category": "Comida",
       "description": "Pan artesanal recién horneado cada mañana, tortas personalizadas y dulces típicos de la región.",
@@ -209,14 +197,6 @@
       "openHours": "Abierto desde 6:00 AM",
       "isFreeDelivery": true,
       "actionText": "Pedir Ya"
-    },
-    {
-      "name": "sssssssddd",
-      "description": "fdfdfsdfsdf",
-      "rating": "dfdf",
-      "openHours": "df",
-      "distanceInfo": "f",
-      "isFreeDelivery": false
     }
   ],
   "mascotas": [

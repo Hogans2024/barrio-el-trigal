@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye } from 'lucide-react';
-import { EVENTS_DATA } from '../data';
 import { NeighborhoodEvent } from '../types';
 
 interface EventosViewProps {
+  eventos: NeighborhoodEvent[];
   onShowNotification: (title: string, message: string) => void;
 }
 
-export default function EventosView({ onShowNotification }: EventosViewProps) {
+export default function EventosView({ eventos, onShowNotification }: EventosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeEvent, setActiveEvent] = useState<NeighborhoodEvent | null>(null);
@@ -15,8 +15,7 @@ export default function EventosView({ onShowNotification }: EventosViewProps) {
 
   const categories = ['Todos', 'Comunidad', 'Salud', 'Medio'];
 
-  const filteredEvents = EVENTS_DATA.filter((event) => {
-    // Standard matches for health/comunidad/medio
+  const filteredEvents = eventos.filter((event) => {
     const matchesSearch = event.title.toLowerCase().includes(search.toLowerCase()) ||
                           event.description.toLowerCase().includes(search.toLowerCase());
     

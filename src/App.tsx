@@ -21,7 +21,7 @@ interface NotificationToast {
 }
 
 export default function App() {
-  const { proyectos, eventos, farmacias, negocios, mascotas, loading } = useSheetData();
+  const { proyectos, eventos, farmacias, negocios, mascotas, loading, error } = useSheetData();
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
@@ -190,6 +190,22 @@ export default function App() {
         {/* Central scrolling panel area */}
         <main ref={mainScrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8">
           <div className="relative z-10 w-full max-w-5xl mx-auto">
+            {/* Banner sutil si falló la carga del JSON dinámico (se sigue mostrando data fallback) */}
+            {error && (
+              <div className="mb-4 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-xl px-4 py-2.5 text-xs flex items-center gap-2">
+                <Info className="h-4 w-4 shrink-0" />
+                <span>No se pudo actualizar el contenido en vivo. Mostrando información guardada.</span>
+              </div>
+            )}
+
+            {/* Spinner de carga inicial */}
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 text-gray-500 gap-3">
+                <div className="h-8 w-8 rounded-full border-2 border-gray-700 border-t-brand-yellow animate-spin" />
+                <span className="text-xs font-mono tracking-wide">Cargando contenido…</span>
+              </div>
+            ) : (
+              <>
             {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
             {activeTab === 'proyectos' && <ProyectosView projects={proyectos} />}
             {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} />}
@@ -197,6 +213,8 @@ export default function App() {
             {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} />}
             {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} />}
             {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
+              </>
+            )}
           </div>
         </main>
       </div>
