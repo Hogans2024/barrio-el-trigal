@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { PlusCircle, MapPin, Phone, Building2, Calendar, Clock, Sparkles } from 'lucide-react';
-import { PHARMACIES_DATA } from '../data';
 import { Pharmacy } from '../types';
 
 interface FarmaciasViewProps {
+  farmacias: Pharmacy[];
   onShowNotification: (title: string, message: string) => void;
 }
 
-export default function FarmaciasView({ onShowNotification }: FarmaciasViewProps) {
+export default function FarmaciasView({ farmacias, onShowNotification }: FarmaciasViewProps) {
   const [filterType, setFilterType] = useState<'all' | 'near'>('all');
 
   const filteredPharmacies = filterType === 'near' 
-    ? PHARMACIES_DATA.filter(p => p.neighborhood === 'Centro' || p.neighborhood === 'El Trigal')
-    : PHARMACIES_DATA;
+    ? farmacias.filter(p => p.neighborhood === 'Centro' || p.neighborhood === 'El Trigal')
+    : farmacias;
 
   const handleCall = (pharmacyName: string, phoneNumber: string) => {
     onShowNotification(
@@ -57,7 +57,7 @@ export default function FarmaciasView({ onShowNotification }: FarmaciasViewProps
           className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 transition cursor-pointer border ${
             filterType === 'all'
               ? 'bg-transparent text-[#2ECC71] border-[#2ECC71] shadow-md shadow-emerald-500/10'
-              : 'bg-transparent text-gray-400 border-gray-850 hover:text-white'
+              : 'bg-transparent text-gray-400 border-gray-800 hover:text-white'
           }`}
         >
           <Building2 className="h-4 w-4" />
@@ -84,7 +84,7 @@ export default function FarmaciasView({ onShowNotification }: FarmaciasViewProps
                 src={pharmacy.imageUrl}
                 alt={pharmacy.name}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-101 transition duration-300"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
               />
               <div className="absolute top-4 right-4 animate-pulse">
                 <span className="bg-brand-yellow text-gray-950 text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shadow-lg">

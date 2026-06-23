@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Phone, Building, Calendar, HelpCircle, X, PlusCircle, AlertCircle, Heart } from 'lucide-react';
-import { LOST_PETS_DATA } from '../data';
 import { LostPet } from '../types';
 
 interface MascotasViewProps {
+  mascotas: LostPet[];
   onShowNotification: (title: string, message: string) => void;
 }
 
-export default function MascotasView({ onShowNotification }: MascotasViewProps) {
+export default function MascotasView({ mascotas, onShowNotification }: MascotasViewProps) {
   const [filterType, setFilterType] = useState<string>('Todos');
   const [pets, setPets] = useState<LostPet[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -22,21 +22,23 @@ export default function MascotasView({ onShowNotification }: MascotasViewProps) 
   const [newImageUrl, setNewImageUrl] = useState('');
 
   useEffect(() => {
-    const stored = localStorage.getItem('barrio_mascotas');
+    const stored = localStorage.getItem('barrio_mascotas_extra');
     if (stored) {
       try {
-        setPets(JSON.parse(stored));
+        const extra: LostPet[] = JSON.parse(stored);
+        setPets([...extra, ...mascotas]);
       } catch (e) {
-        setPets(LOST_PETS_DATA);
+        setPets(mascotas);
       }
     } else {
-      setPets(LOST_PETS_DATA);
+      setPets(mascotas);
     }
-  }, []);
+  }, [mascotas]);
 
   const savePets = (list: LostPet[]) => {
+    const extraItems = list.filter(p => p.id.startsWith('custom_'));
     setPets(list);
-    localStorage.setItem('barrio_mascotas', JSON.stringify(list));
+    localStorage.setItem('barrio_mascotas_extra', JSON.stringify(extraItems));
   };
 
   const categories = ['Todos', 'Perros', 'Gatos'];
@@ -134,10 +136,10 @@ export default function MascotasView({ onShowNotification }: MascotasViewProps) 
                 src={pet.imageUrl}
                 alt={pet.name}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-101 transition duration-200"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
               />
               <div className="absolute top-4 right-4">
-                <span className="bg-[#e9c400]/20 text-[#ffe16d] border border-[#e9c400]/40 text-[10px] font-extrabold px-3 py-1 roundeduppercase tracking-wider">
+                <span className="bg-[#e9c400]/20 text-[#ffe16d] border border-[#e9c400]/40 text-[10px] font-extrabold px-3 py-1 rounded uppercase tracking-wider">
                   {pet.type}
                 </span>
               </div>

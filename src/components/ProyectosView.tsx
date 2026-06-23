@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Search, MapPin, CheckCircle, Clock, FileText, X, ChevronRight, ThumbsUp, MessageSquare } from 'lucide-react';
-import { PROJECTS_DATA } from '../data';
 import { Project } from '../types';
 
-export default function ProyectosView() {
+interface ProyectosViewProps {
+  projects: Project[];
+}
+
+export default function ProyectosView({ projects }: ProyectosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -19,9 +22,9 @@ export default function ProyectosView() {
   });
   const [newComment, setNewComment] = useState('');
 
-  const categories = ['Todos', 'Infraestructura', 'Servicios', 'Seguridad', 'Espacios'];
+  const categories = ['Todos', 'Infraestructura', 'Servicios', 'Seguridad'];
 
-  const filteredProjects = PROJECTS_DATA.filter((project) => {
+  const filteredProjects = projects.filter((project) => {
     const matchesSearch = project.title.toLowerCase().includes(search.toLowerCase()) ||
                           project.description.toLowerCase().includes(search.toLowerCase()) ||
                           project.location.toLowerCase().includes(search.toLowerCase());
