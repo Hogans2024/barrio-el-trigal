@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Siren, LayoutGrid, Calendar, LogIn, Heart, Store, PlusSquare,
-  Bell, Menu, X, Info, Activity
+  Bell, Menu, X, Info, Activity, User, ChevronDown
 } from 'lucide-react';
 
 // Sub-views
@@ -14,6 +14,16 @@ import MascotasView from './components/MascotasView';
 import AfiliacionView from './components/AfiliacionView';
 import { useSheetData } from './hooks/useSheetData';
 
+// Cabecera global (avisos + perfil) migrada del proyecto origen.
+// Reemplaza a la campana + drawer de `mockAlerts` y al área de perfil
+// anteriores. Los avisos viven en `notices` (Notice[]); el sistema de
+// toasts (addToast/onShowNotification) NO se toca (es un sistema distinto).
+import NoticeDropdown from './components/NoticeDropdown';
+import ProfileModal from './components/ProfileModal';
+import { playTone } from './components/AudioSiren';
+import { NOTICES } from './data.alarma';
+import { Notice } from './types.alarma';
+
 interface NotificationToast {
   id: string;
   title: string;
@@ -24,8 +34,26 @@ export default function App() {
   const { proyectos, eventos, farmacias, negocios, mascotas, loading, error } = useSheetData();
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
   const mainScrollRef = useRef<HTMLElement>(null);
+
+  // --- Cabecera global: avisos (NoticeDropdown) + perfil (ProfileModal) ---
+  // Reemplazan a la campana + drawer de mockAlerts y al perfil anteriores.
+  const [notices, setNotices] = useState<Notice[]>(NOTICES);
+  const [isNoticeOpen, setIsNoticeOpen] = useState<boolean>(false);
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+
+  const handleMarkRead = (id: string) => {
+    setNotices((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
+    );
+  };
+
+  const handleClearNotices = () => {
+    setNotices([]);
+    setIsNoticeOpen(false);
+  };
+
+  const unreadCount = notices.filter((n) => n.unread).length;
 
   // Auto-scroll al inicio al cambiar de pestaña
   useEffect(() => {
@@ -36,28 +64,6 @@ export default function App() {
   
   // Custom states for toast alerts
   const [toasts, setToasts] = useState<NotificationToast[]>([]);
-
-  // Static pre-populated notification broadcasts inside system
-  const mockAlerts = [
-    {
-      id: 'n1',
-      title: '🚨 Simulacro de Emergencia',
-      desc: 'Este sábado a las 10:00 AM realizaremos el primer testeo de sirenas unificadas.',
-      time: 'Hace 2 horas'
-    },
-    {
-      id: 'n2',
-      title: '🐕 Vacunación de Mascotas',
-      desc: 'La campaña gratuita se traslada a la Plaza Principal del Trigal para facilitar acceso.',
-      time: 'Hace 1 día'
-    },
-    {
-      id: 'n3',
-      title: '💡 Tarifas Gas domiciliario',
-      desc: 'La directiva vecinal logró un 15% de subvención para sectores en desarrollo.',
-      time: 'Hace 3 días'
-    }
-  ];
 
   // System triggers a new banner/toast
   const addToast = (title: string, message: string) => {
@@ -165,16 +171,45 @@ export default function App() {
 
           {/* Right controls */}
           <div className="flex items-center space-x-3">
-            {/* Notifications bell */}
+            {/* Notifications bell → NoticeDropdown (cabecera global migrada) */}
+            <div className="relative">
+              <button
+                onClick={() => { playTone(500, 50); setIsNoticeOpen(!isNoticeOpen); }}
+                className={`relative p-2.5 md:px-4 md:py-2 transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border flex items-center gap-2 ${
+                  isNoticeOpen
+                    ? 'border-[#FFD700]/40 text-white'
+                    : 'border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white'
+                }`}
+              >
+                <Bell className="h-5 w-5" />
+                <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Dropdown / hoja inferior según breakpoint (sm:) */}
+              <NoticeDropdown
+                isOpen={isNoticeOpen}
+                notices={notices}
+                onMarkRead={handleMarkRead}
+                onClearAll={handleClearNotices}
+                onClose={() => setIsNoticeOpen(false)}
+              />
+            </div>
+
+            {/* Profile trigger → ProfileModal (cabecera global migrada) */}
             <button
-              onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative p-2.5 md:px-4 md:py-2 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 flex items-center gap-2"
+              onClick={() => { playTone(500, 50); setIsProfileOpen(true); }}
+              className="flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3"
+              title="Credencial digital"
             >
-              <Bell className="h-5 w-5" />
-              <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
-              <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
-                2
-              </span>
+              <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-[11px] font-bold border border-white/10 text-white">
+                <User className="h-4 w-4 text-brand-yellow" />
+              </div>
+              <ChevronDown className="hidden md:block w-4 h-4 text-gray-500" />
             </button>
 
             {/* Hamburger menu (Mobile Only) */}
@@ -241,41 +276,13 @@ export default function App() {
         </div>
       </nav>
 
-      {/* 3. NOTIFICATION DRAWER */}
-      {notificationsOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-end">
-          <div className="bg-[#121212] border-l border-gray-800 w-full max-w-sm p-6 overflow-y-auto space-y-6 animate-in slide-in-from-right duration-200">
-            <div className="flex justify-between items-center pb-3 border-b border-gray-900">
-              <h3 className="text-white font-extrabold text-base flex items-center gap-2">
-                <Bell className="h-5 w-5 text-brand-yellow" />
-                <span>Mensajes Colectivos</span>
-              </h3>
-              <button onClick={() => setNotificationsOpen(false)} className="bg-black/50 hover:bg-black/80 text-gray-400 hover:text-white rounded-full p-2 border border-gray-800 transition focus:outline-none cursor-pointer">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              {mockAlerts.map((alt) => (
-                <div key={alt.id} className="bg-[#181818] border border-gray-800/80 rounded-xl p-4 space-y-2 hover:border-gray-700 transition shadow-lg">
-                  <div className="flex justify-between items-start">
-                    <span className="text-white font-bold text-sm">{alt.title}</span>
-                    <span className="text-[10px] font-mono text-gray-500 shrink-0">{alt.time}</span>
-                  </div>
-                  <p className="text-gray-400 text-xs leading-relaxed">{alt.desc}</p>
-                </div>
-              ))}
-            </div>
-            <div className="bg-brand-yellow/5 border border-brand-yellow/15 p-5 rounded-xl space-y-3 mt-8">
-              <span className="text-brand-yellow text-sm font-bold leading-normal block">🚨 Canales de Emergencia</span>
-              <ul className="text-xs text-gray-400 space-y-2 list-disc pl-4 leading-normal">
-                <li><span className="text-white font-semibold">Bomberos Tarija:</span> 119</li>
-                <li><span className="text-white font-semibold">Radio Patrullas:</span> 110</li>
-                <li><span className="text-white font-semibold">Hospital Regional:</span> 4 6642010</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 3. CREDENCIAL DIGITAL DE PERFIL (modal global, accesible desde cualquier pestaña) */}
+      {/* Reemplaza al antiguo drawer de mockAlerts. La bandeja de avisos ahora */}
+      {/* vive en el header vía NoticeDropdown (es un dropdown/hoja, no un drawer). */}
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
 
       {/* 4. HAMBURGER MENU DRAWER (MOBILE ONLY) */}
       {menuOpen && (
