@@ -124,7 +124,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
   const handleKeyPress = (num: string) => {
     playTone(523.25, 80); // Key beep tone
-    if (enteredPin.length < 8) {
+    // Sin límite de dígitos: el backend (Apps Script) valida el número real.
+    if (enteredPin.length < 15) {
       setEnteredPin((prev) => prev + num);
       setPinError(false);
     }
@@ -356,16 +357,17 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
         </div>
 
-        {/* Right pane: Keypad to Enter 8-digit Number */}
+        {/* Right pane: Keypad to Enter phone number */}
         <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-10 pt-3 pb-5 sm:py-10 flex flex-col gap-4 sm:justify-between bg-black/20 relative">
 
           <div className="text-center">
-            <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 ${
+            {/* Escudo — SOLO desktop (oculto en móvil pequeño y grande) */}
+            <div className={`hidden sm:flex w-12 h-12 rounded-xl items-center justify-center mx-auto mb-4 ${
               step === 'enter_activation_phone'
                 ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
                 : 'bg-red-500/10 border border-red-500/20 text-red-400'
             }`}>
-              <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Shield className="w-6 h-6" />
             </div>
             <h3 className={`text-base sm:text-lg font-bold mb-1 font-sans transition-all duration-300 ${
               step === 'enter_activation_phone'
@@ -380,8 +382,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 : 'text-red-200 bg-red-500/10 border border-red-500/30 p-3 sm:p-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
             }`}>
               {step === 'enter_activation_phone'
-                ? 'Ingrese su número de celular de 8 dígitos para iniciar la sirena disuasiva.'
-                : 'vecino si desea desactivar la alarma vecinal, coloque de nuevo los 8 dígitos de su celular y presione el botón rojo inferior para desactivar la alarma vecinal.'
+                ? 'Ingrese su número de celular para iniciar la sirena disuasiva.'
+                : 'vecino si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior para desactivar la alarma vecinal.'
               }
             </p>
             <div className="mt-2 inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
@@ -392,27 +394,32 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
           <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
             {/* Etiqueta + display de dígitos */}
-            <div className="flex items-center justify-center gap-1.5 mb-2.5 text-[#FFD700]">
+            <div className="flex items-center justify-center gap-1.5 mb-2 text-[#FFD700]">
               <Smartphone className="w-3.5 h-3.5" />
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Su número de celular</span>
             </div>
-            <div className="flex justify-center space-x-1 sm:space-x-1.5 mb-3">
-              {[...Array(8)].map((_, idx) => (
+            {/* Display dinámico: muestra los dígitos reales + cursor pulsante al final */}
+            <div className="flex justify-center items-center gap-1 sm:gap-1.5 mb-2.5 min-h-[2.75rem] flex-wrap">
+              {enteredPin.split('').map((digit, idx) => (
                 <div
                   key={idx}
-                  className={`w-7 h-9 tall:w-9 tall:h-11 sm:w-8 sm:h-10 rounded-lg border-2 flex items-center justify-center text-sm tall:text-lg sm:text-sm font-bold font-mono transition-all ${
+                  className={`w-7 h-9 tall:w-8 tall:h-10 sm:w-8 sm:h-10 rounded-lg border-2 flex items-center justify-center text-sm tall:text-base sm:text-sm font-bold font-mono transition-all ${
                     pinError
                       ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                      : enteredPin.length > idx
-                      ? 'border-[#FFD700]/60 bg-[#FFD700]/20 text-white shadow-[0_0_10px_rgba(255,215,0,0.25)]'
-                      : enteredPin.length === idx
-                        ? 'border-[#FFD700]/40 bg-white/5 text-[#FFD700]/30 animate-pulse'
-                        : 'border-white/10 bg-white/5 text-gray-500'
+                      : 'border-[#FFD700]/60 bg-[#FFD700]/20 text-white shadow-[0_0_10px_rgba(255,215,0,0.25)]'
                   }`}
                 >
-                  {enteredPin.length > idx ? enteredPin[idx] : ''}
+                  {digit}
                 </div>
               ))}
+              {/* Cursor pulsante cuando hay espacio */}
+              {enteredPin.length < 15 && (
+                <div className="w-2 h-9 tall:h-10 sm:h-10 rounded bg-[#FFD700]/40 animate-pulse" />
+              )}
+              {/* Placeholder cuando está vacío */}
+              {enteredPin.length === 0 && (
+                <span className="text-gray-600 text-xs font-mono italic self-center">ingrese su número aquí</span>
+              )}
             </div>
             {pinError && (
               <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
@@ -421,31 +428,33 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             )}
             {/* Contador de dígitos */}
             <div className="text-center mb-3">
-              <span className="inline-block text-[10px] font-mono text-gray-400 bg-white/5 border border-white/10 rounded-full px-2.5 py-0.5">
-                {enteredPin.length} / 8 dígitos
+              <span className={`inline-block text-[10px] font-mono bg-white/5 border rounded-full px-2.5 py-0.5 transition-colors ${
+                enteredPin.length >= 8 ? 'text-[#FFD700] border-[#FFD700]/30' : 'text-gray-400 border-white/10'
+              }`}>
+                {enteredPin.length} {enteredPin.length === 1 ? 'dígito' : 'dígitos'} {enteredPin.length >= 8 ? '✓' : `(mín. 8)`}
               </span>
             </div>
 
-            {/* Rejilla numérica premium */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-2">
+            {/* Rejilla numérica premium — botones compactos */}
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
                 <button
                   key={num}
                   onClick={() => handleKeyPress(num)}
-                  className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-white/[0.14] hover:to-white/[0.05] border border-white/10 hover:border-[#FFD700]/30 text-white font-bold font-mono text-xl tall:text-2xl sm:text-sm transition-all active:scale-90 active:bg-[#FFD700]/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+                  className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-[#FFD700]/15 hover:to-[#FFD700]/5 active:from-[#FFD700]/25 active:to-[#FFD700]/10 border border-white/10 hover:border-[#FFD700]/40 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center"
                 >
                   {num}
                 </button>
               ))}
               <button
                 onClick={handleBackspace}
-                className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-white/[0.14] hover:to-white/[0.05] border border-white/10 hover:border-white/20 text-gray-300 font-bold transition-all active:scale-90 text-xl tall:text-2xl sm:text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+                className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-white/[0.16] hover:to-white/[0.06] active:from-white/[0.22] active:to-white/[0.08] border border-white/10 hover:border-white/25 text-gray-300 font-bold transition-all active:scale-90 text-base tall:text-lg sm:text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center"
               >
                 ⌫
               </button>
               <button
                 onClick={() => handleKeyPress('0')}
-                className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-white/[0.14] hover:to-white/[0.05] border border-white/10 hover:border-[#FFD700]/30 text-white font-bold font-mono text-xl tall:text-2xl sm:text-sm transition-all active:scale-90 active:bg-[#FFD700]/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+                className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-[#FFD700]/15 hover:to-[#FFD700]/5 active:from-[#FFD700]/25 active:to-[#FFD700]/10 border border-white/10 hover:border-[#FFD700]/40 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center"
               >
                 0
               </button>
@@ -454,7 +463,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   playTone(300, 100);
                   setEnteredPin('');
                 }}
-                className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-red-500/20 hover:to-red-500/5 border border-white/10 hover:border-red-500/30 text-gray-300 hover:text-red-400 transition-all active:scale-90 text-[11px] tall:text-xs sm:text-xs font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+                className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-red-500/20 hover:to-red-500/5 active:from-red-500/30 active:to-red-500/10 border border-white/10 hover:border-red-500/30 text-gray-300 hover:text-red-400 transition-all active:scale-90 text-[10px] tall:text-[11px] sm:text-[11px] font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center"
               >
                 Limpiar
               </button>
@@ -467,10 +476,10 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             disabled={enteredPin.length < 8}
             className={`w-full py-3.5 tall:py-4 sm:py-3.5 rounded-xl font-bold font-sans text-xs tall:text-sm sm:text-xs transition-all active:scale-98 flex items-center justify-center space-x-2 shadow-lg ${
               step === 'enter_activation_phone'
-                ? enteredPin.length === 8
+                ? enteredPin.length >= 8
                   ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_15px_rgba(255,215,0,0.2)]'
                   : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
-                : enteredPin.length === 8
+                : enteredPin.length >= 8
                   ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/10 hover:shadow-red-500/25'
                   : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
             }`}
@@ -496,6 +505,15 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           {showUnregisteredModal && (
             <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4 overflow-y-auto overscroll-contain animate-fade-in">
               <div className="w-full max-w-sm max-h-[100dvh] overflow-y-auto custom-scrollbar bg-[#0e1324] border border-red-500/30 rounded-3xl p-5 text-center space-y-4 shadow-2xl relative my-auto">
+
+                {/* Botón cerrar (X) superior derecho — mismo estilo que el modal del teclado */}
+                <button
+                  onClick={() => { playTone(400, 100); setShowUnregisteredModal(false); }}
+                  className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors active:scale-90"
+                  aria-label="Cerrar"
+                >
+                  <X className="w-4 h-4" />
+                </button>
 
                 <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500">
                   <ShieldAlert className="w-6 h-6 animate-pulse" />
