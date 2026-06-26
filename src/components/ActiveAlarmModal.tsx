@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone } from 'lucide-react';
+import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
 
@@ -220,27 +220,21 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         </button>
 
         {/* Left pane: Activation Info or Flashing Siren logs */}
-        <div className="flex-1 px-5 pb-5 sm:p-10 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-white/5 bg-gradient-to-br from-black/40 to-transparent">
+        <div className="order-2 sm:order-none flex-1 px-5 pb-6 sm:p-10 flex flex-col justify-between border-t sm:border-b-0 sm:border-r border-white/5 bg-gradient-to-br from-black/40 to-transparent">
 
           {step === 'enter_activation_phone' ? (
-            <div className="space-y-6 flex flex-col justify-center">
-              <div className="flex items-center space-x-3">
+            <div className="flex flex-col gap-4 sm:gap-6 justify-center">
+
+              {/* Escudo + "Validación de Vecinos" — SOLO desktop */}
+              <div className="hidden sm:flex items-center space-x-3">
                 <div className="p-2.5 bg-[#FFD700]/10 rounded-2xl border border-[#FFD700]/20 flex items-center justify-center">
                   <Shield className="w-6 h-6 text-[#FFD700]" />
                 </div>
                 <span className="text-gray-400 font-mono text-xs uppercase tracking-widest font-semibold">Validación de Vecinos</span>
               </div>
 
-              <div>
-                <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-white mb-2 sm:mb-3 leading-tight font-sans">
-                  Activación de Alarma Vecinal
-                </h2>
-                <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed sm:max-w-md">
-                  Para evitar activaciones accidentales o por parte de personas no residentes, el sistema requiere verificar su número de celular de 8 dígitos registrado.
-                </p>
-              </div>
-
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3 sm:space-y-3.5 sm:max-w-md">
+              {/* Pasos 1,2,3 — en móvil aparecen PRIMERO (order-1) */}
+              <div className="order-1 sm:order-none bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3 sm:space-y-3.5 sm:max-w-md">
                 <div className="flex items-center space-x-3 text-xs text-gray-300">
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
                   <span>Ingrese su celular de 8 dígitos en el teclado táctico.</span>
@@ -255,7 +249,18 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
               </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 sm:p-3.5 flex items-start space-x-2.5 text-[10px] text-blue-300 sm:max-w-md leading-normal">
+              {/* Texto "Para evitar activaciones..." — en móvil aparece DESPUÉS de los pasos (order-2) */}
+              <div className="order-2 sm:order-none">
+                <h2 className="hidden sm:block text-3xl font-bold tracking-tight text-white mb-3 leading-tight font-sans">
+                  Activación de Alarma Vecinal
+                </h2>
+                <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed sm:max-w-md">
+                  Para evitar activaciones accidentales o por parte de personas no residentes, el sistema requiere verificar su número de celular de 8 dígitos registrado.
+                </p>
+              </div>
+
+              {/* Tarjeta azul de llamadas — SOLO desktop */}
+              <div className="hidden sm:flex bg-blue-500/10 border border-blue-500/20 rounded-xl p-3.5 items-start space-x-2.5 text-[10px] text-blue-300 sm:max-w-md leading-normal">
                 <Phone className="w-4 h-4 shrink-0 mt-0.5" />
                 <p>Las llamadas y alertas son georreferenciadas y grabadas automáticamente para la seguridad de toda la comunidad del Barrio El Trigal.</p>
               </div>
@@ -352,7 +357,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         </div>
 
         {/* Right pane: Keypad to Enter 8-digit Number */}
-        <div className="w-full sm:w-[420px] px-5 pb-5 sm:p-10 flex flex-col justify-between bg-black/20 relative">
+        <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-10 pt-3 pb-5 sm:py-10 flex flex-col gap-4 sm:justify-between bg-black/20 relative">
 
           <div className="text-center">
             <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 ${
@@ -384,18 +389,25 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             </div>
           </div>
 
-          {/* 8-Digit Display/Slots */}
-          <div className="my-3 sm:my-4">
-            <div className="flex justify-center space-x-1 sm:space-x-1.5">
+          {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
+          <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+            {/* Etiqueta + display de dígitos */}
+            <div className="flex items-center justify-center gap-1.5 mb-2.5 text-[#FFD700]">
+              <Smartphone className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Su número de celular</span>
+            </div>
+            <div className="flex justify-center space-x-1 sm:space-x-1.5 mb-3">
               {[...Array(8)].map((_, idx) => (
                 <div
                   key={idx}
-                  className={`w-7 h-9 tall:w-9 tall:h-11 sm:w-8 sm:h-10 rounded-lg border flex items-center justify-center text-sm tall:text-base font-bold font-mono transition-all ${
+                  className={`w-7 h-9 tall:w-9 tall:h-11 sm:w-8 sm:h-10 rounded-lg border-2 flex items-center justify-center text-sm tall:text-lg sm:text-sm font-bold font-mono transition-all ${
                     pinError
                       ? 'border-red-500/50 bg-red-500/10 text-red-400'
                       : enteredPin.length > idx
-                      ? 'border-[#FFD700]/50 bg-[#FFD700]/20 text-white shadow-[0_0_8px_rgba(255,215,0,0.1)]'
-                      : 'border-white/10 bg-white/5 text-gray-400'
+                      ? 'border-[#FFD700]/60 bg-[#FFD700]/20 text-white shadow-[0_0_10px_rgba(255,215,0,0.25)]'
+                      : enteredPin.length === idx
+                        ? 'border-[#FFD700]/40 bg-white/5 text-[#FFD700]/30 animate-pulse'
+                        : 'border-white/10 bg-white/5 text-gray-500'
                   }`}
                 >
                   {enteredPin.length > idx ? enteredPin[idx] : ''}
@@ -403,44 +415,50 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               ))}
             </div>
             {pinError && (
-              <p className="text-center text-red-400 text-xs mt-2 font-medium animate-pulse">
+              <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
                 Número no válido. Intente nuevamente.
               </p>
             )}
-          </div>
+            {/* Contador de dígitos */}
+            <div className="text-center mb-3">
+              <span className="inline-block text-[10px] font-mono text-gray-400 bg-white/5 border border-white/10 rounded-full px-2.5 py-0.5">
+                {enteredPin.length} / 8 dígitos
+              </span>
+            </div>
 
-          {/* Keypad Grid */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
+            {/* Rejilla numérica premium */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-2">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
+                <button
+                  key={num}
+                  onClick={() => handleKeyPress(num)}
+                  className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-white/[0.14] hover:to-white/[0.05] border border-white/10 hover:border-[#FFD700]/30 text-white font-bold font-mono text-xl tall:text-2xl sm:text-sm transition-all active:scale-90 active:bg-[#FFD700]/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+                >
+                  {num}
+                </button>
+              ))}
               <button
-                key={num}
-                onClick={() => handleKeyPress(num)}
-                className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-95 flex items-center justify-center"
+                onClick={handleBackspace}
+                className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-white/[0.14] hover:to-white/[0.05] border border-white/10 hover:border-white/20 text-gray-300 font-bold transition-all active:scale-90 text-xl tall:text-2xl sm:text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
               >
-                {num}
+                ⌫
               </button>
-            ))}
-            <button
-              onClick={handleBackspace}
-              className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-gray-400 font-bold transition-all active:scale-95 flex items-center justify-center text-base tall:text-lg sm:text-sm"
-            >
-              ⌫
-            </button>
-            <button
-              onClick={() => handleKeyPress('0')}
-              className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-95 flex items-center justify-center"
-            >
-              0
-            </button>
-            <button
-              onClick={() => {
-                playTone(300, 100);
-                setEnteredPin('');
-              }}
-              className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-gray-400 hover:text-red-400 transition-all active:scale-95 flex items-center justify-center text-[11px] tall:text-xs sm:text-xs font-bold"
-            >
-              Limpiar
-            </button>
+              <button
+                onClick={() => handleKeyPress('0')}
+                className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-white/[0.14] hover:to-white/[0.05] border border-white/10 hover:border-[#FFD700]/30 text-white font-bold font-mono text-xl tall:text-2xl sm:text-sm transition-all active:scale-90 active:bg-[#FFD700]/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+              >
+                0
+              </button>
+              <button
+                onClick={() => {
+                  playTone(300, 100);
+                  setEnteredPin('');
+                }}
+                className="h-12 tall:h-16 sm:h-12 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] hover:from-red-500/20 hover:to-red-500/5 border border-white/10 hover:border-red-500/30 text-gray-300 hover:text-red-400 transition-all active:scale-90 text-[11px] tall:text-xs sm:text-xs font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center"
+              >
+                Limpiar
+              </button>
+            </div>
           </div>
 
           {/* Main Action Button */}
