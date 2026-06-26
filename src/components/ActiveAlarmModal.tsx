@@ -167,7 +167,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch sm:items-center justify-center bg-black/90 sm:bg-black/90 backdrop-blur-md overflow-y-auto font-sans">
+    <div className="fixed inset-0 z-50 flex items-center sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans p-0 sm:p-4">
 
       {/* Flashing Warning Visuals (only if alarm is flashing) */}
       {step === 'flashing' && (
@@ -175,9 +175,31 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       )}
 
       {/* Contenedor: en mobile hoja completa con scroll; en sm: panel fijo 1000×620 */}
-      <div className="relative w-full sm:w-[1000px] bg-[#0c101d] sm:rounded-[32px] border-y sm:border border-white/10 overflow-hidden shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:flex-row sm:h-[620px]">
+      <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:flex-row sm:h-[620px]">
 
-        {/* ====== Botón cerrar (siempre visible, mobile top-right) ====== */}
+        {/* ====== Botón cerrar ====== */}
+        {/* Mobile: header sticky para que permanezca accesible al hacer scroll.
+            Desktop: posición absoluta sobre el panel (comportamiento original). */}
+        <div className="sticky top-0 z-50 flex justify-end p-3 sm:hidden bg-transparent pointer-events-none">
+          <button
+            onClick={() => {
+              playTone(400, 100);
+              onClose({
+                id: `log-${Date.now()}`,
+                timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                type: type,
+                user: 'Vecino',
+                status: 'resolved',
+                resolvedBy: 'Cancelado',
+                resolutionTime: '00:00',
+              });
+            }}
+            className="pointer-events-auto w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors active:scale-90"
+            aria-label="Cerrar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
         <button
           onClick={() => {
             playTone(400, 100);
@@ -191,13 +213,14 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               resolutionTime: '00:00',
             });
           }}
-          className="absolute top-4 right-4 z-50 text-gray-500 hover:text-white transition-colors"
+          className="hidden sm:block absolute top-4 right-4 z-50 text-gray-500 hover:text-white transition-colors"
+          aria-label="Cerrar"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Left pane: Activation Info or Flashing Siren logs */}
-        <div className="flex-1 p-5 sm:p-10 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-white/5 bg-gradient-to-br from-black/40 to-transparent">
+        <div className="flex-1 px-5 pb-5 sm:p-10 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-white/5 bg-gradient-to-br from-black/40 to-transparent">
 
           {step === 'enter_activation_phone' ? (
             <div className="space-y-6 flex flex-col justify-center">
@@ -209,15 +232,15 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               </div>
 
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3 leading-tight font-sans">
+                <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-white mb-2 sm:mb-3 leading-tight font-sans">
                   Activación de Alarma Vecinal
                 </h2>
-                <p className="text-gray-300 text-xs leading-relaxed sm:max-w-md">
+                <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed sm:max-w-md">
                   Para evitar activaciones accidentales o por parte de personas no residentes, el sistema requiere verificar su número de celular de 8 dígitos registrado.
                 </p>
               </div>
 
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 space-y-3.5 sm:max-w-md">
+              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3 sm:space-y-3.5 sm:max-w-md">
                 <div className="flex items-center space-x-3 text-xs text-gray-300">
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
                   <span>Ingrese su celular de 8 dígitos en el teclado táctico.</span>
@@ -232,7 +255,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
               </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3.5 flex items-start space-x-2.5 text-[10px] text-blue-300 sm:max-w-md leading-normal">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 sm:p-3.5 flex items-start space-x-2.5 text-[10px] text-blue-300 sm:max-w-md leading-normal">
                 <Phone className="w-4 h-4 shrink-0 mt-0.5" />
                 <p>Las llamadas y alertas son georreferenciadas y grabadas automáticamente para la seguridad de toda la comunidad del Barrio El Trigal.</p>
               </div>
@@ -240,7 +263,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           ) : (
             <>
               <div>
-                <div className="flex items-center space-x-3 mb-6">
+                <div className="flex items-center space-x-3 mb-4 sm:mb-6">
                   <span className="flex h-3 w-3 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F87171] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-[#F87171]"></span>
@@ -248,7 +271,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   <span className="text-[#F87171] font-mono text-xs uppercase tracking-widest font-semibold">Alarma Vecinal Activa</span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2 leading-tight">
+                <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white mb-2 leading-tight">
                   {type === 'panic' && '🚨 Botón de Pánico Activado'}
                   {type === 'suspicious' && '🔍 Actividad Sospechosa Reportada'}
                   {type === 'medical' && '⚕️ Alerta de Emergencia Médica'}
@@ -260,13 +283,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               </div>
 
               {/* Siren Visualization */}
-              <div className="my-6 flex items-center space-x-4 sm:space-x-6 bg-white/5 border border-white/10 rounded-2xl p-5">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shrink-0 ${seconds % 2 === 0 ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]' : 'bg-[#F87171] text-white shadow-[0_0_20px_rgba(248,113,113,0.5)]'}`}>
-                  <ShieldAlert className="w-8 h-8 animate-bounce" />
+              <div className="my-4 sm:my-6 flex items-center space-x-4 sm:space-x-6 bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all shrink-0 ${seconds % 2 === 0 ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]' : 'bg-[#F87171] text-white shadow-[0_0_20px_rgba(248,113,113,0.5)]'}`}>
+                  <ShieldAlert className="w-7 h-7 sm:w-8 sm:h-8 animate-bounce" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-semibold text-white">Transmisión de Sirena</span>
+                    <span className="text-xs sm:text-sm font-semibold text-white">Transmisión de Sirena</span>
                     <span className="text-xs font-mono text-gray-400">{formatTime(seconds)} activo</span>
                   </div>
                   <div className="flex space-x-1 h-6 items-end">
@@ -286,7 +309,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               {/* Dispatch Logs */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider font-mono">Bitácora de Despacho</h4>
-                <div className="bg-[#070912] rounded-xl p-4 border border-white/5 h-44 overflow-y-auto font-mono text-xs space-y-2 text-gray-300 custom-scrollbar">
+                <div className="bg-[#070912] rounded-xl p-4 border border-white/5 h-32 sm:h-44 overflow-y-auto font-mono text-xs space-y-2 text-gray-300 custom-scrollbar">
                   {dispatchLogs.map((log, index) => (
                     <div key={index} className="flex items-start space-x-2">
                       <span className="text-[#FFD700] shrink-0">[{new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}]</span>
@@ -304,7 +327,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 <span className="text-xs text-gray-400">Audio disuasivo de tu altavoz:</span>
                 <button
                   onClick={handleToggleMute}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
+                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
                     isMuted
                       ? 'bg-[#F87171]/10 border-[#F87171]/30 text-[#F87171] hover:bg-[#F87171]/20'
                       : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
@@ -329,27 +352,27 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         </div>
 
         {/* Right pane: Keypad to Enter 8-digit Number */}
-        <div className="w-full sm:w-[420px] p-5 sm:p-10 flex flex-col justify-between bg-black/20 relative">
+        <div className="w-full sm:w-[420px] px-5 pb-5 sm:p-10 flex flex-col justify-between bg-black/20 relative">
 
           <div className="text-center">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${
+            <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 ${
               step === 'enter_activation_phone'
                 ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
                 : 'bg-red-500/10 border border-red-500/20 text-red-400'
             }`}>
-              <Shield className="w-6 h-6" />
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <h3 className={`text-lg font-bold mb-1 font-sans transition-all duration-300 ${
+            <h3 className={`text-base sm:text-lg font-bold mb-1 font-sans transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'text-white'
                 : 'text-red-400 animate-pulse drop-shadow-[0_0_10px_rgba(239,68,68,0.5)] scale-105'
             }`}>
               {step === 'enter_activation_phone' ? 'Activar Alarma' : '⚠️ Desactivar Alarma'}
             </h3>
-            <p className={`text-xs leading-normal transition-all duration-300 ${
+            <p className={`text-[11px] sm:text-xs leading-normal transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'text-gray-400'
-                : 'text-red-200 bg-red-500/10 border border-red-500/30 p-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
+                : 'text-red-200 bg-red-500/10 border border-red-500/30 p-3 sm:p-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
             }`}>
               {step === 'enter_activation_phone'
                 ? 'Ingrese su número de celular de 8 dígitos para iniciar la sirena disuasiva.'
@@ -362,12 +385,12 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           </div>
 
           {/* 8-Digit Display/Slots */}
-          <div className="my-4">
-            <div className="flex justify-center space-x-1.5">
+          <div className="my-3 sm:my-4">
+            <div className="flex justify-center space-x-1 sm:space-x-1.5">
               {[...Array(8)].map((_, idx) => (
                 <div
                   key={idx}
-                  className={`w-8 h-10 rounded-lg border flex items-center justify-center text-sm font-bold font-mono transition-all ${
+                  className={`w-7 h-9 tall:w-9 tall:h-11 sm:w-8 sm:h-10 rounded-lg border flex items-center justify-center text-sm tall:text-base font-bold font-mono transition-all ${
                     pinError
                       ? 'border-red-500/50 bg-red-500/10 text-red-400'
                       : enteredPin.length > idx
@@ -392,20 +415,20 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               <button
                 key={num}
                 onClick={() => handleKeyPress(num)}
-                className="h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold font-mono text-sm transition-all active:scale-95 flex items-center justify-center"
+                className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-95 flex items-center justify-center"
               >
                 {num}
               </button>
             ))}
             <button
               onClick={handleBackspace}
-              className="h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-gray-400 font-bold transition-all active:scale-95 flex items-center justify-center text-sm"
+              className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-gray-400 font-bold transition-all active:scale-95 flex items-center justify-center text-base tall:text-lg sm:text-sm"
             >
               ⌫
             </button>
             <button
               onClick={() => handleKeyPress('0')}
-              className="h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold font-mono text-sm transition-all active:scale-95 flex items-center justify-center"
+              className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-95 flex items-center justify-center"
             >
               0
             </button>
@@ -414,7 +437,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 playTone(300, 100);
                 setEnteredPin('');
               }}
-              className="h-10 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-gray-400 hover:text-red-400 transition-all active:scale-95 flex items-center justify-center text-xs font-bold"
+              className="h-11 tall:h-14 sm:h-12 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-gray-400 hover:text-red-400 transition-all active:scale-95 flex items-center justify-center text-[11px] tall:text-xs sm:text-xs font-bold"
             >
               Limpiar
             </button>
@@ -424,7 +447,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           <button
             onClick={handleVerifyPhone}
             disabled={enteredPin.length < 8}
-            className={`w-full py-3.5 rounded-xl font-bold font-sans text-xs transition-all active:scale-98 flex items-center justify-center space-x-2 shadow-lg ${
+            className={`w-full py-3.5 tall:py-4 sm:py-3.5 rounded-xl font-bold font-sans text-xs tall:text-sm sm:text-xs transition-all active:scale-98 flex items-center justify-center space-x-2 shadow-lg ${
               step === 'enter_activation_phone'
                 ? enteredPin.length === 8
                   ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_15px_rgba(255,215,0,0.2)]'
@@ -453,8 +476,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
           {/* CUSTOM MODAL FOR UNREGISTERED NEIGHBOR */}
           {showUnregisteredModal && (
-            <div className="absolute inset-0 bg-black/95 z-50 flex items-center justify-center p-4 animate-fade-in">
-              <div className="w-full max-w-sm bg-[#0e1324] border border-red-500/30 rounded-3xl p-5 text-center space-y-4 shadow-2xl relative">
+            <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4 overflow-y-auto overscroll-contain animate-fade-in">
+              <div className="w-full max-w-sm max-h-[100dvh] overflow-y-auto custom-scrollbar bg-[#0e1324] border border-red-500/30 rounded-3xl p-5 text-center space-y-4 shadow-2xl relative my-auto">
 
                 <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500">
                   <ShieldAlert className="w-6 h-6 animate-pulse" />
