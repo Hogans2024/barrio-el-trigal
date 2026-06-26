@@ -179,9 +179,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:flex-row sm:h-[620px]">
 
         {/* ====== Botón cerrar ====== */}
-        {/* Mobile: header sticky para que permanezca accesible al hacer scroll.
+        {/* Mobile: header sticky con título "Activar Alarma" centrado + "ID de Terminal" + X.
             Desktop: posición absoluta sobre el panel (comportamiento original). */}
-        <div className="sticky top-0 z-50 flex justify-end p-3 sm:hidden bg-transparent pointer-events-none">
+        <div className="sticky top-0 z-50 flex items-center justify-between px-3 py-2.5 sm:hidden bg-[#0c101d]/90 backdrop-blur-md border-b border-white/5">
           <button
             onClick={() => {
               playTone(400, 100);
@@ -195,11 +195,22 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 resolutionTime: '00:00',
               });
             }}
-            className="pointer-events-auto w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors active:scale-90"
+            className="w-9 h-9 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors active:scale-90"
             aria-label="Cerrar"
           >
             <X className="w-4 h-4" />
           </button>
+          <div className="text-center">
+            <h3 className={`text-sm font-bold font-sans transition-all duration-300 ${
+              step === 'enter_activation_phone'
+                ? 'text-white'
+                : 'text-red-400 animate-pulse'
+            }`}>
+              {step === 'enter_activation_phone' ? 'Activar Alarma' : '⚠️ Desactivar Alarma'}
+            </h3>
+            <span className="text-[9px] text-gray-500 font-mono">ID de Terminal: #CA-TARIJA-0912</span>
+          </div>
+          <div className="w-9 h-9" /> {/* Spacer para equilibrar el botón X */}
         </div>
         <button
           onClick={() => {
@@ -369,7 +380,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             }`}>
               <Shield className="w-6 h-6" />
             </div>
-            <h3 className={`text-base sm:text-lg font-bold mb-1 font-sans transition-all duration-300 ${
+            <h3 className={`hidden sm:block text-lg font-bold mb-1 font-sans transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'text-white'
                 : 'text-red-400 animate-pulse drop-shadow-[0_0_10px_rgba(239,68,68,0.5)] scale-105'
@@ -386,7 +397,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 : 'vecino si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior para desactivar la alarma vecinal.'
               }
             </p>
-            <div className="mt-2 inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
+            <div className="mt-2 hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
               <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
             </div>
           </div>
@@ -497,7 +508,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             )}
           </button>
 
-          <div className="text-center text-[10px] text-gray-500 font-mono mt-2">
+          <div className="hidden sm:block text-center text-[10px] text-gray-500 font-mono mt-2">
             ID de Terminal: #CA-TARIJA-0912
           </div>
 
