@@ -185,25 +185,27 @@ export default function App() {
                   onChange={(e) => setGlobalSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      // TODO: Implementar lógica de búsqueda
+                      setIsTopSearchOpen(false);
+                      // TODO: Implementar lógica de búsqueda a futuro
                     }
                   }}
                 />
                 {globalSearchQuery === '' ? (
                   <button 
                     onClick={() => setIsTopSearchOpen(false)}
-                    className="ml-2 p-1 text-gray-400 hover:text-white"
+                    className="ml-2 p-1 text-gray-400 hover:text-white shrink-0"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 ) : (
                   <button 
                     onClick={() => {
-                      // TODO: Implementar lógica de búsqueda
+                      setIsTopSearchOpen(false);
+                      // TODO: Implementar lógica de búsqueda a futuro
                     }}
-                    className="ml-2 p-1 text-brand-yellow hover:text-white"
+                    className="ml-2 px-3 py-1 text-[10px] font-bold text-brand-yellow border border-brand-yellow rounded-lg hover:bg-brand-yellow/10 transition-colors uppercase shrink-0"
                   >
-                    <Search className="h-5 w-5" />
+                    BUSCAR
                   </button>
                 )}
               </div>
