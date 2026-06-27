@@ -63,6 +63,23 @@ export default function App() {
       mainScrollRef.current.scrollTop = 0;
     }
   }, [activeTab]);
+
+  // Click outside para cerrar la barra superior
+  const topSearchRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (topSearchRef.current && !topSearchRef.current.contains(event.target as Node)) {
+        setIsTopSearchOpen(false);
+      }
+    }
+    
+    if (isTopSearchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isTopSearchOpen]);
   
   // Custom states for toast alerts
   const [toasts, setToasts] = useState<NotificationToast[]>([]);
@@ -172,7 +189,7 @@ export default function App() {
           </div>
 
           {/* Right controls */}
-          <div className={`flex items-center justify-end ${isTopSearchOpen ? 'flex-1 ml-3' : 'space-x-1.5'}`}>
+          <div ref={topSearchRef} className={`flex items-center justify-end ${isTopSearchOpen ? 'flex-1 ml-3' : 'space-x-1.5'}`}>
             {isTopSearchOpen ? (
               <div className="flex items-center w-full bg-black/60 border border-brand-yellow/50 rounded-xl px-3 py-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
                 <input
