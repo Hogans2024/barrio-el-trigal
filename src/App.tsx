@@ -159,8 +159,8 @@ export default function App() {
               alt="Logo Barrio El Trigal" 
               className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
             />
-            <div className="flex flex-col -space-y-1">
-              <span className="bg-gradient-to-r from-green-300 to-green-600 bg-clip-text text-transparent text-[11px] uppercase font-mono block tracking-[0.15em] font-bold">BARRIO</span>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold">BARRIO</span>
               <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
             </div>
           </div>

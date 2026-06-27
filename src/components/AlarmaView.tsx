@@ -283,41 +283,63 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
           </div>
 
           {/* Middle Column: Selector de tipo + Pulsating Panic Button + Direct Dial */}
-          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-2.5 sm:border-l sm:border-r sm:border-white/5 sm:px-4">
+          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-4 sm:border-l sm:border-r sm:border-white/5 sm:px-4">
 
-            {/* Selector de tipo de alarma (4 tipos: panic/suspicious/test/medical) */}
-            <div className="w-full">
-              <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono mb-1.5 text-center sm:text-left">Tipo de alerta</p>
-              <div className="grid grid-cols-4 sm:grid-cols-2 gap-1.5 sm:gap-2">
-                {ALARM_TYPES.map((t) => {
-                  const isSelected = activeAlarmType === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => { playTone(700, 60); setActiveAlarmType(t.id); }}
-                      className={`flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-1 sm:px-2 py-1.5 rounded-lg border text-[9px] sm:text-[10px] font-bold transition-all active:scale-95 ${
-                        isSelected ? t.color : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      {t.icon}
-                      <span>{t.label}</span>
-                    </button>
-                  );
-                })}
+            <div className="w-full flex flex-col items-center">
+              <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono mb-3 text-center">Tipo de alerta</p>
+              
+              <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
+                {/* Left Buttons: Panic & Suspicious */}
+                <div className="flex flex-col gap-2">
+                  {ALARM_TYPES.slice(0, 2).map((t) => {
+                    const isSelected = activeAlarmType === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => { playTone(700, 60); setActiveAlarmType(t.id); }}
+                        className={`flex flex-col items-center justify-center gap-1 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border text-[9px] sm:text-[10px] font-bold transition-all active:scale-95 shadow-md ${
+                          isSelected ? t.color : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        {t.icon}
+                        <span className="text-center leading-tight">{t.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Circular pulsing trigger */}
+                <button
+                  onClick={() => handleTriggerAlarm(activeAlarmType)}
+                  className="w-28 h-28 tall:w-32 tall:h-32 sm:w-36 sm:h-36 rounded-full border-4 border-[#FFD700] flex flex-col items-center justify-center bg-black/40 hover:bg-black/70 transition-all duration-300 group shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)] relative active:scale-95 shrink-0 mx-1 sm:mx-0"
+                >
+                  <span className="absolute inset-0 rounded-full border border-[#FFD700]/30 animate-ping pointer-events-none" />
+                  <Volume2 className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFD700] mb-1 sm:mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-[8px] sm:text-[9px] font-black text-[#FFD700] tracking-widest text-center uppercase leading-tight">
+                    Activar<br />Alarma<br />Vecinal
+                  </span>
+                </button>
+
+                {/* Right Buttons: Medical & Test */}
+                <div className="flex flex-col gap-2">
+                  {ALARM_TYPES.slice(2, 4).map((t) => {
+                    const isSelected = activeAlarmType === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => { playTone(700, 60); setActiveAlarmType(t.id); }}
+                        className={`flex flex-col items-center justify-center gap-1 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border text-[9px] sm:text-[10px] font-bold transition-all active:scale-95 shadow-md ${
+                          isSelected ? t.color : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        {t.icon}
+                        <span className="text-center leading-tight">{t.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-
-            {/* Circular pulsing trigger */}
-            <button
-              onClick={() => handleTriggerAlarm(activeAlarmType)}
-              className="w-28 h-28 tall:w-32 tall:h-32 sm:w-36 sm:h-36 rounded-full border-4 border-[#FFD700] flex flex-col items-center justify-center bg-black/40 hover:bg-black/70 transition-all duration-300 group shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)] relative active:scale-95 shrink-0"
-            >
-              <span className="absolute inset-0 rounded-full border border-[#FFD700]/30 animate-ping pointer-events-none" />
-              <Volume2 className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFD700] mb-1 sm:mb-1.5 group-hover:scale-110 transition-transform" />
-              <span className="text-[8px] sm:text-[9px] font-black text-[#FFD700] tracking-widest text-center uppercase leading-tight">
-                Activar<br />Alarma<br />Vecinal
-              </span>
-            </button>
 
             {/* Call Emergency contact phone button */}
             <button
