@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Siren, LayoutGrid, Calendar, LogIn, Heart, Store, PlusSquare,
-  Bell, Menu, X, Info, Activity, User, ChevronDown
+  Bell, Menu, X, Info, Activity, User, ChevronDown, Search
 } from 'lucide-react';
 
 // Sub-views
@@ -171,6 +171,11 @@ export default function App() {
 
           {/* Right controls */}
           <div className="flex items-center space-x-3">
+            {/* Lupa (Mobile Only) */}
+            <button className="md:hidden p-2 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer">
+              <Search className="h-5 w-5" />
+            </button>
+
             {/* Notifications bell → NoticeDropdown (cabecera global migrada) */}
             <div className="relative">
               <button
@@ -203,7 +208,7 @@ export default function App() {
             {/* Profile trigger → ProfileModal (cabecera global migrada) */}
             <button
               onClick={() => { playTone(500, 50); setIsProfileOpen(true); }}
-              className="flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3"
+              className="hidden md:flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3"
               title="Credencial digital"
             >
               <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-[11px] font-bold border border-white/10 text-white">
@@ -298,6 +303,7 @@ export default function App() {
               {[['alarma','🚨 Central Alarma Vecinal'],['proyectos','🧱 Proyectos del Barrio'],['eventos','📆 Eventos programados'],['farmacias','💊 Farmacias de Turno'],['negocios','🍔 Negocios Locales'],['mascotas','🐾 Mascotas Perdidas'],['afiliacion','📝 Registro de Afiliados']].map(([id,label]) => (
                 <button key={id} onClick={() => { setActiveTab(id); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">{label}</button>
               ))}
+              <button onClick={() => { playTone(500, 50); setIsProfileOpen(true); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">👤 Usuario</button>
             </div>
             <div className="bg-black/40 border border-gray-900 rounded-2xl p-5 space-y-2 text-xs text-gray-500 font-mono mt-8">
               <span className="text-white font-bold block">Contacto Directiva</span>
