@@ -283,13 +283,13 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
           </div>
 
           {/* Middle Column: Selector de tipo + Pulsating Panic Button + Direct Dial */}
-          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-4 sm:border-l sm:border-r sm:border-white/5 sm:px-4 -mt-2 tall:-mt-3 sm:mt-0">
+          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-4 sm:border-l sm:border-r sm:border-white/5 sm:px-4 sm:mt-0">
 
             <div className="w-full flex flex-col items-center">
               
-              <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
+              <div className="flex items-start justify-center gap-2 sm:gap-4 w-full">
                 {/* Left Buttons: Panic & Suspicious */}
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 -mt-2 tall:-mt-3 sm:mt-0">
                   {ALARM_TYPES.slice(0, 2).map((t) => {
                     const isSelected = activeAlarmType === t.id;
                     return (
@@ -308,7 +308,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
                 </div>
 
                 {/* Circular pulsing trigger & Label */}
-                <div className="flex flex-col items-center relative mb-8">
+                <div className="flex flex-col items-center relative mb-6">
                   <button
                     onClick={() => handleTriggerAlarm(activeAlarmType)}
                     className="w-28 h-28 tall:w-32 tall:h-32 sm:w-36 sm:h-36 rounded-full border-4 border-[#FFD700] flex flex-col items-center justify-center bg-black/40 hover:bg-black/70 transition-all duration-300 group shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)] relative active:scale-95 shrink-0 mx-1 sm:mx-0 z-10"
@@ -319,13 +319,13 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
                       Activar<br />Alarma<br />Vecinal
                     </span>
                   </button>
-                  <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono absolute top-[calc(100%+32px)] w-[120px] text-center">
+                  <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono absolute top-[calc(100%+4px)] w-[120px] text-center">
                     Tipo de alerta
                   </p>
                 </div>
 
                 {/* Right Buttons: Medical & Test */}
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 -mt-2 tall:-mt-3 sm:mt-0">
                   {ALARM_TYPES.slice(2, 4).map((t) => {
                     const isSelected = activeAlarmType === t.id;
                     return (
