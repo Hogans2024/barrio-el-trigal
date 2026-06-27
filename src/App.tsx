@@ -35,6 +35,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const mainScrollRef = useRef<HTMLElement>(null);
+  const [isTopSearchOpen, setIsTopSearchOpen] = useState(false);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
 
   // --- Cabecera global: avisos (NoticeDropdown) + perfil (ProfileModal) ---
   // Reemplazan a la campana + drawer de mockAlerts y al perfil anteriores.
@@ -170,60 +172,91 @@ export default function App() {
           </div>
 
           {/* Right controls */}
-          <div className="flex items-center space-x-3">
-            {/* Lupa (Mobile Only) */}
-            <button className="md:hidden p-2 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer">
-              <Search className="h-5 w-5" />
-            </button>
-
-            {/* Notifications bell → NoticeDropdown (cabecera global migrada) */}
-            <div className="relative">
-              <button
-                onClick={() => { playTone(500, 50); setIsNoticeOpen(!isNoticeOpen); }}
-                className={`relative p-2.5 md:px-4 md:py-2 transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border flex items-center gap-2 ${
-                  isNoticeOpen
-                    ? 'border-[#FFD700]/40 text-white'
-                    : 'border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white'
-                }`}
-              >
-                <Bell className="h-5 w-5" />
-                <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Dropdown / hoja inferior según breakpoint (sm:) */}
-              <NoticeDropdown
-                isOpen={isNoticeOpen}
-                notices={notices}
-                onMarkRead={handleMarkRead}
-                onClearAll={handleClearNotices}
-                onClose={() => setIsNoticeOpen(false)}
-              />
-            </div>
-
-            {/* Profile trigger → ProfileModal (cabecera global migrada) */}
-            <button
-              onClick={() => { playTone(500, 50); setIsProfileOpen(true); }}
-              className="hidden md:flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3"
-              title="Credencial digital"
-            >
-              <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-[11px] font-bold border border-white/10 text-white">
-                <User className="h-4 w-4 text-brand-yellow" />
+          <div className={`flex items-center ${isTopSearchOpen ? 'w-full ml-3 max-w-sm' : 'space-x-3'}`}>
+            {isTopSearchOpen ? (
+              <div className="flex items-center w-full bg-black/60 border border-brand-yellow/50 rounded-xl px-3 py-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
+                <Search className="h-4 w-4 text-brand-yellow shrink-0" />
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Buscar en Alarma..."
+                  className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 text-sm ml-2 font-sans"
+                  value={globalSearchQuery}
+                  onChange={(e) => setGlobalSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      setIsTopSearchOpen(false);
+                    }
+                  }}
+                />
+                <button 
+                  onClick={() => setIsTopSearchOpen(false)}
+                  className="ml-2 p-1 text-gray-400 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <ChevronDown className="hidden md:block w-4 h-4 text-gray-500" />
-            </button>
+            ) : (
+              <>
+                {/* Lupa (Mobile Only) - Activa la barra superior */}
+                {activeTab === 'alarma' && (
+                  <button 
+                    onClick={() => setIsTopSearchOpen(true)}
+                    className="md:hidden p-2 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer"
+                  >
+                    <Search className="h-5 w-5" />
+                  </button>
+                )}
 
-            {/* Hamburger menu (Mobile Only) */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600"
-            >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+                {/* Notifications bell → NoticeDropdown (cabecera global migrada) */}
+                <div className="relative">
+                  <button
+                    onClick={() => { playTone(500, 50); setIsNoticeOpen(!isNoticeOpen); }}
+                    className={`relative p-2.5 md:px-4 md:py-2 transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border flex items-center gap-2 ${
+                      isNoticeOpen
+                        ? 'border-[#FFD700]/40 text-white'
+                        : 'border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <Bell className="h-5 w-5" />
+                    <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <NoticeDropdown
+                    isOpen={isNoticeOpen}
+                    notices={notices}
+                    onMarkRead={handleMarkRead}
+                    onClearAll={handleClearNotices}
+                    onClose={() => setIsNoticeOpen(false)}
+                  />
+                </div>
+
+                {/* Profile trigger → ProfileModal (cabecera global migrada) */}
+                <button
+                  onClick={() => { playTone(500, 50); setIsProfileOpen(true); }}
+                  className="hidden md:flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3"
+                  title="Credencial digital"
+                >
+                  <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-[11px] font-bold border border-white/10 text-white">
+                    <User className="h-4 w-4 text-brand-yellow" />
+                  </div>
+                  <ChevronDown className="hidden md:block w-4 h-4 text-gray-500" />
+                </button>
+
+                {/* Hamburger menu (Mobile Only) */}
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="md:hidden p-2.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600"
+                >
+                  {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+              </>
+            )}
           </div>
         </header>
 
@@ -246,7 +279,7 @@ export default function App() {
               </div>
             ) : (
               <>
-            {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
+            {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} globalSearchQuery={globalSearchQuery} />}
             {activeTab === 'proyectos' && <ProyectosView projects={proyectos} />}
             {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} />}
             {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} />}
