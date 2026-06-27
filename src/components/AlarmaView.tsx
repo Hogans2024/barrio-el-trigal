@@ -117,14 +117,22 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
 
       {/* ============ 1. CARRUSEL HERO ============ */}
-      <section className="relative rounded-t-none rounded-b-[16px] sm:rounded-b-[20px] overflow-hidden border-b border-x border-white/10 h-32 tall:h-44 sm:h-64 shrink-0 select-none bg-[#080a0f]">
+      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-32 tall:h-44 sm:h-64 shrink-0 select-none bg-[#080a0f]">
+        {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
+        <div className="md:hidden absolute top-3 left-4 z-20 flex items-center space-x-2">
+          <div className="p-1.5 bg-[#FFD700]/10 rounded-xl border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
+            <Shield className="w-4 h-4 text-[#FFD700]" />
+          </div>
+          <h2 className="text-sm font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
+        </div>
+
         <img
           alt="Barrio El Trigal"
           className="absolute inset-0 w-full h-full object-cover opacity-50"
           src={CAROUSEL_SLIDES[carouselIndex].imageUrl}
         />
         {/* Dark overlay vignette gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent flex flex-col justify-center px-4 tall:px-6 sm:px-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent flex flex-col justify-center px-4 tall:px-6 sm:px-10 mt-6 md:mt-0">
           <h2 className="text-sm tall:text-lg sm:text-2xl font-light text-white leading-tight">
             {CAROUSEL_SLIDES[carouselIndex].title}
           </h2>
@@ -139,19 +147,19 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
         {/* Carousel Arrow Controls */}
         <button
           onClick={handlePrevSlide}
-          className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90"
+          className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
         >
           <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
         <button
           onClick={handleNextSlide}
-          className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90"
+          className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
         >
           <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         {/* Carousel Page Indicators */}
-        <div className="absolute bottom-2 sm:bottom-2.5 left-1/2 -translate-x-1/2 flex space-x-1.5">
+        <div className="absolute bottom-2 sm:bottom-2.5 left-1/2 -translate-x-1/2 flex space-x-1.5 z-10">
           {CAROUSEL_SLIDES.map((slide, index) => (
             <button
               key={slide.id}
@@ -165,14 +173,15 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
       </section>
 
       {/* ============ 2. BIENVENIDA + BUSCADOR ============ */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 select-none shrink-0 py-1">
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="p-1.5 sm:p-2 bg-[#FFD700]/10 rounded-xl border border-[#FFD700]/20 flex items-center justify-center shrink-0">
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-[#FFD700]" />
+      {/* Oculto en móviles, visible solo en escritorio (md:flex) */}
+      <section className="hidden md:flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none shrink-0 py-1">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-[#FFD700]/10 rounded-xl border border-[#FFD700]/20 flex items-center justify-center shrink-0">
+            <Shield className="w-5 h-5 text-[#FFD700]" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-sm tall:text-base sm:text-base font-bold font-sans truncate">Central de Alarma Vecinal</h2>
-            <p className="text-gray-400 text-[10px] sm:text-[11px] hidden md:block">Selecciona una opción o busca lo que necesitas.</p>
+            <h2 className="text-base font-bold font-sans truncate">Central de Alarma Vecinal</h2>
+            <p className="text-gray-400 text-[11px]">Selecciona una opción o busca lo que necesitas.</p>
           </div>
         </div>
 
