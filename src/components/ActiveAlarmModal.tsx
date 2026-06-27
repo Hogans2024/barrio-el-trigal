@@ -351,7 +351,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           {/* Right pane: Keypad to Enter phone number */}
           <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 py-5 flex flex-col justify-between bg-black/20 relative overflow-y-auto">
 
-            <div className="text-center">
+            <div className="text-center mb-6 sm:mb-8">
               <p className={`text-[11px] sm:text-xs leading-normal transition-all duration-300 ${
                 step === 'enter_activation_phone'
                   ? 'text-gray-400'
@@ -371,10 +371,21 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
             <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-              {/* Etiqueta + display de dígitos */}
-              <div className="flex items-center justify-center gap-1.5 mb-2 text-[#FFD700]">
-                <Smartphone className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Su número de celular</span>
+              {/* Etiqueta + display de dígitos y contador */}
+              <div className="flex items-center justify-center mb-2">
+                <div className="flex items-center gap-1.5 text-[#FFD700]">
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Su número de celular</span>
+                </div>
+                
+                {/* Contador de dígitos */}
+                <div className="ml-4 flex items-center">
+                  <span className={`inline-block text-[10px] font-mono bg-white/5 border rounded-full px-2.5 py-0.5 transition-colors ${
+                    enteredPin.length >= 1 ? 'text-[#FFD700] border-[#FFD700]/30' : 'text-gray-400 border-white/10'
+                  }`}>
+                    {enteredPin.length} {enteredPin.length === 1 ? 'dígito' : 'dígitos'}
+                  </span>
+                </div>
               </div>
               {/* Display dinámico: muestra los dígitos reales + cursor pulsante al final */}
               <div className="flex justify-center items-center gap-1 sm:gap-1.5 mb-2.5 min-h-[2.75rem] flex-wrap">
@@ -404,14 +415,6 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   Número no válido. Intente nuevamente.
                 </p>
               )}
-              {/* Contador de dígitos */}
-              <div className="text-center mb-3">
-                <span className={`inline-block text-[10px] font-mono bg-white/5 border rounded-full px-2.5 py-0.5 transition-colors ${
-                  enteredPin.length >= 1 ? 'text-[#FFD700] border-[#FFD700]/30' : 'text-gray-400 border-white/10'
-                }`}>
-                  {enteredPin.length} {enteredPin.length === 1 ? 'dígito' : 'dígitos'}
-                </span>
-              </div>
 
               {/* Rejilla numérica premium — botones compactos */}
               <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
