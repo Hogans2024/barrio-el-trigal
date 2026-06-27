@@ -150,7 +150,7 @@ export default function App() {
       <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
         
         {/* APP STATUS HEADER (Mobile & Desktop) */}
-        <header className="bg-black/30 border-b border-gray-900/60 px-5 py-2.5 md:py-4 flex justify-between items-center shrink-0 backdrop-blur-md">
+        <header className="bg-black/30 border-b border-gray-900/60 px-5 py-1.5 md:py-2.5 flex justify-between items-center shrink-0 backdrop-blur-md">
           
           {/* Left part varies between mobile and desktop */}
           <div className="flex items-center space-x-2.5 md:hidden">
