@@ -217,10 +217,10 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 resolutionTime: '00:00',
               });
             }}
-            className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer shadow-md"
+            className="w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors active:scale-90"
             aria-label="Cerrar"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -241,23 +241,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   <span className="text-gray-400 font-mono text-xs uppercase tracking-widest font-semibold">Validación de Vecinos</span>
                 </div>
 
-                {/* Pasos 1,2,3 — en móvil aparecen PRIMERO (order-1) */}
-                <div className="order-1 sm:order-none bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3 sm:space-y-3.5 sm:max-w-md">
-                  <div className="flex items-center space-x-3 text-xs text-gray-300">
-                    <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
-                    <span>Ingrese su celular de 8 dígitos en el teclado táctico.</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-xs text-gray-300">
-                    <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">2</div>
-                    <span>Presione el botón inferior <strong className="text-[#FFD700]">"CONFIRMAR Y ACTIVAR"</strong>.</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-xs text-gray-300">
-                    <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">3</div>
-                    <span>La sirena de alta potencia del barrio El Trigal sonará al instante.</span>
-                  </div>
-                </div>
-
-                {/* Texto "Para evitar activaciones..." — en móvil aparece DESPUÉS de los pasos (order-2) */}
+                {/* Texto "Para evitar activaciones..." */}
                 <div className="order-2 sm:order-none">
                   <h2 className="hidden sm:block text-2xl font-bold tracking-tight text-white mb-2 leading-tight font-sans">
                     Activación de Alarma Vecinal
@@ -379,7 +363,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 }
               </p>
               {step === 'enter_activation_phone' && (
-                <div className="mt-2 inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
+                <div className="mt-2 hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
                   <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                 </div>
               )}
@@ -494,6 +478,24 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </>
               )}
             </button>
+
+            {/* Pasos 1,2,3 — pegado al teclado y solo visible en modo de activación */}
+            {step === 'enter_activation_phone' && (
+              <div className="mt-4 bg-white/[0.02] border border-white/5 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center space-x-3 text-xs text-gray-300">
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
+                  <span>Ingrese su celular de 8 dígitos en el teclado táctico.</span>
+                </div>
+                <div className="flex items-center space-x-3 text-xs text-gray-300">
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">2</div>
+                  <span>Presione el botón inferior <strong className="text-[#FFD700]">"CONFIRMAR Y ACTIVAR"</strong>.</span>
+                </div>
+                <div className="flex items-center space-x-3 text-xs text-gray-300">
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">3</div>
+                  <span>La sirena de alta potencia del barrio El Trigal sonará al instante.</span>
+                </div>
+              </div>
+            )}
 
 
           {/* CUSTOM MODAL FOR UNREGISTERED NEIGHBOR */}
