@@ -283,10 +283,9 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
           </div>
 
           {/* Middle Column: Selector de tipo + Pulsating Panic Button + Direct Dial */}
-          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-4 sm:border-l sm:border-r sm:border-white/5 sm:px-4">
+          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-4 sm:border-l sm:border-r sm:border-white/5 sm:px-4 -mt-3 tall:-mt-4 sm:mt-0">
 
             <div className="w-full flex flex-col items-center">
-              <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono mb-3 text-center">Tipo de alerta</p>
               
               <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
                 {/* Left Buttons: Panic & Suspicious */}
@@ -308,17 +307,22 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
                   })}
                 </div>
 
-                {/* Circular pulsing trigger */}
-                <button
-                  onClick={() => handleTriggerAlarm(activeAlarmType)}
-                  className="w-28 h-28 tall:w-32 tall:h-32 sm:w-36 sm:h-36 rounded-full border-4 border-[#FFD700] flex flex-col items-center justify-center bg-black/40 hover:bg-black/70 transition-all duration-300 group shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)] relative active:scale-95 shrink-0 mx-1 sm:mx-0"
-                >
-                  <span className="absolute inset-0 rounded-full border border-[#FFD700]/30 animate-ping pointer-events-none" />
-                  <Volume2 className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFD700] mb-1 sm:mb-1.5 group-hover:scale-110 transition-transform" />
-                  <span className="text-[8px] sm:text-[9px] font-black text-[#FFD700] tracking-widest text-center uppercase leading-tight">
-                    Activar<br />Alarma<br />Vecinal
-                  </span>
-                </button>
+                {/* Circular pulsing trigger & Label */}
+                <div className="flex flex-col items-center relative">
+                  <button
+                    onClick={() => handleTriggerAlarm(activeAlarmType)}
+                    className="w-28 h-28 tall:w-32 tall:h-32 sm:w-36 sm:h-36 rounded-full border-4 border-[#FFD700] flex flex-col items-center justify-center bg-black/40 hover:bg-black/70 transition-all duration-300 group shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)] relative active:scale-95 shrink-0 mx-1 sm:mx-0 z-10"
+                  >
+                    <span className="absolute inset-0 rounded-full border border-[#FFD700]/30 animate-ping pointer-events-none" />
+                    <Volume2 className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFD700] mb-1 sm:mb-1.5 group-hover:scale-110 transition-transform" />
+                    <span className="text-[8px] sm:text-[9px] font-black text-[#FFD700] tracking-widest text-center uppercase leading-tight">
+                      Activar<br />Alarma<br />Vecinal
+                    </span>
+                  </button>
+                  <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono absolute -bottom-3 sm:-bottom-4 text-center z-20 bg-[#080a0f]/50 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/5">
+                    Tipo de alerta
+                  </p>
+                </div>
 
                 {/* Right Buttons: Medical & Test */}
                 <div className="flex flex-col gap-2">
