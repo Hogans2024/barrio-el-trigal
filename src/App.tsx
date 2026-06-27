@@ -150,10 +150,10 @@ export default function App() {
       <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
         
         {/* APP STATUS HEADER (Mobile & Desktop) */}
-        <header className="bg-black/30 border-b border-gray-900/60 px-5 pt-0 pb-1.5 md:pt-0 md:pb-2 flex justify-between items-center shrink-0 backdrop-blur-md">
+        <header className="bg-black/30 border-b border-gray-900/60 px-5 py-0 flex justify-between items-center shrink-0 backdrop-blur-md">
           
           {/* Left part varies between mobile and desktop */}
-          <div className="flex items-center space-x-2.5 md:hidden">
+          <div className="flex items-center space-x-2.5 md:hidden -mt-1.5">
             <img 
               src={`${import.meta.env.BASE_URL}logo-trigal.svg`} 
               alt="Logo Barrio El Trigal" 
@@ -165,14 +165,14 @@ export default function App() {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2 -mt-1.5">
             <Activity className="h-5 w-5 text-brand-green animate-pulse" />
             <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
             <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
           </div>
 
           {/* Right controls */}
-          <div className={`flex items-center ${isTopSearchOpen ? 'w-full ml-3 max-w-sm' : 'space-x-3'}`}>
+          <div className={`flex items-center ${isTopSearchOpen ? 'w-full ml-3 max-w-sm' : 'space-x-3'} -mt-1.5`}>
             {isTopSearchOpen ? (
               <div className="flex items-center w-full bg-black/60 border border-brand-yellow/50 rounded-xl px-3 py-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
                 <Search className="h-4 w-4 text-brand-yellow shrink-0" />
