@@ -117,13 +117,13 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
 
       {/* ============ 1. CARRUSEL HERO ============ */}
-      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-28 tall:h-36 sm:h-52 shrink-0 select-none bg-[#080a0f]">
+      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-24 tall:h-32 sm:h-52 shrink-0 select-none bg-[#080a0f]">
         {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
-        <div className="md:hidden absolute top-3 left-4 z-20 flex items-center space-x-2">
-          <div className="p-1.5 bg-[#FFD700]/10 rounded-xl border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
-            <Shield className="w-4 h-4 text-[#FFD700]" />
+        <div className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center space-x-2">
+          <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
+            <Shield className="w-3.5 h-3.5 text-[#FFD700]" />
           </div>
-          <h2 className="text-sm font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
+          <h2 className="text-xs font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
         </div>
 
         <img
@@ -147,19 +147,19 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
         {/* Carousel Arrow Controls */}
         <button
           onClick={handlePrevSlide}
-          className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
+          className="absolute left-1.5 sm:left-3 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
         >
-          <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
         </button>
         <button
           onClick={handleNextSlide}
-          className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
+          className="absolute right-1.5 sm:right-3 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
         >
-          <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
         </button>
 
         {/* Carousel Page Indicators */}
-        <div className="absolute bottom-2 sm:bottom-2.5 left-1/2 -translate-x-1/2 flex space-x-1.5 z-10">
+        <div className="absolute bottom-1.5 right-2 sm:bottom-2.5 sm:right-3 flex space-x-1.5 z-10">
           {CAROUSEL_SLIDES.map((slide, index) => (
             <button
               key={slide.id}
