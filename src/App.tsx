@@ -202,10 +202,10 @@ export default function App() {
                 {activeTab === 'alarma' && (
                   <button 
                     onClick={() => setIsTopSearchOpen(true)}
-                    className="md:hidden flex items-center space-x-1.5 bg-black/40 border border-gray-800 hover:border-gray-600 rounded-xl px-2 py-1.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer"
+                    className="md:hidden flex items-center bg-black/60 border border-gray-800 hover:border-brand-yellow/50 rounded-xl px-2.5 py-1.5 transition-all focus:outline-none cursor-pointer w-[90px]"
                   >
-                    <Search className="h-4 w-4" />
-                    <span className="text-[10px] font-sans opacity-50 pr-1">Buscar</span>
+                    <Search className="h-4 w-4 text-gray-400 shrink-0" />
+                    <span className="text-[11px] font-sans text-white/30 ml-2">Buscar</span>
                   </button>
                 )}
 
