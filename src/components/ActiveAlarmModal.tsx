@@ -384,7 +384,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
                 
                 {/* Contador de dígitos */}
-                <div className="ml-4 flex items-center">
+                <div className="ml-2 flex items-center">
                   <span className={`inline-block text-[10px] font-mono bg-white/5 border rounded-full px-2.5 py-0.5 transition-colors ${
                     enteredPin.length >= 1 ? 'text-[#FFD700] border-[#FFD700]/30' : 'text-gray-400 border-white/10'
                   }`}>
