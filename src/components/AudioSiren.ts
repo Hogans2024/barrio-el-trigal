@@ -102,32 +102,35 @@ export const stopSiren = () => {
   }
 };
 
-export const playTone = (freq: number, durationMs: number) => {
+let toneCtx: AudioContext | null = null;
+
+export const playTone = (freq: number, durationMs: number, type: OscillatorType = 'sine') => {
   try {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContextClass) return;
 
-    const tempCtx = new AudioContextClass();
-    const osc = tempCtx.createOscillator();
-    const gain = tempCtx.createGain();
+    if (!toneCtx) {
+      toneCtx = new AudioContextClass();
+    }
+    if (toneCtx.state === 'suspended') {
+      toneCtx.resume();
+    }
 
-    osc.type = 'sine';
+    const osc = toneCtx.createOscillator();
+    const gain = toneCtx.createGain();
+
+    osc.type = type;
     osc.frequency.value = freq;
 
-    gain.gain.setValueAtTime(0.15, tempCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, tempCtx.currentTime + durationMs / 1000);
+    gain.gain.setValueAtTime(0.15, toneCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, toneCtx.currentTime + durationMs / 1000);
 
     osc.connect(gain);
-    gain.connect(tempCtx.destination);
+    gain.connect(toneCtx.destination);
 
-    osc.start();
-    setTimeout(() => {
-      try {
-        osc.stop();
-        osc.disconnect();
-        gain.disconnect();
-        tempCtx.close();
-      } catch (e) {}
-    }, durationMs + 100);
-  } catch (e) {}
+    osc.start(toneCtx.currentTime);
+    osc.stop(toneCtx.currentTime + durationMs / 1000 + 0.1);
+  } catch (e) {
+    console.error('Audio error:', e);
+  }
 };
