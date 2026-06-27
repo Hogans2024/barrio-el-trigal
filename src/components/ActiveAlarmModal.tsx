@@ -123,8 +123,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const handleKeyPress = (num: string) => {
-    playTone(800, 40); // High tech beep
-    setTimeout(() => playTone(1200, 40), 60);
+    playTone(1500, 35, 'square'); // Tech beep
     // Sin límite de dígitos: el backend (Apps Script) valida el número real.
     if (enteredPin.length < 15) {
       setEnteredPin((prev) => prev + num);
@@ -350,19 +349,24 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           </div>
 
           {/* Right pane: Keypad to Enter phone number */}
-          <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-3 pb-5 flex flex-col justify-between bg-black/20 relative overflow-y-auto">
+          <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-1 pb-3 flex flex-col justify-between bg-black/20 relative overflow-y-auto">
 
-            <div className="text-center mb-3 sm:mb-4">
-              <p className={`text-[11px] sm:text-xs leading-normal transition-all duration-300 ${
+            <div className="text-center mb-1 sm:mb-2">
+              <div className={`flex items-center justify-center space-x-2 transition-all duration-300 ${
                 step === 'enter_activation_phone'
                   ? 'text-gray-400'
-                  : 'text-red-200 bg-red-500/10 border border-red-500/30 p-3 sm:p-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
+                  : 'text-red-200 bg-red-500/10 border border-red-500/30 p-2 sm:p-3 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
               }`}>
-                {step === 'enter_activation_phone'
-                  ? 'Ingrese su numero de celular para activar la alarma'
-                  : 'Vecino, si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior.'
-                }
-              </p>
+                {step === 'enter_activation_phone' && (
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
+                )}
+                <p className="text-[11px] sm:text-xs leading-normal">
+                  {step === 'enter_activation_phone'
+                    ? 'Ingrese su numero de celular para activar la alarma'
+                    : 'Vecino, si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior.'
+                  }
+                </p>
+              </div>
               {step === 'enter_activation_phone' && (
                 <div className="mt-2 hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
                   <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
@@ -418,7 +422,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
 
               {/* Rejilla numérica premium — botones compactos */}
-              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[260px] mx-auto">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[220px] mx-auto">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
                   <button
                     key={num}
@@ -485,17 +489,19 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             {/* Pasos 1,2,3 — pegado al teclado y solo visible en modo de activación */}
             {step === 'enter_activation_phone' && (
-              <div className="mt-4 bg-white/[0.02] border border-white/5 rounded-2xl p-4 space-y-3">
-                <div className="flex items-center space-x-3 text-xs text-gray-300">
+              <div className="mt-3 bg-white/[0.02] border border-white/5 rounded-2xl p-3 space-y-2.5">
+                <div className="hidden sm:flex items-center space-x-3 text-xs text-gray-300">
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
                   <span>Ingrese su celular de 8 dígitos en el teclado táctico.</span>
                 </div>
                 <div className="flex items-center space-x-3 text-xs text-gray-300">
-                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">2</div>
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 hidden sm:flex">2</div>
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 sm:hidden">1</div>
                   <span>Presione el botón inferior <strong className="text-[#FFD700]">"CONFIRMAR Y ACTIVAR"</strong>.</span>
                 </div>
                 <div className="flex items-center space-x-3 text-xs text-gray-300">
-                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">3</div>
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 hidden sm:flex">3</div>
+                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 sm:hidden">2</div>
                   <span>La sirena de alta potencia del barrio El Trigal sonará al instante.</span>
                 </div>
               </div>
