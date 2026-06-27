@@ -172,7 +172,7 @@ export default function App() {
           </div>
 
           {/* Right controls */}
-          <div className={`flex items-center ${isTopSearchOpen ? 'w-full ml-3 max-w-sm' : 'space-x-3'}`}>
+          <div className={`flex items-center ${isTopSearchOpen ? 'w-full ml-3 max-w-sm' : 'space-x-1.5'}`}>
             {isTopSearchOpen ? (
               <div className="flex items-center w-full bg-black/60 border border-brand-yellow/50 rounded-xl px-3 py-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
                 <Search className="h-4 w-4 text-brand-yellow shrink-0" />
@@ -202,10 +202,10 @@ export default function App() {
                 {activeTab === 'alarma' && (
                   <button 
                     onClick={() => setIsTopSearchOpen(true)}
-                    className="md:hidden flex items-center bg-black/60 border border-gray-800 hover:border-brand-yellow/50 rounded-xl px-2.5 py-1.5 transition-all focus:outline-none cursor-pointer w-[90px]"
+                    className="md:hidden flex items-center bg-black/60 border border-gray-800 hover:border-brand-yellow/50 rounded-xl px-2 py-1.5 transition-all focus:outline-none cursor-pointer w-[75px]"
                   >
                     <Search className="h-4 w-4 text-gray-400 shrink-0" />
-                    <span className="text-[11px] font-sans text-white/30 ml-2">Buscar</span>
+                    <span className="text-[11px] font-sans text-white/30 ml-1">Buscar</span>
                   </button>
                 )}
 
