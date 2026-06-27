@@ -153,14 +153,14 @@ export default function App() {
         <header className="bg-black/30 border-b border-gray-900/60 px-5 py-0 flex justify-between items-center shrink-0 backdrop-blur-md">
           
           {/* Left part varies between mobile and desktop */}
-          <div className="flex items-center space-x-2.5 md:hidden -mt-1.5">
+          <div className="flex items-end space-x-2.5 md:hidden self-end pb-0.5">
             <img 
               src={`${import.meta.env.BASE_URL}logo-trigal.svg`} 
               alt="Logo Barrio El Trigal" 
               className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
             />
-            <div className="flex flex-col space-y-1">
-              <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold">BARRIO</span>
+            <div className="flex flex-col space-y-[2px] pb-0.5">
+              <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
               <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
             </div>
           </div>
