@@ -175,12 +175,11 @@ export default function App() {
           <div className={`flex items-center justify-end ${isTopSearchOpen ? 'flex-1 ml-3' : 'space-x-1.5'}`}>
             {isTopSearchOpen ? (
               <div className="flex items-center w-full bg-black/60 border border-brand-yellow/50 rounded-xl px-3 py-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
-                <Search className="h-4 w-4 text-brand-yellow shrink-0" />
                 <input
                   type="text"
                   autoFocus
                   placeholder="Buscar en Alarma..."
-                  className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 text-sm ml-2 font-sans"
+                  className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 text-sm ml-1 font-sans"
                   value={globalSearchQuery}
                   onChange={(e) => setGlobalSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
