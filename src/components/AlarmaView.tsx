@@ -282,8 +282,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
             </p>
           </div>
 
-          {/* Middle Column: Selector de tipo + Pulsating Panic Button + Direct Dial */}
-          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-4 sm:border-l sm:border-r sm:border-white/5 sm:px-4 sm:mt-0">
+          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-[7px] sm:border-l sm:border-r sm:border-white/5 sm:px-4 sm:mt-0">
 
             <div className="w-full flex flex-col items-center">
               
