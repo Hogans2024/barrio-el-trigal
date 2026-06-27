@@ -244,7 +244,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
       )}
 
       {/* ============ 3. ACCESOS RÁPIDOS (grid mock → DetailModal) ============ */}
-      <section className="grid grid-cols-2 tall:grid-cols-4 sm:grid-cols-4 gap-2 tall:gap-3 sm:gap-4 select-none shrink-0">
+      <section className="grid grid-cols-2 tall:grid-cols-4 sm:grid-cols-4 gap-[5px] tall:gap-[9px] sm:gap-[13px] select-none shrink-0 -mt-[3px]">
         {filteredItems.map((item) => (
           <div
             key={item.id}
@@ -265,7 +265,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
       </section>
 
       {/* ============ 4. CENTRAL DE ALARMA ============ */}
-      <section className="bg-white/[0.02] backdrop-blur border border-white/10 rounded-2xl sm:rounded-[24px] p-3 tall:p-4 sm:p-4.5 relative overflow-hidden shrink-0 shadow-[0_0_30px_rgba(255,215,0,0.03)]">
+      <section className="bg-white/[0.02] backdrop-blur border border-white/10 rounded-2xl sm:rounded-[24px] p-3 tall:p-4 sm:p-4.5 relative overflow-hidden shrink-0 shadow-[0_0_30px_rgba(255,215,0,0.03)] -mt-[3px]">
         {/* En desktop: grid de 12 columnas estilo origen. En mobile: apilado. */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-6 sm:items-center">
 
@@ -318,7 +318,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
                       Activar<br />Alarma<br />Vecinal
                     </span>
                   </button>
-                  <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono absolute top-[calc(100%+4px)] w-[120px] text-center">
+                  <p className="text-[9px] tall:text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono absolute top-[calc(100%+6px)] w-[120px] text-center">
                     Tipo de alerta
                   </p>
                 </div>
