@@ -117,7 +117,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
 
       {/* ============ 1. CARRUSEL HERO ============ */}
-      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-32 tall:h-44 sm:h-64 shrink-0 select-none bg-[#080a0f]">
+      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-28 tall:h-36 sm:h-52 shrink-0 select-none bg-[#080a0f]">
         {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
         <div className="md:hidden absolute top-3 left-4 z-20 flex items-center space-x-2">
           <div className="p-1.5 bg-[#FFD700]/10 rounded-xl border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
