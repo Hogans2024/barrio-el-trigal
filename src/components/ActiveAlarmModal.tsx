@@ -123,7 +123,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const handleKeyPress = (num: string) => {
-    playTone(523.25, 80); // Key beep tone
+    playTone(800, 40); // High tech beep
+    setTimeout(() => playTone(1200, 40), 60);
     // Sin límite de dígitos: el backend (Apps Script) valida el número real.
     if (enteredPin.length < 15) {
       setEnteredPin((prev) => prev + num);
@@ -200,7 +201,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   step === 'enter_activation_phone' ? 'bg-[#FFD700] animate-pulse' : 'bg-red-500 animate-ping'
                 }`} />
               </div>
-              <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-0.5">ID de Terminal: #CA-TARIJA-0912</span>
+              <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-0.5">ID TERM: #0912</span>
             </div>
           </div>
 
@@ -417,7 +418,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
 
               {/* Rejilla numérica premium — botones compactos */}
-              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[260px] mx-auto">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
                   <button
                     key={num}
@@ -459,13 +460,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             <button
               onClick={handleVerifyPhone}
               disabled={enteredPin.length < 1}
-              className={`w-full py-3.5 tall:py-4 sm:py-3.5 rounded-xl font-bold font-sans text-xs tall:text-sm sm:text-xs transition-all active:scale-98 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
+              className={`w-full py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 1
-                    ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_15px_rgba(255,215,0,0.2)] font-extrabold'
+                    ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30 transform scale-[1.02]'
                     : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
                   : enteredPin.length >= 1
-                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/10 hover:shadow-red-500/25 font-extrabold'
+                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30 transform scale-[1.02]'
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
               }`}
             >
