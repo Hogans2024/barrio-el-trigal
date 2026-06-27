@@ -180,7 +180,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px]">
 
         {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL */}
-        <div className="sticky top-0 z-50 w-full flex items-center justify-between px-5 py-4 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div className="sticky top-0 z-50 w-full flex items-center justify-between px-5 py-2.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
           <div className="flex items-center space-x-3">
             <div className={`p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
@@ -349,16 +349,16 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           </div>
 
           {/* Right pane: Keypad to Enter phone number */}
-          <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 py-5 flex flex-col justify-between bg-black/20 relative overflow-y-auto">
+          <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-3 pb-5 flex flex-col justify-between bg-black/20 relative overflow-y-auto">
 
-            <div className="text-center mb-6 sm:mb-8">
+            <div className="text-center mb-3 sm:mb-4">
               <p className={`text-[11px] sm:text-xs leading-normal transition-all duration-300 ${
                 step === 'enter_activation_phone'
                   ? 'text-gray-400'
                   : 'text-red-200 bg-red-500/10 border border-red-500/30 p-3 sm:p-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
               }`}>
                 {step === 'enter_activation_phone'
-                  ? 'ingresa tu numero de celular para activar la Alarma vecinal'
+                  ? 'Ingrese su numero de celular para activar la alarma'
                   : 'Vecino, si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior.'
                 }
               </p>
