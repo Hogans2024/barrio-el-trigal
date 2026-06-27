@@ -282,7 +282,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
             </p>
           </div>
 
-          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-[7px] sm:border-l sm:border-r sm:border-white/5 sm:px-4 sm:mt-0">
+          <div className="sm:col-span-4 flex flex-col items-center justify-center space-y-[3px] sm:border-l sm:border-r sm:border-white/5 sm:px-4 sm:mt-0">
 
             <div className="w-full flex flex-col items-center">
               
