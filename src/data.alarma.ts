@@ -273,23 +273,16 @@ export const DEFAULT_VECINOS: Vecino[] = [
 export const NOTICES: Notice[] = [
   {
     id: '1',
-    title: 'Mantenimiento de cámaras de seguridad en calle Los Nogales',
+    title: 'Nueva campaña de vacunación para mascotas este sábado en la plaza principal',
     time: 'Hace 10 min',
     unread: true,
     type: 'info',
   },
   {
     id: '2',
-    title: 'Simulacro de sismo barrial programado para el sábado',
-    time: 'Hace 2 horas',
+    title: 'Corte de agua programado para el día martes de 08:00 a 14:00 por mantenimiento',
+    time: 'Ayer',
     unread: true,
     type: 'warning',
-  },
-  {
-    id: '3',
-    title: 'Alerta de auto sospechoso de color blanco rondando el parque',
-    time: 'Ayer',
-    unread: false,
-    type: 'alert',
   },
 ];

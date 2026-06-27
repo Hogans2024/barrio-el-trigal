@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Info, AlertTriangle, ShieldAlert, CheckCircle, BellOff, X } from 'lucide-react';
 import { Notice } from '../types.alarma';
 import { playTone } from './AudioSiren';
@@ -11,21 +11,18 @@ interface NoticeDropdownProps {
   onClose?: () => void;
 }
 
-/**
- * Bandeja de avisos del header global.
- *
- * Responsive (sección 5.1):
- *  - sin prefijo / `tall:` (mobile, < 640px de ancho): hoja inferior fija
- *    (bottom-sheet) a ancho completo, scroll vertical, botón cerrar visible.
- *  - `sm:` (≥ 640px, escritorio/tablet): dropdown absoluto centrado bajo el
- *    disparador, tal como en el proyecto origen.
- */
 export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll, onClose }: NoticeDropdownProps) {
-  if (!isOpen) return null;
+  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
 
-  const handleItemClick = (id: string) => {
+  if (!isOpen) {
+    if (selectedNotice) setSelectedNotice(null);
+    return null;
+  }
+
+  const handleItemClick = (notice: Notice) => {
     playTone(500, 50);
-    onMarkRead(id);
+    onMarkRead(notice.id);
+    setSelectedNotice(notice);
   };
 
   const getNoticeIcon = (type: string) => {
@@ -61,7 +58,7 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
                   onClick={() => { playTone(440, 100); onClearAll(); }}
                   className="text-[10px] text-gray-400 hover:text-white underline font-mono transition-colors"
                 >
-                  Limpiar todos
+                  Limpiar
                 </button>
               )}
               <button
@@ -83,7 +80,7 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
               notices.map((notice) => (
                 <div
                   key={notice.id}
-                  onClick={() => handleItemClick(notice.id)}
+                  onClick={() => handleItemClick(notice)}
                   className={`p-4 flex items-start space-x-3 cursor-pointer transition-all ${
                     notice.unread ? 'bg-[#FFD700]/5 hover:bg-[#FFD700]/10' : 'hover:bg-white/5'
                   }`}
@@ -102,25 +99,29 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
               ))
             )}
           </div>
-
-          <div className="p-3 bg-black/10 border-t border-white/5 text-center shrink-0">
-            <span className="text-[9px] text-gray-500 font-mono">© Central El Trigal • Tarija</span>
-          </div>
         </div>
       </div>
 
       {/* ====== DESKTOP / TABLET (≥ sm): dropdown absoluto estilo origen ====== */}
       <div className="hidden sm:block absolute right-0 mt-2 w-80 bg-[#0c101d] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden font-sans">
         <div className="p-4 bg-black/20 border-b border-white/5 flex items-center justify-between">
-          <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">Bandeja de Avisos</span>
-          {notices.length > 0 && (
+          <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">Avisos {unreadCount > 0 && `(${unreadCount})`}</span>
+          <div className="flex items-center gap-3">
+            {notices.length > 0 && (
+              <button
+                onClick={() => { playTone(440, 100); onClearAll(); }}
+                className="text-[10px] text-gray-400 hover:text-white underline font-mono transition-colors"
+              >
+                Limpiar
+              </button>
+            )}
             <button
-              onClick={() => { playTone(440, 100); onClearAll(); }}
-              className="text-[10px] text-gray-400 hover:text-white underline font-mono transition-colors"
+              onClick={() => { playTone(400, 50); onClose?.(); }}
+              className="w-7 h-7 rounded-full hover:bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all"
             >
-              Limpiar todos
+              <X className="w-4 h-4" />
             </button>
-          )}
+          </div>
         </div>
 
         <div className="max-h-72 overflow-y-auto divide-y divide-white/5 custom-scrollbar">
@@ -133,7 +134,7 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
             notices.map((notice) => (
               <div
                 key={notice.id}
-                onClick={() => handleItemClick(notice.id)}
+                onClick={() => handleItemClick(notice)}
                 className={`p-4 flex items-start space-x-3 cursor-pointer transition-all ${
                   notice.unread ? 'bg-[#FFD700]/5 hover:bg-[#FFD700]/10' : 'hover:bg-white/5'
                 }`}
@@ -152,11 +153,43 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
             ))
           )}
         </div>
-
-        <div className="p-3 bg-black/10 border-t border-white/5 text-center">
-          <span className="text-[9px] text-gray-500 font-mono">© Central El Trigal • Tarija</span>
-        </div>
       </div>
+
+      {/* ====== MODAL DE DETALLE DE NOTIFICACIÓN ====== */}
+      {selectedNotice && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setSelectedNotice(null)}
+          />
+          <div className="relative w-full max-w-sm bg-[#0c101d] border border-white/10 rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setSelectedNotice(null)}
+              className="absolute top-4 right-4 w-8 h-8 bg-black/40 hover:bg-black/80 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-all border border-gray-800"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-white/5 rounded-full border border-white/10 shrink-0">
+                {getNoticeIcon(selectedNotice.type)}
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-base leading-snug">Detalle del Aviso</h3>
+                <p className="text-gray-400 text-xs font-mono mt-1">{selectedNotice.time}</p>
+              </div>
+              <p className="text-gray-300 text-sm bg-black/40 p-4 rounded-xl border border-white/5 w-full text-left leading-relaxed">
+                {selectedNotice.title}
+              </p>
+              <button
+                onClick={() => setSelectedNotice(null)}
+                className="mt-2 w-full py-2.5 bg-brand-yellow hover:bg-yellow-400 text-black font-bold rounded-xl text-xs transition-colors"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

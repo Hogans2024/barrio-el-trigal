@@ -256,7 +256,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
               className="absolute inset-0 w-full h-full object-cover opacity-45 group-hover:scale-105 transition-transform duration-500"
               src={item.imageUrl}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-black/30 p-2 sm:p-3 flex flex-col justify-end w-full">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-black/30 p-2 sm:p-3 flex flex-col justify-end items-center text-center w-full">
               <h4 className="font-bold text-[11px] sm:text-xs text-white group-hover:text-[#FFD700] transition-colors leading-tight">{item.title}</h4>
               <p className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 leading-none hidden sm:block">{item.subtitle}</p>
             </div>
