@@ -356,7 +356,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
           </div>
 
           {/* Right Column: Key Benefits Indicators */}
-          <div className="sm:col-span-4 space-y-2.5 sm:pl-4">
+          <div className="sm:col-span-4 space-y-2.5 sm:pl-4 -mt-3 sm:mt-0">
             <div className="flex items-start space-x-3">
               <div className="w-7 h-7 rounded-lg bg-[#22c55e]/10 border border-[#22c55e]/20 flex items-center justify-center text-[#22c55e] shrink-0">
                 <CheckCircle className="w-4 h-4" />
