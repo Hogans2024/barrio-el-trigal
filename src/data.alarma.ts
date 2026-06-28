@@ -4,10 +4,6 @@ import {
   Notice,
   EmergencyContact,
   AlarmLog,
-  MockLostPet,
-  MockPharmacy,
-  MockLocalBusiness,
-  MockNeighborhoodEvent,
   Vecino,
 } from './types.alarma';
 
@@ -135,88 +131,6 @@ export const ALARM_LOGS: AlarmLog[] = [
     status: 'resolved',
     resolvedBy: 'Ambulancia 168',
     resolutionTime: '8 min',
-  },
-];
-
-// --- Datos MOCK renombrados (Mock*) para el DetailModal ---
-
-export const LOST_PETS: MockLostPet[] = [
-  {
-    id: 'pet-1',
-    name: 'Toby',
-    breed: 'Golden Retriever',
-    description: 'Perrito juguetón color dorado, llevaba collar rojo con placa de El Trigal. Perdido cerca del parque central.',
-    contact: '729 12345',
-    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=400',
-    status: 'lost',
-  },
-  {
-    id: 'pet-2',
-    name: 'Michi',
-    breed: 'Gato Siamés',
-    description: 'Gato siamés con ojos azules muy llamativos, asustadizo. Responde al nombre de Michi.',
-    contact: '715 98765',
-    imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400',
-    status: 'lost',
-  },
-];
-
-export const PHARMACIES: MockPharmacy[] = [
-  {
-    id: 'ph-1',
-    name: 'Farmacia El Sol',
-    address: 'Av. Las Américas esq. Calle Los Pinos',
-    phone: '66 41100',
-    schedule: 'Abierto 24 Horas',
-    open: true,
-  },
-  {
-    id: 'ph-2',
-    name: 'Farmacia Tarija',
-    address: 'Calle Bolívar #420',
-    phone: '66 32200',
-    schedule: 'Abierto hasta las 23:00',
-    open: true,
-  },
-];
-
-export const LOCAL_BUSINESSES: MockLocalBusiness[] = [
-  {
-    id: 'biz-1',
-    name: 'Panadería Don Bosco',
-    category: 'Alimentos',
-    phone: '729 88311',
-    address: 'Av. Integración #120',
-    rating: 4.8,
-    featuredProduct: 'Pan casero y empanadas tarijeñas',
-  },
-  {
-    id: 'biz-2',
-    name: 'Ferretería El Trigal',
-    category: 'Construcción / Hogar',
-    phone: '730 45221',
-    address: 'Calle Los Tilos #15',
-    rating: 4.6,
-    featuredProduct: 'Herramientas y duplicado de llaves',
-  },
-];
-
-export const NEIGHBORHOOD_EVENTS: MockNeighborhoodEvent[] = [
-  {
-    id: 'ev-1',
-    title: 'Asamblea General del Barrio',
-    date: 'Sábado 27 de Junio',
-    time: '10:00 AM',
-    location: 'Cancha Polifuncional de El Trigal',
-    description: 'Reunión para coordinar la instalación de 3 nuevas cámaras de vigilancia y cobro de cuota de mantenimiento.',
-  },
-  {
-    id: 'ev-2',
-    title: 'Simulacro de Sismo y Evacuación',
-    date: 'Domingo 28 de Junio',
-    time: '04:00 PM',
-    location: 'Todo el Barrio',
-    description: 'Ejercicio preventivo en conjunto con Bomberos Brasschaat para poner a prueba los tiempos de respuesta comunitaria.',
   },
 ];
 
