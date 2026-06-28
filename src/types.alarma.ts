@@ -66,50 +66,6 @@ export interface AlarmLog {
   resolutionTime?: string;
 }
 
-// --- Tipos que CHOCAN con los reales del CMS → renombrados Mock* ---
-// Comparar con src/types.ts: ahí existen Pharmacy, LocalBusiness,
-// LostPet y NeighborhoodEvent con campos distintos (conectados a
-// Sheets). Estos Mock* son los del proyecto origen, con datos de
-// prueba, y NUNCA deben mezclarse.
-
-export interface MockLostPet {
-  id: string;
-  name: string;
-  breed: string;
-  description: string;
-  contact: string;
-  imageUrl: string;
-  status: 'lost' | 'found';
-}
-
-export interface MockPharmacy {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  schedule: string;
-  open: boolean;
-}
-
-export interface MockLocalBusiness {
-  id: string;
-  name: string;
-  category: string;
-  phone: string;
-  address: string;
-  rating: number;
-  featuredProduct: string;
-}
-
-export interface MockNeighborhoodEvent {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-}
-
 // --- Tipos propios de la sección "Registro de Afiliados" ---
 
 export interface Vecino {
