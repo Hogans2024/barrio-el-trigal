@@ -24,7 +24,6 @@ import { playTone } from './AudioSiren';
 // Subcomponents migrados del proyecto origen (con imports a *.alarma)
 import ActiveAlarmModal from './ActiveAlarmModal';
 import CallModal from './CallModal';
-import DetailModal from './DetailModal';
 
 interface AlarmaViewProps {
   /** Navegación entre pestañas del CMS (no usada activamente aquí, pero se conserva la firma). */
@@ -48,14 +47,11 @@ interface AlarmaViewProps {
  *  - tall: celular grande (≥ 700px de alto)
  *  - sm: tablet/escritorio (≥ 640px de ancho) — fiel al diseño del origen.
  */
-export default function AlarmaView({ onShowNotification, globalSearchQuery = '' }: AlarmaViewProps) {
+export default function AlarmaView({ onNavigate, onShowNotification, globalSearchQuery = '' }: AlarmaViewProps) {
   // Main interactive modals toggles
   const [isAlarmActive, setIsAlarmActive] = useState(false);
   const [activeAlarmType, setActiveAlarmType] = useState<'panic' | 'suspicious' | 'test' | 'medical'>('panic');
   const [isDialerOpen, setIsDialerOpen] = useState(false);
-
-  // Detail views state (accesos rápidos)
-  const [activeDetailType, setActiveDetailType] = useState<'eventos' | 'farmacias' | 'mascotas' | 'negocios' | null>(null);
 
   // Dynamic state for data
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -212,28 +208,28 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
           <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono">Resultados de búsqueda:</h4>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div
-              onClick={() => { setActiveDetailType('farmacias'); setSearchQuery(''); }}
+              onClick={() => { onNavigate('farmacias'); setSearchQuery(''); }}
               className="p-2 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl cursor-pointer flex justify-between items-center"
             >
               <span>💊 Farmacias Abiertas</span>
               <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
             </div>
             <div
-              onClick={() => { setActiveDetailType('mascotas'); setSearchQuery(''); }}
+              onClick={() => { onNavigate('mascotas'); setSearchQuery(''); }}
               className="p-2 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl cursor-pointer flex justify-between items-center"
             >
               <span>🐕 Mascotas Perdidas</span>
               <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
             </div>
             <div
-              onClick={() => { setActiveDetailType('eventos'); setSearchQuery(''); }}
+              onClick={() => { onNavigate('eventos'); setSearchQuery(''); }}
               className="p-2 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl cursor-pointer flex justify-between items-center"
             >
               <span>📅 Asambleas y Simulacros</span>
               <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
             </div>
             <div
-              onClick={() => { setActiveDetailType('negocios'); setSearchQuery(''); }}
+              onClick={() => { onNavigate('negocios'); setSearchQuery(''); }}
               className="p-2 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl cursor-pointer flex justify-between items-center"
             >
               <span>🛒 Tiendas Cercanas</span>
@@ -248,7 +244,7 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            onClick={() => { playTone(600, 80); setActiveDetailType(item.id as any); }}
+            onClick={() => { playTone(600, 80); onNavigate(item.id); }}
             className="group relative rounded-xl overflow-hidden border border-white/5 hover:border-[#FFD700]/30 cursor-pointer h-16 tall:h-20 sm:h-20 transition-all duration-300 hover:shadow-lg flex animate-fade-in"
           >
             <img
@@ -457,12 +453,8 @@ export default function AlarmaView({ onShowNotification, globalSearchQuery = '' 
         onClose={() => setIsDialerOpen(false)}
       />
 
-      {/* MULTIPURPOSE COMPONENT PORTAL PORT (Eventos, Farmacias, Mascotas, Negocios) */}
-      <DetailModal
-        isOpen={activeDetailType !== null}
-        onClose={() => setActiveDetailType(null)}
-        type={activeDetailType || 'eventos'}
-      />
+      {/* Los accesos rápidos (Eventos, Farmacias, Mascotas, Negocios) ahora */}
+      {/* navegan directamente a las pestañas CMS vía onNavigate(). */}
 
     </div>
   );
