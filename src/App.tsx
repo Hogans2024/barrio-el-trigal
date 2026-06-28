@@ -257,13 +257,6 @@ export default function App() {
                     )}
                   </button>
 
-                  <NoticeDropdown
-                    isOpen={isNoticeOpen}
-                    notices={notices}
-                    onMarkRead={handleMarkRead}
-                    onClearAll={handleClearNotices}
-                    onClose={() => setIsNoticeOpen(false)}
-                  />
                 </div>
 
                 {/* Profile trigger → ProfileModal (cabecera global migrada) */}
@@ -347,6 +340,13 @@ export default function App() {
       {/* 3. CREDENCIAL DIGITAL DE PERFIL (modal global, accesible desde cualquier pestaña) */}
       {/* Reemplaza al antiguo drawer de mockAlerts. La bandeja de avisos ahora */}
       {/* vive en el header vía NoticeDropdown (es un dropdown/hoja, no un drawer). */}
+      <NoticeDropdown
+        isOpen={isNoticeOpen}
+        notices={notices}
+        onMarkRead={handleMarkRead}
+        onClearAll={handleClearNotices}
+        onClose={() => setIsNoticeOpen(false)}
+      />
       <ProfileModal
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
