@@ -225,10 +225,16 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         </div>
 
         {/* CUERPO DEL MODAL (PANELES SPLIT) */}
-        <div className="flex-1 flex flex-col sm:flex-row overflow-y-auto sm:overflow-hidden">
+        {/* En mobile sin overflow: el contenido fluye y es el contenedor
+            principal (línea 180) el único que hace scroll, así teclado +
+            texto "ALARMA VECINAL ACTIVA" + bitácora se deslizan juntos.
+            En desktop (sm:) cada panel mantiene su scroll independiente. */}
+        <div className="flex-1 flex flex-col sm:flex-row sm:overflow-hidden">
 
-          {/* Left pane: Activation Info or Flashing Siren logs */}
-          <div className="order-2 sm:order-none flex-1 px-5 pb-6 sm:p-8 flex flex-col justify-between border-t sm:border-t-0 sm:border-r border-white/5 bg-gradient-to-br from-black/40 to-transparent overflow-y-auto">
+          {/* Left pane: Activation Info or Flashing Siren logs.
+              Sin overflow en mobile para que todo fluya en un solo scroll
+              junto con el teclado; en desktop cada panel tiene su propio scroll. */}
+          <div className="order-2 sm:order-none flex-1 px-5 pb-6 sm:p-8 flex flex-col justify-between border-t sm:border-t-0 sm:border-r border-white/5 bg-gradient-to-br from-black/40 to-transparent sm:overflow-y-auto">
 
             {step === 'enter_activation_phone' ? (
               <div className="flex flex-col gap-4 sm:gap-6 justify-center">
@@ -348,8 +354,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
           </div>
 
-          {/* Right pane: Keypad to Enter phone number */}
-          <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-1 pb-3 flex flex-col justify-between bg-black/20 relative overflow-y-auto">
+          {/* Right pane: Keypad to Enter phone number.
+              Sin overflow en mobile: fluye con el scroll único del modal. */}
+          <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-1 pb-3 flex flex-col justify-between bg-black/20 relative sm:overflow-y-auto">
 
             <div className="text-center mb-1 sm:mb-2">
               <div className={`flex items-center justify-center space-x-2 transition-all duration-300 ${
