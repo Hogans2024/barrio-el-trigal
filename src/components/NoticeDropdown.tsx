@@ -40,14 +40,15 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
 
   return (
     <>
-      <div className="fixed inset-0 z-[55] flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/80 backdrop-blur-md"
-          onClick={() => { playTone(400, 50); onClose?.(); }}
-        />
+      {/* Contenedor idéntico al de ActiveAlarmModal: fixed inset-0, centrado,
+          sin backdrop-blur en ancestros para que `fixed` cubra toda la pantalla.
+          Click fuera del panel (en el backdrop) cierra el modal. */}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-0 sm:p-4 overflow-y-auto overscroll-contain font-sans"
+        onClick={(e) => { if (e.target === e.currentTarget) { playTone(400, 50); onClose?.(); } }}
+      >
         {/* Modal Container */}
-        <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-2xl border border-white/10 shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
+        <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] sm:h-[620px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(255,215,0,0.15)] flex flex-col animate-in zoom-in-95 duration-200 my-auto">
           {/* HEADER */}
           <div className="p-4 sm:p-5 bg-black/40 border-b border-white/5 flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
@@ -133,13 +134,14 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
       </div>
 
       {/* ====== MODAL DE DETALLE DE NOTIFICACIÓN ====== */}
+      {/* Mismo patrón que el modal principal y que ActiveAlarmModal:
+          contenedor fixed centrado que actúa también de backdrop (click fuera cierra). */}
       {selectedNotice && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setSelectedNotice(null)}
-          />
-          <div className="relative w-full max-w-sm bg-[#0c101d] border border-white/10 rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 overflow-y-auto overscroll-contain"
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedNotice(null); }}
+        >
+          <div className="relative w-full max-w-sm max-h-[100dvh] overflow-y-auto custom-scrollbar bg-[#0c101d] border border-white/10 rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 my-auto">
             <button
               onClick={() => setSelectedNotice(null)}
               className="absolute top-4 right-4 w-8 h-8 bg-black/40 hover:bg-black/80 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-all border border-gray-800"
