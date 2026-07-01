@@ -11,3 +11,9 @@ coverage/
 # Vive solo en el disco local + Google Apps Script, NUNCA en GitHub
 # (para evitar exponer el token por accidente).
 apps-script/
+GS code funcionak.txt
+
+# Datos personales de afiliados (PII): CI, telefono, correo, direccion, etc.
+# El repo es publico, asi que NUNCA subir este archivo.
+# Los datos alimentan el sitio via Apps Script -> public/data.json.
+Datos_Afiliacion.xlsx
