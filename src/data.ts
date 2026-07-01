@@ -144,7 +144,7 @@ export const LOST_PETS_DATA: LostPet[] = [
   {
     id: 'lp3',
     name: 'Kiwi',
-    type: 'Loro',
+    type: 'Aves',
     imageUrl: 'https://images.unsplash.com/photo-1522850400371-33188d2d6342?w=600&auto=format&fit=crop&q=80',
     description: 'Se escapó el 21 de mayo por la mañana. Es un loro hablador, verde brillante con plumas amarillas en la cabeza.',
     lastSeen: 'Pasaje El Trigal',

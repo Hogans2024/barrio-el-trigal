@@ -26,26 +26,39 @@ export interface LocalBusiness {
   id: string;
   name: string;
   imageUrl: string;
-  category: 'Comunidad' | 'Comida' | 'Ropa' | 'Plantas' | 'Papa de comer' | 'Todos';
+  category: string;
   description: string;
+  phone?: string;
+  phones?: string[];
+  address?: string;
+  socialNetworks?: Record<string, string>;
+  facebook?: string;
+  tiktok?: string;
+  instagram?: string;
+  youtube?: string;
   rating?: string;
   reviewsCount?: number;
   openHours?: string;
   distanceInfo?: string;
   isFreeDelivery?: boolean;
   actionText: string;
+  images?: string[];
+  videoUrl?: string;
 }
 
 export interface LostPet {
   id: string;
   name: string;
-  type: 'Perro' | 'Gato' | 'Loro' | 'Todos';
+  type: string;
   imageUrl: string;
   description: string;
   lastSeen: string;
   contact: string;
   neighborhood: string;
   date: string;
+  images?: string[];
+  videoUrl?: string;
+  phones?: string[];
 }
 
 export interface Project {
