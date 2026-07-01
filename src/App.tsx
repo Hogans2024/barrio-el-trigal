@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Siren, LayoutGrid, Calendar, LogIn, Heart, Store, PlusSquare,
+  Siren, LayoutGrid, Calendar, Users, Heart, Store, PlusSquare,
   Bell, Menu, X, Info, Activity, User, ChevronDown, Search
 } from 'lucide-react';
 
@@ -108,6 +108,16 @@ export default function App() {
     }
   };
 
+  // Listen for floating button navigation events
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setActiveTab(customEvent.detail);
+    };
+    window.addEventListener('navigate', handler);
+    return () => window.removeEventListener('navigate', handler);
+  }, []);
+
   return (
     <div className="h-[100dvh] bg-[#070707] text-white flex flex-col md:flex-row antialiased selection:bg-brand-yellow selection:text-black overflow-hidden relative">
       
@@ -138,7 +148,7 @@ export default function App() {
               { id: 'farmacias', icon: PlusSquare, label: 'Farmacias de Turno' },
               { id: 'negocios', icon: Store, label: 'Negocios Locales' },
               { id: 'mascotas', icon: Heart, label: 'Mascotas Perdidas' },
-              { id: 'afiliacion', icon: LogIn, label: 'Registro Afiliados' }
+              { id: 'afiliacion', icon: Users, label: 'Registro Afiliados' }
             ].map((item) => (
               <button
                 key={item.id}
@@ -331,7 +341,7 @@ export default function App() {
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Eventos</span>
           </button>
           <button onClick={() => setActiveTab('afiliacion')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
-            <LogIn className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
+            <Users className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Afiliación</span>
           </button>
         </div>
