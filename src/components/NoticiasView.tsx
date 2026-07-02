@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 
-interface EventosViewProps {
-  eventos: NeighborhoodEvent[];
+interface NoticiasViewProps {
+  noticias: NeighborhoodEvent[];
   onShowNotification: (title: string, message: string) => void;
 }
 
-export default function EventosView({ eventos, onShowNotification }: EventosViewProps) {
+export default function NoticiasView({ noticias, onShowNotification }: NoticiasViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
-  const [activeEvent, setActiveEvent] = useState<NeighborhoodEvent | null>(null);
-  const [subscribedEvents, setSubscribedEvents] = useState<Record<string, boolean>>({});
+  const [activeNews, setActiveNews] = useState<NeighborhoodEvent | null>(null);
+  const [subscribedNews, setSubscribedNews] = useState<Record<string, boolean>>({});
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [viewMode, setViewMode] = useState<string>('eventos');
+  const [viewMode, setViewMode] = useState<string>('noticias');
   const [showViewModal, setShowViewModal] = useState(false);
   const [shimmer, setShimmer] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
@@ -22,6 +22,23 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
+
+  useEffect(() => {
+    const t2 = setTimeout(() => setShimmer(true), 2900);
+    const t3 = setTimeout(() => setShimmer(false), 7900);
+    return () => { clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowFloatingBtns(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const header = document.querySelector('header');
@@ -44,67 +61,66 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
     return () => ro.disconnect();
   }, [showFloatingBtns]);
 
-  useEffect(() => {
-    const t2 = setTimeout(() => setShimmer(true), 2900);
-    const t3 = setTimeout(() => setShimmer(false), 7900);
-    return () => { clearTimeout(t2); clearTimeout(t3); };
-  }, []);
+  const categoryLabels: Record<string, string> = {
+    Todos: 'Todas', Comunidad: 'Comunidad', Salud: 'Salud', Medio: 'Medio Ambiente',
+    Seguridad: 'Seguridad', Cultura: 'Cultura', Servicios: 'Servicios',
+    Tecnologia: 'Tecnología', Politica: 'Política', Deportes: 'Deportes',
+    Economia: 'Economía', Transporte: 'Transporte', Turismo: 'Turismo',
+  };
 
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowFloatingBtns(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, []);
-
-  const categories = ['Todos', 'Comunidad', 'Salud', 'Medio'];
+  const categories = Object.keys(categoryLabels);
 
   const categoryIcons: Record<string, React.ReactNode> = {
     Todos: <LayoutGrid className="w-4 h-4" />,
     Comunidad: <Users className="w-4 h-4" />,
     Salud: <HeartHandshake className="w-4 h-4" />,
     Medio: <HelpCircle className="w-4 h-4" />,
+    Seguridad: <Eye className="w-4 h-4" />,
+    Cultura: <Calendar className="w-4 h-4" />,
+    Servicios: <Building2 className="w-4 h-4" />,
+    Tecnologia: <Cpu className="w-4 h-4" />,
+    Politica: <Briefcase className="w-4 h-4" />,
+    Deportes: <Trophy className="w-4 h-4" />,
+    Economia: <Store className="w-4 h-4" />,
+    Transporte: <Bus className="w-4 h-4" />,
+    Turismo: <Globe className="w-4 h-4" />,
   };
 
   const viewOptions = [
-    { id: 'eventos', label: 'Eventos', icon: <Calendar className="w-4 h-4" /> },
+    { id: 'noticias', label: 'Noticias', icon: <Newspaper className="w-4 h-4" /> },
     { id: 'proyectos', label: 'Proyectos', icon: <PanelLeft className="w-4 h-4" /> },
     { id: 'farmacias', label: 'Farmacias', icon: <Pill className="w-4 h-4" /> },
     { id: 'mascotas', label: 'Mascotas', icon: <PawPrint className="w-4 h-4" /> },
     { id: 'negocios', label: 'Negocios', icon: <Store className="w-4 h-4" /> },
   ];
 
-  const filteredEvents = eventos.filter((event) => {
-    const matchesSearch = event.title.toLowerCase().includes(search.toLowerCase()) ||
-                          event.description.toLowerCase().includes(search.toLowerCase());
+  const filteredNews = noticias.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase()) ||
+                          item.description.toLowerCase().includes(search.toLowerCase());
     
     let matchesCategory = false;
     if (selectedCategory === 'Todos') {
       matchesCategory = true;
     } else if (selectedCategory === 'Medio') {
-      matchesCategory = event.category === 'Medio';
+      matchesCategory = item.category === 'Medio';
     } else {
-      matchesCategory = event.category.toLowerCase() === selectedCategory.toLowerCase();
+      matchesCategory = item.category.toLowerCase() === selectedCategory.toLowerCase();
     }
 
     return matchesSearch && matchesCategory;
   });
 
   const handleSubscribe = (id: string, name: string) => {
-    const nextStatus = !subscribedEvents[id];
-    setSubscribedEvents(prev => ({
+    const nextStatus = !subscribedNews[id];
+    setSubscribedNews(prev => ({
       ...prev,
       [id]: nextStatus
     }));
 
     if (nextStatus) {
       onShowNotification(
-        '🔔 Inscripción Confirmada',
-        `Te has suscrito para recibir recordatorios prácticos sobre el evento: "${name}".`
+        '🔔 Suscripción Confirmada',
+        `Te has suscrito para recibir notificaciones sobre: "${name}".`
       );
     }
   };
@@ -124,9 +140,9 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
       <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" />
       {/* Header title */}
       <div className="-mt-[16px]">
-        <h2 className="text-gray-400 text-sm font-bold tracking-tight">Eventos del Barrio:</h2>
+        <h2 className="text-gray-400 text-sm font-bold tracking-tight">Noticias del Barrio:</h2>
         <p className="text-gray-400 text-xs mt-0">
-          Participa y disfruta de los eventos que fortalecen la unión y el bienestar de nuestra comunidad.
+          Mantente informado con las últimas novedades y comunicados de la comunidad.
         </p>
         <style>{`
           @keyframes beam-sweep {
@@ -156,23 +172,8 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
           <div className="absolute inset-x-0 bg-[#070707]" style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
           {/* Content */}
           <div className="relative flex flex-col items-center">
-            {/* Search bar width matches buttons group */}
-            <div className="pt-1 pb-1.5" style={{ width: stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-300" />
-                </span>
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar eventos..."
-className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
-                />
-              </div>
-            </div>
             {/* Buttons group */}
-            <div className="w-full pb-2 flex items-center justify-center">
+            <div className="w-full pt-1.5 pb-1 flex items-center justify-center">
             <div ref={buttonsRef} className="flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
@@ -205,7 +206,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             </button>
             <button
               onClick={() => {
-                const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar eventos..."]');
+                const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar noticias..."]');
                 el?.focus();
                 el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }}
@@ -216,6 +217,21 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             </button>
           </div>
           </div>
+            {/* Search bar width matches buttons group */}
+            <div className="pb-1.5" style={{ width: stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-300" />
+                </span>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar noticias..."
+                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                />
+              </div>
+            </div>
         </div>
         </div>
       ) : (
@@ -230,14 +246,14 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar eventos..."
+                placeholder="Buscar noticias..."
                 className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
               />
             </div>
           </div>
 
           {/* Category Selector - normal flow */}
-          <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap transition-all duration-300 ease-out" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
+          <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
               onClick={() => setShowCategoryModal(true)}
@@ -251,7 +267,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
               className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
             >
               {categoryIcons[selectedCategory]}
-              <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
+              <span>{categoryLabels[selectedCategory] || selectedCategory}</span>
               {selectedCategory !== 'Todos' && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
@@ -331,7 +347,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             <div className="p-3 space-y-1">
               {categories.map((cat) => {
                 const isActive = selectedCategory === cat;
-                const displayName = cat === 'Medio' ? 'Medio Ambiente' : cat === 'Todos' ? 'Todas las categorías' : cat;
+                const displayName = cat === 'Todos' ? 'Todas las categorías' : categoryLabels[cat] || cat;
                 return (
                   <button
                     key={cat}
@@ -355,26 +371,26 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
         </div>
       )}
 
-      {/* Event Cards Section */}
+      {/* News Cards Section */}
       <div className="space-y-4 -mt-[4px]">
-        {filteredEvents.map((evt) => {
+        {filteredNews.map((item) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
               <div
-                key={evt.id}
-                onClick={() => setActiveEvent(evt)}
+                key={item.id}
+                onClick={() => setActiveNews(item)}
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
               >
                 <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
-                  <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-1.5 mb-1.5">
-                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition line-clamp-2">{evt.title}</h3>
+                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition line-clamp-2">{item.title}</h3>
                     </div>
-                    <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{evt.description}</p>
+                    <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{item.description}</p>
                   </div>
                   <div className="flex items-center justify-end mt-2 w-full">
                     <span className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
@@ -390,30 +406,30 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
           if (viewMode === 'farmacias') {
             return (
               <div
-                key={evt.id}
-                onClick={() => setActiveEvent(evt)}
+                key={item.id}
+                onClick={() => setActiveNews(item)}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
               >
                 <div className="relative h-44 w-full bg-slate-900">
-                  <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#080a0f] to-transparent h-16 pointer-events-none" />
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-base font-bold tracking-tight">{evt.title}</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight">{item.title}</h3>
                     <span className="bg-[#22c55e]/40 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-[#22c55e]/40 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">
-                      {evt.category === 'Medio' ? 'Medio Ambiente' : evt.category}
+                      {categoryLabels[item.category] || item.category}
                     </span>
                   </div>
-                  <p className="text-gray-400 text-xs leading-normal">{evt.description}</p>
+                  <p className="text-gray-400 text-xs leading-normal">{item.description}</p>
                   <div className="space-y-2 pt-2 border-t border-white/5 text-xs">
                     <div className="flex items-center space-x-2.5 text-gray-300">
                       <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                      <span className="font-mono text-[11px]">Barrio El Trigal</span>
+                      <span className="font-mono text-[11px]">{item.location || 'Barrio El Trigal'}</span>
                     </div>
                     <div className="flex items-center space-x-2.5 text-gray-400">
                       <Calendar className="h-4 w-4 text-gray-500 shrink-0" />
-                      <span className="font-mono text-[11px]">Sábado, 24 de Mayo de 2026</span>
+                      <span className="font-mono text-[11px]">{item.date || 'Sin fecha'}</span>
                     </div>
                   </div>
                 </div>
@@ -425,20 +441,20 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
           if (viewMode === 'mascotas') {
             return (
               <div
-                key={evt.id}
-                onClick={() => setActiveEvent(evt)}
+                key={item.id}
+                onClick={() => setActiveNews(item)}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
               >
                 <div className="relative h-44 w-full bg-slate-900">
-                  <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-white text-base font-bold tracking-tight">{evt.title}</h3>
-                    <p className="text-gray-400 text-xs mt-1 leading-relaxed">{evt.description}</p>
+                    <h3 className="text-white text-base font-bold tracking-tight">{item.title}</h3>
+                    <p className="text-gray-400 text-xs mt-1 leading-relaxed">{item.description}</p>
                   </div>
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 text-[10px] font-extrabold px-2.5 py-1 rounded [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">{evt.category === 'Medio' ? 'Medio Ambiente' : evt.category}</span>
+                    <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 text-[10px] font-extrabold px-2.5 py-1 rounded [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">{categoryLabels[item.category] || item.category}</span>
                     <span className="bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] font-extrabold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 border border-[#FFD700]/40 transition cursor-pointer">
                       <Phone className="h-3.5 w-3.5" />
                       <span>Ver Detalles</span>
@@ -453,25 +469,25 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
           if (viewMode === 'negocios') {
             return (
               <div
-                key={evt.id}
-                onClick={() => setActiveEvent(evt)}
+                key={item.id}
+                onClick={() => setActiveNews(item)}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group cursor-pointer"
               >
                 <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
-                  <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-base font-bold tracking-tight">{evt.title}</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight">{item.title}</h3>
                     <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 font-extrabold text-[10px] px-2.5 py-1 rounded-md tracking-wider uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">
-                      {evt.category === 'Medio' ? 'Medio Ambiente' : evt.category}
+                      {categoryLabels[item.category] || item.category}
                     </span>
                   </div>
-                  <p className="text-gray-400 text-xs leading-relaxed max-h-16 line-clamp-2">{evt.description}</p>
+                  <p className="text-gray-400 text-xs leading-relaxed max-h-16 line-clamp-2">{item.description}</p>
                   <div className="pt-2 border-t border-white/5 mt-2 flex items-center justify-between text-xs">
                     <div className="flex items-center space-x-1 font-mono text-[#22c55e]">
                       <MapPin className="h-3.5 w-3.5 text-[#22c55e] shrink-0" />
-                      <span>Barrio El Trigal</span>
+                      <span>{item.location || 'Barrio El Trigal'}</span>
                     </div>
                     <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
                       Ver Detalles
@@ -482,31 +498,31 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             );
           }
 
-          // Default: Eventos view
+          // Default: Noticias view
           return (
             <div
-              key={evt.id}
-              onClick={() => setActiveEvent(evt)}
+              key={item.id}
+              onClick={() => setActiveNews(item)}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer group"
             >
               <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
                 <img
-                  src={evt.imageUrl}
-                  alt={evt.title}
+                  src={item.imageUrl}
+                  alt={item.title}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
               </div>
 
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
-                {getIcon(evt.icon)}
+                {getIcon(item.icon)}
 
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    {evt.title}
+                    {item.title}
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
-                    {evt.description}
+                    {item.description}
                   </p>
                 </div>
               </div>
@@ -515,19 +531,19 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSubscribe(evt.id, evt.title);
+                    handleSubscribe(item.id, item.title);
                   }}
                   className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap ${
-                    subscribedEvents[evt.id]
+                    subscribedNews[item.id]
                       ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20'
                       : 'bg-white/5 text-gray-300 border border-white/10 hover:text-white'
                   }`}
                 >
-                  <Bell className={`h-3 w-3 ${subscribedEvents[evt.id] ? 'fill-current' : ''}`} />
-                  <span>{subscribedEvents[evt.id] ? 'Inscrito' : 'Asistiré'}</span>
+                  <Bell className={`h-3 w-3 ${subscribedNews[item.id] ? 'fill-current' : ''}`} />
+                  <span>{subscribedNews[item.id] ? 'Suscrito' : 'Notificarme'}</span>
                 </button>
                 <span className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-500/40 whitespace-nowrap">
-                  {evt.category === 'Medio' ? 'Medio Ambiente' : evt.category}
+                  {categoryLabels[item.category] || item.category}
                 </span>
                 <span className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap">
                   Ver Detalles
@@ -537,70 +553,70 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
           );
         })}
 
-        {filteredEvents.length === 0 && (
+        {filteredNews.length === 0 && (
           <div className="text-center py-12 text-gray-500 text-sm">
-            No se encontraron eventos programados para esta búsqueda.
+            No se encontraron noticias para esta búsqueda.
           </div>
         )}
       </div>
 
-      {/* Event Details Expanded Modal */}
-      {activeEvent && (
+      {/* News Details Expanded Modal */}
+      {activeNews && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="relative h-44 bg-gray-950">
               <img
-                src={activeEvent.imageUrl}
-                alt={activeEvent.title}
+                src={activeNews.imageUrl}
+                alt={activeNews.title}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
               <button
-                onClick={() => setActiveEvent(null)}
+                onClick={() => setActiveNews(null)}
                 className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none"
               >
                 <X className="h-4 w-4" />
               </button>
               <div className="absolute bottom-4 left-4">
                 <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                  {activeEvent.category === 'Medio' ? 'Medio Ambiente' : activeEvent.category}
+                  {categoryLabels[activeNews.category] || activeNews.category}
                 </span>
               </div>
             </div>
 
             <div className="p-5 space-y-4">
-              <h4 className="text-white text-xl font-bold tracking-tight">{activeEvent.title}</h4>
-              <p className="text-gray-300 text-xs leading-relaxed">{activeEvent.description}</p>
+              <h4 className="text-white text-xl font-bold tracking-tight">{activeNews.title}</h4>
+              <p className="text-gray-300 text-xs leading-relaxed">{activeNews.description}</p>
 
               <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
                 <div className="flex items-center space-x-2 text-gray-400">
                   <Calendar className="h-4 w-4 text-[#FFD700] shrink-0" />
-                  <span className="text-white">Sábado, 24 de Mayo de 2026</span>
+                  <span className="text-white">{activeNews.date || 'Sin fecha'}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-400">
                   <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                  <span className="text-white">Sede Vecinal - Plaza Principal El Trigal</span>
+                  <span className="text-white">{activeNews.location || 'Barrio El Trigal'}</span>
                 </div>
               </div>
 
               <div className="flex space-x-2 pt-2">
                 <button
-                  onClick={() => setActiveEvent(null)}
+                  onClick={() => setActiveNews(null)}
                   className="flex-1 bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
                 >
                   Cerrar
                 </button>
                 <button
                   onClick={() => {
-                    handleSubscribe(activeEvent.id, activeEvent.title);
+                    handleSubscribe(activeNews.id, activeNews.title);
                   }}
                   className={`flex-1 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer ${
-                    subscribedEvents[activeEvent.id]
+                    subscribedNews[activeNews.id]
                       ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20'
                       : 'bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40'
                   }`}
                 >
-                  {subscribedEvents[activeEvent.id] ? 'Inscripto ✓' : 'Anotarse al Evento'}
+                  {subscribedNews[activeNews.id] ? 'Suscrito ✓' : 'Notificarme'}
                 </button>
               </div>
             </div>
@@ -625,12 +641,12 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
         <div>
           <button
             onClick={() => {
-              const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar eventos..."]');
+              const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar noticias..."]');
               el?.focus();
               el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }}
             className="w-10 bg-gray-600/30 hover:bg-gray-600/40 text-gray-200 border border-gray-500/50 backdrop-blur-md rounded-l-xl flex flex-col items-center gap-0 py-1 text-[9px] font-semibold shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
-            title="Buscar eventos"
+            title="Buscar noticias"
           >
             <Search className="w-4 h-4" />
             <span className="text-[8px] font-semibold leading-none text-center">Buscar</span>

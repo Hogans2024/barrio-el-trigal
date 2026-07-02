@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Siren, LayoutGrid, Calendar, Users, Heart, Store, PlusSquare,
-  Bell, Menu, X, Info, Activity, User, ChevronDown, Search
+  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, Newspaper
 } from 'lucide-react';
 
 // Sub-views
@@ -12,6 +12,7 @@ import FarmaciasView from './components/FarmaciasView';
 import NegociosView from './components/NegociosView';
 import MascotasView from './components/MascotasView';
 import AfiliacionView from './components/AfiliacionView';
+import NoticiasView from './components/NoticiasView';
 import { useSheetData } from './hooks/useSheetData';
 
 // Cabecera global (avisos + perfil) migrada del proyecto origen.
@@ -31,7 +32,7 @@ interface NotificationToast {
 }
 
 export default function App() {
-  const { proyectos, eventos, farmacias, negocios, mascotas, loading, error } = useSheetData();
+  const { proyectos, eventos, farmacias, negocios, mascotas, noticias, loading, error } = useSheetData();
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const mainScrollRef = useRef<HTMLElement>(null);
@@ -103,6 +104,7 @@ export default function App() {
       case 'farmacias': return 'Farmacias de Turno';
       case 'negocios': return 'Negocios Locales';
       case 'mascotas': return 'Mascotas Perdidas';
+      case 'noticias': return 'Noticias del Barrio';
       case 'afiliacion': return 'Registro de Afiliados';
       default: return 'Barrio El Trigal';
     }
@@ -130,9 +132,9 @@ export default function App() {
         <div className="flex-1 space-y-8">
           <div className="flex items-center space-x-3">
             <img 
-              src={`${import.meta.env.BASE_URL}logo-trigal.svg`} 
+              src={`${import.meta.env.BASE_URL}logo_01.svg`} 
               alt="Logo Barrio El Trigal" 
-              className="w-16 h-16 object-contain drop-shadow-md"
+               className="w-16 h-16 object-contain drop-shadow-md"
             />
             <div>
               <span className="text-gray-500 text-[10px] uppercase font-mono block tracking-widest">ZONA SUR TARIJA</span>
@@ -148,6 +150,7 @@ export default function App() {
               { id: 'farmacias', icon: PlusSquare, label: 'Farmacias de Turno' },
               { id: 'negocios', icon: Store, label: 'Negocios Locales' },
               { id: 'mascotas', icon: Heart, label: 'Mascotas Perdidas' },
+              { id: 'noticias', icon: Newspaper, label: 'Noticias' },
               { id: 'afiliacion', icon: Users, label: 'Registro Afiliados' }
             ].map((item) => (
               <button
@@ -177,26 +180,69 @@ export default function App() {
       <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
         
         {/* APP STATUS HEADER (Mobile & Desktop) */}
-        <header className="bg-black/30 border-b border-gray-900/60 px-5 py-0 flex justify-between items-center shrink-0 backdrop-blur-md">
+        <header className="relative z-30 bg-black/30 border-b border-white/10 px-5 py-0 flex items-center shrink-0 backdrop-blur-md">
           
-          {/* Left part varies between mobile and desktop */}
-          <div className="flex items-center space-x-2.5 md:hidden">
-            <img 
-              src={`${import.meta.env.BASE_URL}logo-trigal.svg`} 
-              alt="Logo Barrio El Trigal" 
-              className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
-            />
-            <div className="flex flex-col space-y-[2px]">
-              <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
-              <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
-            </div>
+          {/* Left: Back button (non-Alarma) / Logo (Alarma) */}
+          <div className="flex-1 flex justify-start items-center">
+            {activeTab !== 'alarma' ? (
+              <button
+                onClick={() => setActiveTab('alarma')}
+                className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-gradient-to-b from-[#1a1a1d] to-[#0C0C0E] border border-[#2a3547] hover:border-[#686D75] cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 shadow-lg shadow-black/40"
+                title="Volver"
+              >
+                <ChevronLeft className="w-[18px] h-[18px] text-[#D1D5DB]" />
+              </button>
+            ) : (
+              <>
+                <div className="flex items-center space-x-2.5 md:hidden">
+                    <span>
+                    <img 
+                      src={`${import.meta.env.BASE_URL}logo_01.svg`} 
+                      alt="Logo Barrio El Trigal" 
+                      className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
+                    />
+                  </span>
+                  <div className="relative">
+                    <div className="flex flex-col space-y-[2px]">
+                      <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
+                      <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center space-x-2">
+                  <Activity className="h-5 w-5 text-brand-green animate-pulse" />
+                  <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
+                  <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
+                </div>
+              </>
+            )}
           </div>
 
-          <div className="hidden md:flex items-center space-x-2">
-            <Activity className="h-5 w-5 text-brand-green animate-pulse" />
-            <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
-            <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
-          </div>
+          {/* Center: Logo (mobile) / Title (desktop) — only for non-Alarma */}
+          {activeTab !== 'alarma' && (
+            <div className="flex-1 flex justify-center items-center -ml-[125px]">
+                <div className="flex items-center space-x-2.5 md:hidden">
+                  <span className="img-float">
+                    <img 
+                      src={`${import.meta.env.BASE_URL}logo_01.svg`} 
+                      alt="Logo Barrio El Trigal" 
+                      className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
+                    />
+                  </span>
+                  <div className="relative">
+                  <div className="flex flex-col space-y-[2px]">
+                    <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
+                    <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden md:flex items-center space-x-2">
+                <Activity className="h-5 w-5 text-brand-green animate-pulse" />
+                <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
+                <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
+              </div>
+            </div>
+          )}
 
           {/* Right controls */}
           <div ref={topSearchRef} className={`flex items-center justify-end ${isTopSearchOpen ? 'flex-1 ml-3' : 'space-x-1.5'}`}>
@@ -318,6 +364,7 @@ export default function App() {
             {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} />}
             {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} />}
             {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} />}
+            {activeTab === 'noticias' && <NoticiasView noticias={noticias} onShowNotification={addToast} />}
             {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
               </>
             )}
@@ -328,19 +375,23 @@ export default function App() {
       {/* -------------------- BOTTOM NAVIGATION BAR (MOBILE ONLY) -------------------- */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-1.5 tall:py-3 flex justify-around items-center z-40">
         <div className="w-full max-w-md mx-auto flex justify-around items-center">
-          <button onClick={() => setActiveTab('alarma')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('alarma')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Siren className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Alarma</span>
           </button>
-          <button onClick={() => setActiveTab('proyectos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('proyectos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <LayoutGrid className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Proyectos</span>
           </button>
-          <button onClick={() => setActiveTab('eventos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('eventos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Calendar className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Eventos</span>
           </button>
-          <button onClick={() => setActiveTab('afiliacion')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('noticias')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'noticias' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
+            <Newspaper className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
+            <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Noticias</span>
+          </button>
+          <button onClick={() => setActiveTab('afiliacion')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Users className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Afiliación</span>
           </button>
@@ -373,7 +424,7 @@ export default function App() {
               </button>
             </div>
             <div className="space-y-2 text-sm font-semibold">
-              {[['alarma','🚨 Central Alarma Vecinal'],['proyectos','🧱 Proyectos del Barrio'],['eventos','📆 Eventos programados'],['farmacias','💊 Farmacias de Turno'],['negocios','🍔 Negocios Locales'],['mascotas','🐾 Mascotas Perdidas'],['afiliacion','📝 Registro de Afiliados']].map(([id,label]) => (
+              {[['alarma','🚨 Central Alarma Vecinal'],['proyectos','🧱 Proyectos del Barrio'],['eventos','📆 Eventos programados'],['noticias','📰 Noticias'],['farmacias','💊 Farmacias de Turno'],['negocios','🍔 Negocios Locales'],['mascotas','🐾 Mascotas Perdidas'],['afiliacion','📝 Registro de Afiliados']].map(([id,label]) => (
                 <button key={id} onClick={() => { setActiveTab(id); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">{label}</button>
               ))}
               <button onClick={() => { playTone(500, 50); setIsProfileOpen(true); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">👤 Usuario</button>

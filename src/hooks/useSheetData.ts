@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Pharmacy, NeighborhoodEvent, LocalBusiness, LostPet, Project } from '../types';
 import {
-  PHARMACIES_DATA, EVENTS_DATA, BUSINESSES_DATA, LOST_PETS_DATA, PROJECTS_DATA
+  PHARMACIES_DATA, EVENTS_DATA, BUSINESSES_DATA, LOST_PETS_DATA, PROJECTS_DATA, NEWS_DATA
 } from '../data';
 
 interface SheetData {
@@ -10,6 +10,7 @@ interface SheetData {
   farmacias: Pharmacy[];
   negocios: LocalBusiness[];
   mascotas: LostPet[];
+  noticias: NeighborhoodEvent[];
   loading: boolean;
   error: string | null;
 }
@@ -20,6 +21,7 @@ const FALLBACK = {
   farmacias: PHARMACIES_DATA,
   negocios: BUSINESSES_DATA,
   mascotas: LOST_PETS_DATA,
+  noticias: NEWS_DATA,
 };
 
 export function useSheetData(): SheetData {
@@ -38,6 +40,7 @@ export function useSheetData(): SheetData {
           farmacias: json.farmacias ?? FALLBACK.farmacias,
           negocios:  json.negocios  ?? FALLBACK.negocios,
           mascotas:  json.mascotas  ?? FALLBACK.mascotas,
+          noticias:  json.noticias  ?? FALLBACK.noticias,
         });
         setError(null);
       })

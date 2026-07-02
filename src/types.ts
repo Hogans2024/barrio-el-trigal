@@ -17,9 +17,11 @@ export interface NeighborhoodEvent {
   id: string;
   title: string;
   imageUrl: string;
-  category: 'Comunidad' | 'Salud' | 'Medio' | 'Todos'; // Category tag
+  category: 'Comunidad' | 'Salud' | 'Medio' | 'Seguridad' | 'Cultura' | 'Servicios' | 'Tecnologia' | 'Politica' | 'Deportes' | 'Economia' | 'Transporte' | 'Turismo' | 'Todos'; // Category tag
   description: string;
   icon: string;
+  date?: string;
+  location?: string;
 }
 
 export interface LocalBusiness {
