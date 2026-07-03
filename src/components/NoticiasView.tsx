@@ -63,6 +63,8 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
   }, [showFloatingBtns]);
 
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const stickyBarRef = useRef<HTMLDivElement>(null);
+  const [stickyBarHeight, setStickyBarHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
@@ -77,6 +79,17 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
     ro.observe(parent);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!showFloatingBtns) return;
+    const el = stickyBarRef.current;
+    if (!el) return;
+    const measure = () => setStickyBarHeight(el.offsetHeight);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showFloatingBtns]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -191,7 +204,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
 
       {/* Search + Category Bar */}
       {showFloatingBtns ? (
-        <div className={`fixed top-0 z-10 overflow-visible ${!isMobile ? 'left-4 right-4 md:left-80 md:right-8' : ''}`} style={isMobile ? { left: '50%', transform: `translateX(-50%) ${headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)'}`, width: cardWidth > 0 ? cardWidth : undefined } : { transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
+        <div ref={stickyBarRef} className={`fixed top-0 z-10 overflow-visible ${!isMobile ? 'left-4 right-4 md:left-80 md:right-8' : ''}`} style={isMobile ? { left: '50%', transform: `translateX(-50%) ${headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)'}`, width: cardWidth > 0 ? cardWidth : undefined } : { transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
           {/* Background flush with header */}
           <div className={`absolute ${isMobile ? 'inset-x-0' : 'inset-x-0'} bg-[#070707]`} style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
           {/* Content */}
@@ -313,7 +326,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       )}
 
       {/* Spacer when sticky */}
-      {showFloatingBtns && <div style={{ height: `calc(${headerHeight || 43}px + 72px + 2vh)` }} />}
+      {showFloatingBtns && <div style={{ height: stickyBarHeight > 0 ? `calc(${headerHeight}px + ${stickyBarHeight}px + 2vh)` : `calc(${headerHeight || 43}px + 72px + 2vh)` }} />}
 
       {/* View Selection Modal */}
       {showViewModal && (
