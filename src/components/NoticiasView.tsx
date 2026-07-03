@@ -313,7 +313,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       )}
 
       {/* Spacer when sticky */}
-      {showFloatingBtns && <div style={{ height: headerHeight > 0 ? headerHeight + 80 : 123 }} />}
+      {showFloatingBtns && <div style={{ height: `calc(${headerHeight || 43}px + 72px + 2vh)` }} />}
 
       {/* View Selection Modal */}
       {showViewModal && (
