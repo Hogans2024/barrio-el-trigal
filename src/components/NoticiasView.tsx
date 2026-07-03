@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 
@@ -64,9 +64,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
 
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const stickyBarRef = useRef<HTMLDivElement>(null);
-  const normalFlowRef = useRef<HTMLDivElement>(null);
   const [stickyBarHeight, setStickyBarHeight] = useState(0);
-  const [normalFlowHeight, setNormalFlowHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
@@ -82,26 +80,15 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
     return () => ro.disconnect();
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!showFloatingBtns) return;
     const el = stickyBarRef.current;
     if (!el) return;
-    const measure = () => setStickyBarHeight(el.offsetHeight);
-    measure();
-    const ro = new ResizeObserver(measure);
+    setStickyBarHeight(el.offsetHeight);
+    const ro = new ResizeObserver(() => setStickyBarHeight(el.offsetHeight));
     ro.observe(el);
     return () => ro.disconnect();
   }, [showFloatingBtns]);
-
-  useEffect(() => {
-    const el = normalFlowRef.current;
-    if (!el) return;
-    const measure = () => setNormalFlowHeight(el.offsetHeight);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -214,61 +201,8 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
         `}</style>
       </div>
 
-      {/* Normal flow elements - always in DOM to maintain stable layout */}
-      <div ref={normalFlowRef} className={showFloatingBtns ? 'invisible' : ''}>
-        {/* Search Input - normal flow */}
-        <div className="relative -mt-[7px] transition-all duration-300 ease-out">
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-gray-300" />
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar noticias..."
-              className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
-            />
-          </div>
-        </div>
-
-        {/* Category Selector - normal flow */}
-        <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
-          {shimmer && <div className="shimmer-beam buttons" />}
-          <button
-            onClick={() => setShowCategoryModal(true)}
-            className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Categorías</span>
-          </button>
-          <div
-            onClick={() => setShowCategoryModal(true)}
-            className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
-          >
-            {categoryIcons[selectedCategory]}
-            <span>{categoryLabels[selectedCategory] || selectedCategory}</span>
-            {selectedCategory !== 'Todos' && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
-                className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
-              >
-                <X className="w-2.5 h-2.5 text-white" />
-              </button>
-            )}
-          </div>
-          <button
-            onClick={() => setShowViewModal(true)}
-            className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
-          >
-            {viewOptions.find(v => v.id === viewMode)?.icon}
-            <span>Vista</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Sticky bar - overlays on top when scrolling */}
-      {showFloatingBtns && (
+      {/* Search + Category Bar */}
+      {showFloatingBtns ? (
         <div ref={stickyBarRef} className={`fixed top-0 z-10 overflow-visible ${!isMobile ? 'left-4 right-4 md:left-80 md:right-8' : ''}`} style={isMobile ? { left: '50%', transform: `translateX(-50%) ${headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)'}`, width: cardWidth > 0 ? cardWidth : undefined } : { transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
           {/* Background flush with header */}
           <div className="absolute inset-x-0 bg-[#070707]" style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
@@ -336,10 +270,62 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
             </div>
         </div>
         </div>
+      ) : (
+        <>
+          {/* Search Input - normal flow */}
+          <div className="relative -mt-[7px] transition-all duration-300 ease-out">
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="h-4 w-4 text-gray-300" />
+              </span>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar noticias..."
+                className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+              />
+            </div>
+          </div>
+
+          {/* Category Selector - normal flow */}
+          <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
+            {shimmer && <div className="shimmer-beam buttons" />}
+            <button
+              onClick={() => setShowCategoryModal(true)}
+              className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Categorías</span>
+            </button>
+            <div
+              onClick={() => setShowCategoryModal(true)}
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+            >
+              {categoryIcons[selectedCategory]}
+              <span>{categoryLabels[selectedCategory] || selectedCategory}</span>
+              {selectedCategory !== 'Todos' && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
+                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
+                >
+                  <X className="w-2.5 h-2.5 text-white" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setShowViewModal(true)}
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+            >
+              {viewOptions.find(v => v.id === viewMode)?.icon}
+              <span>Vista</span>
+            </button>
+          </div>
+        </>
       )}
 
-      {/* Spacer when sticky - compensa diferencia entre fixed bar bottom y normal flow height */}
-      {showFloatingBtns && <div style={{ height: stickyBarHeight > 0 && normalFlowHeight > 0 ? `max(0px, ${headerHeight}px + ${stickyBarHeight}px + 2vh - ${normalFlowHeight}px)` : `calc(${headerHeight || 43}px + 72px + 2vh)` }} />}
+      {/* Spacer when sticky */}
+      {showFloatingBtns && <div style={{ height: stickyBarHeight > 0 ? `${headerHeight + stickyBarHeight}px` : `${(headerHeight || 43) + 72}px` }} />}
 
       {/* View Selection Modal */}
       {showViewModal && (
@@ -422,7 +408,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       )}
 
       {/* News Cards Section */}
-      <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
+      <div ref={cardsContainerRef} className={`space-y-4 ${showFloatingBtns ? '-mt-5' : '-mt-[4px]'}`}>
         {filteredNews.map((item) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
