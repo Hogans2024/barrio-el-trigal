@@ -22,6 +22,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [cardWidth, setCardWidth] = useState(0);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);
@@ -60,6 +61,29 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
     ro.observe(el);
     return () => ro.disconnect();
   }, [showFloatingBtns]);
+
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const parent = cardsContainerRef.current;
+    if (!parent) return;
+    const measure = () => {
+      const el = parent.firstElementChild as HTMLElement | null;
+      if (el) setCardWidth(el.offsetWidth);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(parent);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const categoryLabels: Record<string, string> = {
     Todos: 'Todas', Comunidad: 'Comunidad', Salud: 'Salud', Medio: 'Medio Ambiente',
@@ -167,14 +191,14 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
 
       {/* Search + Category Bar */}
       {showFloatingBtns ? (
-        <div className="fixed top-0 left-4 right-4 md:top-0 md:left-80 md:right-8 z-10 overflow-visible" style={{ transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
+        <div className={`fixed top-0 z-10 overflow-visible ${!isMobile ? 'left-4 right-4 md:left-80 md:right-8' : ''}`} style={isMobile ? { left: '50%', transform: `translateX(-50%) ${headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)'}`, width: cardWidth > 0 ? cardWidth : undefined } : { transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
           {/* Background flush with header */}
-          <div className="absolute inset-x-0 bg-[#070707]" style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
+          <div className={`absolute ${isMobile ? 'inset-x-0' : 'inset-x-0'} bg-[#070707]`} style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
           {/* Content */}
           <div className="relative flex flex-col items-center">
             {/* Buttons group */}
-            <div className="w-full pt-1.5 pb-1 flex items-center justify-center">
-            <div ref={buttonsRef} className="flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
+            <div className={`w-full pt-1.5 pb-1 flex items-center ${isMobile ? '' : 'justify-center'}`}>
+            <div ref={buttonsRef} className={`flex items-center flex-nowrap ${isMobile ? 'w-full justify-between gap-0' : 'justify-center'}`} style={!isMobile ? { gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' } : undefined}>
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
               onClick={() => setShowCategoryModal(true)}
@@ -218,7 +242,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
           </div>
           </div>
             {/* Search bar width matches buttons group */}
-            <div className="pb-1.5" style={{ width: stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
+            <div className={`pb-1.5 ${isMobile ? 'w-full' : ''}`} style={{ width: isMobile ? undefined : stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search className="h-4 w-4 text-gray-300" />
@@ -372,7 +396,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       )}
 
       {/* News Cards Section */}
-      <div className="space-y-4 -mt-[4px]">
+      <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
         {filteredNews.map((item) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
