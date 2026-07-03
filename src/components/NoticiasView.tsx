@@ -202,7 +202,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       </div>
 
       {/* Search + Category Bar */}
-      {showFloatingBtns ? (
+      {showFloatingBtns && (
         <div ref={stickyBarRef} className={`fixed top-0 z-10 overflow-visible ${!isMobile ? 'left-4 right-4 md:left-80 md:right-8' : ''}`} style={isMobile ? { left: '50%', transform: `translateX(-50%) ${headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)'}`, width: cardWidth > 0 ? cardWidth : undefined } : { transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
           {/* Background flush with header */}
           <div className="absolute inset-x-0 bg-[#070707]" style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
@@ -270,10 +270,10 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
             </div>
         </div>
         </div>
-      ) : (
-        <>
-          {/* Search Input - normal flow */}
-          <div className="relative -mt-[7px] transition-all duration-300 ease-out">
+      )}
+
+      {/* Search Input - always in flow, invisible when sticky */}
+      <div className="relative -mt-[7px] transition-all duration-300 ease-out" style={showFloatingBtns ? { visibility: 'hidden' } : undefined}>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <Search className="h-4 w-4 text-gray-300" />
@@ -288,8 +288,8 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
             </div>
           </div>
 
-          {/* Category Selector - normal flow */}
-          <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
+      {/* Category Selector - always in flow, invisible when sticky */}
+      <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)', ...(showFloatingBtns ? { visibility: 'hidden' } : {}) }}>
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
               onClick={() => setShowCategoryModal(true)}
@@ -320,12 +320,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
               {viewOptions.find(v => v.id === viewMode)?.icon}
               <span>Vista</span>
             </button>
-          </div>
-        </>
-      )}
-
-      {/* Spacer when sticky */}
-      {showFloatingBtns && <div style={{ height: stickyBarHeight > 0 ? `${headerHeight + stickyBarHeight}px` : `${(headerHeight || 43) + 72}px` }} />}
+      </div>
 
       {/* View Selection Modal */}
       {showViewModal && (
@@ -408,7 +403,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       )}
 
       {/* News Cards Section */}
-      <div ref={cardsContainerRef} className={`space-y-4 ${showFloatingBtns ? '-mt-5' : '-mt-[4px]'}`}>
+      <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
         {filteredNews.map((item) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
