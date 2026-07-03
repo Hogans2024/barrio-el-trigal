@@ -202,13 +202,13 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
               onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+              className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
             >
               <span>Categorías</span>
             </button>
             <div
               onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
             >
               {categoryIcons[selectedCategory]}
               <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
@@ -223,7 +223,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
             </div>
             <button
               onClick={() => setShowViewModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
             >
               {viewOptions.find(v => v.id === viewMode)?.icon}
               <span>Vista</span>
@@ -234,7 +234,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
                 el?.focus();
                 el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Buscar</span>
@@ -641,8 +641,19 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
                   }`}
                 >
                   {subscribedNews[activeNews.id] ? 'Suscrito ✓' : 'Notificarme'}
-                </button>
-              </div>
+            </button>
+            <button
+              onClick={() => {
+                const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar noticias..."]');
+                el?.focus();
+                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>Buscar</span>
+            </button>
+          </div>
             </div>
           </div>
         </div>
