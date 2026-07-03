@@ -205,8 +205,10 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       <div
         ref={stickyBarRef}
         className="z-10 -mt-[7px]"
-        style={{ position: 'sticky', top: -1, background: '#070707', marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
+        style={{ position: 'sticky', top: 0, marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
       >
+        {/* Background extends upward to cover gap between header and sticky buttons */}
+        <div className="absolute inset-x-0 bottom-0 bg-[#070707]" style={{ top: '-4rem' }} />
         {showFloatingBtns ? (
           /* ── Sticky layout: 4 buttons + search bar below ── */
           <div className="relative flex flex-col items-center">
@@ -270,7 +272,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
           </div>
         ) : (
           /* ── Normal layout: search bar + 3 buttons ── */
-          <>
+          <div className="relative">
             <div className="relative transition-all duration-300 ease-out">
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -317,7 +319,7 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
                 <span>Vista</span>
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 
