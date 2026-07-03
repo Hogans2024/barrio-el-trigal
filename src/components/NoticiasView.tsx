@@ -92,6 +92,23 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
   }, [showFloatingBtns]);
 
   useEffect(() => {
+    if (!showFloatingBtns) return;
+    const raf = requestAnimationFrame(() => {
+      const cardsContainer = cardsContainerRef.current;
+      const bar = stickyBarRef.current;
+      if (!cardsContainer || !bar) return;
+      const barBottom = bar.getBoundingClientRect().bottom;
+      const cardsTop = cardsContainer.getBoundingClientRect().top;
+      const gap = window.innerHeight * 0.02;
+      const offset = cardsTop - barBottom - gap;
+      if (Math.abs(offset) > 1) {
+        window.scrollTo({ top: window.scrollY + offset, behavior: 'auto' });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [showFloatingBtns]);
+
+  useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener('resize', check);
