@@ -205,13 +205,11 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
       <div
         ref={stickyBarRef}
         className="z-10 -mt-[7px]"
-        style={{ position: 'sticky', top: 0, marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
+        style={{ position: 'sticky', top: '-1.5rem', background: '#070707', marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
       >
-        {/* Background extends upward to cover gap between header and sticky buttons */}
-        <div className="absolute inset-x-0 bottom-0 bg-[#070707]" style={{ top: '-4rem' }} />
         {showFloatingBtns ? (
           /* ── Sticky layout: 4 buttons + search bar below ── */
-          <div className="relative flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <div className={`w-full pt-1.5 pb-1 flex items-center ${isMobile ? '' : 'justify-center'}`}>
               <div ref={buttonsRef} className={`flex items-center flex-nowrap ${isMobile ? 'w-full justify-between gap-0' : 'justify-center'}`} style={!isMobile ? { gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' } : undefined}>
                 {shimmer && <div className="shimmer-beam buttons" />}
