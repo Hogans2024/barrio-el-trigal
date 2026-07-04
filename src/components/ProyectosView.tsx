@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, MapPin, CheckCircle, Clock, FileText, X, ChevronRight, ThumbsUp, MessageSquare, LayoutGrid, Building2, Zap, Shield, PanelLeft, Calendar, Pill, PawPrint, Store, Phone, Heart, Home, Users, Bell, Eye, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, HelpCircle, HeartHandshake } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, ThumbsUp, MessageSquare, Zap, Shield, Heart } from 'lucide-react';
 import { Project } from '../types';
 
 interface ProyectosViewProps {
@@ -129,10 +129,15 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch = project.title.toLowerCase().includes(search.toLowerCase()) ||
-                          project.description.toLowerCase().includes(search.toLowerCase()) ||
-                          project.location.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = selectedCategory === 'Todos' ||
-                            project.category.toLowerCase() === selectedCategory.toLowerCase();
+                          project.description.toLowerCase().includes(search.toLowerCase());
+    
+    let matchesCategory = false;
+    if (selectedCategory === 'Todos') {
+      matchesCategory = true;
+    } else {
+      matchesCategory = project.category.toLowerCase() === selectedCategory.toLowerCase();
+    }
+
     return matchesSearch && matchesCategory;
   });
 
@@ -381,7 +386,6 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
                         : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border-transparent'
                     }`}
                   >
-                    <span className="shrink-0">{categoryIcons[cat]}</span>
                     <span>{displayName}</span>
                     {isActive && <CheckCircle className="w-3.5 h-3.5 ml-auto text-current" />}
                   </button>
@@ -460,9 +464,9 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
                   </div>
                   <p className="text-gray-400 text-xs leading-normal">{proj.description}</p>
                   <div className="space-y-2 pt-2 border-t border-white/5 text-xs">
-                    <div className="flex items-start space-x-2.5 text-gray-300">
-                      <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
-                      <span className="font-mono text-[11px] leading-tight">{proj.location}</span>
+                    <div className="flex items-center space-x-2.5 text-gray-300">
+                      <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
+                      <span className="font-mono text-[11px]">{proj.location}</span>
                     </div>
                     <div className="flex items-center space-x-2.5 text-gray-400">
                       <div className="flex items-center gap-1">
