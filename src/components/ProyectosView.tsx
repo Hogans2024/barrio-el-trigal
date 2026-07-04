@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, ThumbsUp, MessageSquare, Zap, Shield, Heart } from 'lucide-react';
 import { Project } from '../types';
 
@@ -30,6 +30,8 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [cardWidth, setCardWidth] = useState(0);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);
@@ -49,6 +51,16 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   }, []);
 
   useEffect(() => {
+    const header = document.querySelector('header');
+    if (!header) return;
+    const measure = () => setHeaderHeight(header.offsetHeight);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (!showFloatingBtns) return;
     const el = buttonsRef.current;
     if (!el) return;
@@ -61,7 +73,31 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
 
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const stickyBarRef = useRef<HTMLDivElement>(null);
+  const [stickyBarHeight, setStickyBarHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const parent = cardsContainerRef.current;
+    if (!parent) return;
+    const measure = () => {
+      const el = parent.firstElementChild as HTMLElement | null;
+      if (el) setCardWidth(el.offsetWidth);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(parent);
+    return () => ro.disconnect();
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!showFloatingBtns) return;
+    const el = stickyBarRef.current;
+    if (!el) return;
+    setStickyBarHeight(el.offsetHeight);
+    const ro = new ResizeObserver(() => setStickyBarHeight(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showFloatingBtns]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -163,7 +199,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
       {/* Search + Category Bar — sticky wrapper */}
       <div
         ref={stickyBarRef}
-        className="z-10 -mt-[7px] will-change-transform"
+        className="z-10 -mt-[7px]"
         style={{ position: 'sticky', top: '-1.5rem', background: '#070707', marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
       >
         {showFloatingBtns ? (
