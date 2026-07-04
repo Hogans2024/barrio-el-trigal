@@ -180,7 +180,7 @@ export default function App() {
       <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
         
         {/* APP STATUS HEADER (Mobile & Desktop) */}
-        <header className="relative z-30 bg-black/30 border-b border-white/10 px-5 py-0 flex items-center shrink-0 backdrop-blur-md">
+        <header className="relative z-30 bg-[#070707]/85 px-5 py-0 flex items-center shrink-0 backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.08)] will-change-transform">
           
           {/* Left: Back button (non-Alarma) / Logo (Alarma) */}
           <div className="flex-1 flex justify-start items-center">
@@ -340,7 +340,7 @@ export default function App() {
         </header>
 
         {/* Central scrolling panel area */}
-        <main ref={mainScrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8">
+        <main ref={mainScrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8 -mt-px">
           <div className="relative z-10 w-full max-w-5xl mx-auto">
             {/* Banner sutil si falló la carga del JSON dinámico (se sigue mostrando data fallback) */}
             {error && (
