@@ -177,13 +177,13 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
               onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+              className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
             >
               <span>Categorías</span>
             </button>
             <div
               onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
             >
               {categoryIcons[selectedCategory]}
               <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
@@ -198,7 +198,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             </div>
             <button
               onClick={() => setShowViewModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
             >
               {viewOptions.find(v => v.id === viewMode)?.icon}
               <span>Vista</span>
@@ -209,7 +209,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
                 el?.focus();
                 el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Buscar</span>
@@ -241,14 +241,14 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             {shimmer && <div className="shimmer-beam buttons" />}
             <button
               onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+              className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               <span>Categorías</span>
             </button>
             <div
               onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
             >
               {categoryIcons[selectedCategory]}
               <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
@@ -263,7 +263,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             </div>
             <button
               onClick={() => setShowViewModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
             >
               {viewOptions.find(v => v.id === viewMode)?.icon}
               <span>Vista</span>
