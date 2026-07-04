@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Heart, PlusCircle, Upload, ChevronDown, Home } from 'lucide-react';
 import { LostPet } from '../types';
 
@@ -174,6 +174,8 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [showViewModal, setShowViewModal] = useState(false);
   const [shimmer, setShimmer] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
+  const buttonsRef = useRef<HTMLDivElement>(null);
+  const [stickyBarWidth, setStickyBarWidth] = useState(0);
 
   const [pets, setPets] = useState<LostPet[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -209,6 +211,39 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!showFloatingBtns) return;
+    const el = buttonsRef.current;
+    if (!el) return;
+    const measure = () => setStickyBarWidth(el.offsetWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showFloatingBtns]);
+
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const stickyBarRef = useRef<HTMLDivElement>(null);
+  const [stickyBarHeight, setStickyBarHeight] = useState(0);
+  const [isMobile, setIsMobile] = useState(true);
+
+  useLayoutEffect(() => {
+    if (!showFloatingBtns) return;
+    const el = stickyBarRef.current;
+    if (!el) return;
+    setStickyBarHeight(el.offsetHeight);
+    const ro = new ResizeObserver(() => setStickyBarHeight(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showFloatingBtns]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
   useEffect(() => {
@@ -354,86 +389,137 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
         `}</style>
       </div>
 
-      {/* Search + Add button */}
-      <div className={`transition-all duration-300 ease-out ${
-        showFloatingBtns ? 'opacity-0 pointer-events-none -translate-y-2 h-0 overflow-hidden mb-0' : 'opacity-100 translate-y-0'
-      }`}>
-        <div className="flex gap-2 -mt-[7px]">
-          <div className="relative flex-1">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-gray-500" />
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar mascotas..."
-              className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-sm focus:outline-none focus:border-[#FFD700] transition"
-            />
+      {/* Search + Category Bar — sticky wrapper */}
+      <div
+        ref={stickyBarRef}
+        className="z-10 -mt-[7px]"
+        style={{ position: 'sticky', top: '-1.5rem', background: '#070707', marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
+      >
+        {showFloatingBtns ? (
+          /* ── Sticky layout: 4 buttons + search bar below ── */
+          <div className="flex flex-col items-center">
+            <div className={`w-full pt-1.5 pb-1 flex items-center ${isMobile ? '' : 'justify-center'}`}>
+              <div ref={buttonsRef} className={`flex items-center flex-nowrap ${isMobile ? 'w-full justify-between gap-0' : 'justify-center'}`} style={!isMobile ? { gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' } : undefined}>
+                {shimmer && <div className="shimmer-beam buttons" />}
+                <button
+                  onClick={() => setShowCategoryModal(true)}
+                  className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+                >
+                  <span>Categorías</span>
+                </button>
+                <div
+                  onClick={() => setShowCategoryModal(true)}
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+                >
+                  {categoryIcons[selectedCategory]}
+                  <span>{selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
+                  {selectedCategory !== 'Todos' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
+                      className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
+                    >
+                      <X className="w-2.5 h-2.5 text-white" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowViewModal(true)}
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+                >
+                  {viewOptions.find(v => v.id === viewMode)?.icon}
+                  <span>Vista</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar mascotas..."]');
+                    el?.focus();
+                  }}
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Buscar</span>
+                </button>
+              </div>
+            </div>
+            <div className={`pb-1.5 ${isMobile ? 'w-full' : ''}`} style={{ width: isMobile ? undefined : stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-300" />
+                </span>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar mascotas..."
+                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                />
+              </div>
+            </div>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
-          >
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span>Añadir Mascota</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Category Selector */}
-      <div ref={barRef} className={`transition-all duration-300 ease-out ${
-        showFloatingBtns
-          ? 'fixed top-0 left-4 right-4 md:top-0 md:left-80 md:right-8 z-10 flex items-center justify-center flex-nowrap bg-[#070707] py-2 translate-y-[45px]'
-          : 'relative -mt-[7px] flex items-center justify-center flex-nowrap'
-      }`} style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
-        {shimmer && <div className="shimmer-beam buttons" />}
-        <button
-          onClick={() => setShowCategoryModal(true)}
-          className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
-        >
-          {!showFloatingBtns && <LayoutGrid className="w-3.5 h-3.5" />}
-          <span>Categorías</span>
-        </button>
-        <div
-          onClick={() => setShowCategoryModal(true)}
-          className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
-        >
-          {categoryIcons[selectedCategory]}
-          <span>{selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
-          {selectedCategory !== 'Todos' && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
-              className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
-            >
-              <X className="w-2.5 h-2.5 text-white" />
-            </button>
-          )}
-        </div>
-        <button
-          onClick={() => setShowViewModal(true)}
-          className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
-        >
-          {viewOptions.find(v => v.id === viewMode)?.icon}
-          <span>Vista</span>
-        </button>
-        {showFloatingBtns && (
-          <button
-            onClick={() => {
-              const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar mascotas..."]');
-              el?.focus();
-              el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-            className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
-          >
-            <Search className="w-3.5 h-3.5" />
-            <span>Buscar</span>
-          </button>
+        ) : (
+          /* ── Normal layout: search bar + category bar ── */
+          <div className="relative">
+            <div className="relative transition-all duration-300 ease-out">
+              <div className="flex gap-2 -mt-[7px]">
+                <div className="relative flex-1">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-300" />
+                  </span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar mascotas..."
+                    className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span>Añadir Mascota</span>
+                </button>
+              </div>
+            </div>
+            <div ref={barRef} className="mt-3 flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
+              {shimmer && <div className="shimmer-beam buttons" />}
+              <button
+                onClick={() => setShowCategoryModal(true)}
+                className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>Categorías</span>
+              </button>
+              <div
+                onClick={() => setShowCategoryModal(true)}
+                className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+              >
+                {categoryIcons[selectedCategory]}
+                <span>{selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
+                {selectedCategory !== 'Todos' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
+                  >
+                    <X className="w-2.5 h-2.5 text-white" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => setShowViewModal(true)}
+                className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+              >
+                {viewOptions.find(v => v.id === viewMode)?.icon}
+                <span>Vista</span>
+              </button>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Spacer when buttons are fixed */}
-      {showFloatingBtns && <div className="h-12" />}
+      {/* Spacer matching sticky bar height */}
+      {showFloatingBtns && <div style={{ height: stickyBarHeight > 0 ? stickyBarHeight : undefined }} className="h-14" />}
 
       {/* View Selection Modal */}
       {showViewModal && (
@@ -516,7 +602,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
       )}
 
       {/* Pet Cards Section */}
-      <div className="space-y-4 -mt-[4px]">
+      <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
         {filteredPets.map((pet) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {

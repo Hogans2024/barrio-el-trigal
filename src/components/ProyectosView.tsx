@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, ThumbsUp, MessageSquare, Zap, Shield, Heart } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, MessageSquare, Zap, Shield } from 'lucide-react';
 import { Project } from '../types';
 
 interface ProyectosViewProps {
@@ -10,11 +10,6 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [likes, setLikes] = useState<Record<string, number>>({
-    'pr1': 42,
-    'pr2': 67,
-    'pr3': 105,
-  });
   const [comments, setComments] = useState<Record<string, string[]>>({
     'pr1': ['¡Excelente iniciativa! Hacía falta empedrar estas cuadras.', '¿Saben cuándo estiman terminar la obra?'],
     'pr2': ['Por fin llegará el gas a nuestro manzano!', 'Una gran mejora para la economía del hogar.'],
@@ -30,8 +25,6 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const [cardWidth, setCardWidth] = useState(0);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);
@@ -51,16 +44,6 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   }, []);
 
   useEffect(() => {
-    const header = document.querySelector('header');
-    if (!header) return;
-    const measure = () => setHeaderHeight(header.offsetHeight);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(header);
-    return () => ro.disconnect();
-  }, []);
-
-  useEffect(() => {
     if (!showFloatingBtns) return;
     const el = buttonsRef.current;
     if (!el) return;
@@ -75,19 +58,6 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   const stickyBarRef = useRef<HTMLDivElement>(null);
   const [stickyBarHeight, setStickyBarHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(true);
-
-  useEffect(() => {
-    const parent = cardsContainerRef.current;
-    if (!parent) return;
-    const measure = () => {
-      const el = parent.firstElementChild as HTMLElement | null;
-      if (el) setCardWidth(el.offsetWidth);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(parent);
-    return () => ro.disconnect();
-  }, []);
 
   useLayoutEffect(() => {
     if (!showFloatingBtns) return;
@@ -140,14 +110,6 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
 
     return matchesSearch && matchesCategory;
   });
-
-  const handleLike = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLikes(prev => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1
-    }));
-  };
 
   const handleAddComment = (id: string) => {
     if (!newComment.trim()) return;
