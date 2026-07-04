@@ -17,3 +17,5 @@ GS code funcionak.txt
 # El repo es publico, asi que NUNCA subir este archivo.
 # Los datos alimentan el sitio via Apps Script -> public/data.json.
 Datos_Afiliacion.xlsx
+
+*.zip
