@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home } from 'lucide-react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 
 interface EventosViewProps {
@@ -22,6 +22,24 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [cardWidth, setCardWidth] = useState(0);
+
+  useEffect(() => {
+    const t2 = setTimeout(() => setShimmer(true), 2900);
+    const t3 = setTimeout(() => setShimmer(false), 7900);
+    return () => { clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowFloatingBtns(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const header = document.querySelector('header');
@@ -44,24 +62,46 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
     return () => ro.disconnect();
   }, [showFloatingBtns]);
 
-  useEffect(() => {
-    const t2 = setTimeout(() => setShimmer(true), 2900);
-    const t3 = setTimeout(() => setShimmer(false), 7900);
-    return () => { clearTimeout(t2); clearTimeout(t3); };
-  }, []);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const stickyBarRef = useRef<HTMLDivElement>(null);
+  const [stickyBarHeight, setStickyBarHeight] = useState(0);
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowFloatingBtns(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    const parent = cardsContainerRef.current;
+    if (!parent) return;
+    const measure = () => {
+      const el = parent.firstElementChild as HTMLElement | null;
+      if (el) setCardWidth(el.offsetWidth);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(parent);
+    return () => ro.disconnect();
   }, []);
 
-  const categories = ['Todos', 'Comunidad', 'Salud', 'Medio'];
+  useLayoutEffect(() => {
+    if (!showFloatingBtns) return;
+    const el = stickyBarRef.current;
+    if (!el) return;
+    setStickyBarHeight(el.offsetHeight);
+    const ro = new ResizeObserver(() => setStickyBarHeight(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showFloatingBtns]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const categoryLabels: Record<string, string> = {
+    Todos: 'Todas', Comunidad: 'Comunidad', Salud: 'Salud', Medio: 'Medio Ambiente',
+  };
+
+  const categories = Object.keys(categoryLabels);
 
   const categoryIcons: Record<string, React.ReactNode> = {
     Todos: <LayoutGrid className="w-4 h-4" />,
@@ -78,17 +118,17 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
     { id: 'negocios', label: 'Negocios', icon: <Store className="w-4 h-4" /> },
   ];
 
-  const filteredEvents = eventos.filter((event) => {
-    const matchesSearch = event.title.toLowerCase().includes(search.toLowerCase()) ||
-                          event.description.toLowerCase().includes(search.toLowerCase());
+  const filteredEvents = eventos.filter((evt) => {
+    const matchesSearch = evt.title.toLowerCase().includes(search.toLowerCase()) ||
+                          evt.description.toLowerCase().includes(search.toLowerCase());
     
     let matchesCategory = false;
     if (selectedCategory === 'Todos') {
       matchesCategory = true;
     } else if (selectedCategory === 'Medio') {
-      matchesCategory = event.category === 'Medio';
+      matchesCategory = evt.category === 'Medio';
     } else {
-      matchesCategory = event.category.toLowerCase() === selectedCategory.toLowerCase();
+      matchesCategory = evt.category.toLowerCase() === selectedCategory.toLowerCase();
     }
 
     return matchesSearch && matchesCategory;
@@ -149,15 +189,59 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
         `}</style>
       </div>
 
-      {/* Search + Category Bar */}
-      {showFloatingBtns ? (
-        <div className="fixed top-0 left-4 right-4 md:top-0 md:left-80 md:right-8 z-10 overflow-visible" style={{ transform: headerHeight > 0 ? `translateY(${headerHeight}px)` : 'translateY(47px)' }}>
-          {/* Background flush with header */}
-          <div className="absolute inset-x-0 bg-[#070707]" style={{ top: headerHeight > 0 ? `-${headerHeight}px` : '-2px', bottom: '0' }} />
-          {/* Content */}
-          <div className="relative flex flex-col items-center">
-            {/* Search bar width matches buttons group */}
-            <div className="pt-1 pb-1.5" style={{ width: stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
+      {/* Search + Category Bar — sticky wrapper */}
+      <div
+        ref={stickyBarRef}
+        className="z-10 -mt-[7px]"
+        style={{ position: 'sticky', top: '-1.5rem', background: '#070707', marginLeft: '-1rem', marginRight: '-1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
+      >
+        {showFloatingBtns ? (
+          /* ── Sticky layout: 4 buttons + search bar below ── */
+          <div className="flex flex-col items-center">
+            <div className={`w-full pt-1.5 pb-1 flex items-center ${isMobile ? '' : 'justify-center'}`}>
+              <div ref={buttonsRef} className={`flex items-center flex-nowrap ${isMobile ? 'w-full justify-between gap-0' : 'justify-center'}`} style={!isMobile ? { gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' } : undefined}>
+                {shimmer && <div className="shimmer-beam buttons" />}
+                <button
+                  onClick={() => setShowCategoryModal(true)}
+                  className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+                >
+                  <span>Categorías</span>
+                </button>
+                <div
+                  onClick={() => setShowCategoryModal(true)}
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+                >
+                  {categoryIcons[selectedCategory]}
+                  <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
+                  {selectedCategory !== 'Todos' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
+                      className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
+                    >
+                      <X className="w-2.5 h-2.5 text-white" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowViewModal(true)}
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+                >
+                  {viewOptions.find(v => v.id === viewMode)?.icon}
+                  <span>Vista</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar eventos..."]');
+                    el?.focus();
+                  }}
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Buscar</span>
+                </button>
+              </div>
+            </div>
+            <div className={`pb-1.5 ${isMobile ? 'w-full' : ''}`} style={{ width: isMobile ? undefined : stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search className="h-4 w-4 text-gray-300" />
@@ -167,113 +251,63 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Buscar eventos..."
-className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
                 />
               </div>
             </div>
-            {/* Buttons group */}
-            <div className="w-full pb-2 flex items-center justify-center">
-            <div ref={buttonsRef} className="flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
-            {shimmer && <div className="shimmer-beam buttons" />}
-            <button
-              onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
-            >
-              <span>Categorías</span>
-            </button>
-            <div
-              onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
-            >
-              {categoryIcons[selectedCategory]}
-              <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
-              {selectedCategory !== 'Todos' && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
-                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
-                >
-                  <X className="w-2.5 h-2.5 text-white" />
-                </button>
-              )}
+          </div>
+        ) : (
+          /* ── Normal layout: search bar + 3 buttons ── */
+          <div className="relative">
+            <div className="relative transition-all duration-300 ease-out">
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-300" />
+                </span>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar eventos..."
+                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                />
+              </div>
             </div>
-            <button
-              onClick={() => setShowViewModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
-            >
-              {viewOptions.find(v => v.id === viewMode)?.icon}
-              <span>Vista</span>
-            </button>
-            <button
-              onClick={() => {
-                const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar eventos..."]');
-                el?.focus();
-                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }}
-              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Buscar</span>
-            </button>
-          </div>
-          </div>
-        </div>
-        </div>
-      ) : (
-        <>
-          {/* Search Input - normal flow */}
-          <div className="relative -mt-[7px] transition-all duration-300 ease-out">
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="h-4 w-4 text-gray-300" />
-              </span>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar eventos..."
-                className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
-              />
+            <div ref={barRef} className="relative mt-2 flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
+              {shimmer && <div className="shimmer-beam buttons" />}
+              <button
+                onClick={() => setShowCategoryModal(true)}
+                className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>Categorías</span>
+              </button>
+              <div
+                onClick={() => setShowCategoryModal(true)}
+                className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+              >
+                {categoryIcons[selectedCategory]}
+                <span>{categoryLabels[selectedCategory] || selectedCategory}</span>
+                {selectedCategory !== 'Todos' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
+                  >
+                    <X className="w-2.5 h-2.5 text-white" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => setShowViewModal(true)}
+                className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+              >
+                {viewOptions.find(v => v.id === viewMode)?.icon}
+                <span>Vista</span>
+              </button>
             </div>
           </div>
-
-          {/* Category Selector - normal flow */}
-          <div ref={barRef} className="relative -mt-[7px] flex items-center justify-center flex-nowrap transition-all duration-300 ease-out" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
-            {shimmer && <div className="shimmer-beam buttons" />}
-            <button
-              onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Categorías</span>
-            </button>
-            <div
-              onClick={() => setShowCategoryModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
-            >
-              {categoryIcons[selectedCategory]}
-              <span>{selectedCategory === 'Medio' ? 'Medio Ambiente' : selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
-              {selectedCategory !== 'Todos' && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setSelectedCategory('Todos'); }}
-                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition"
-                >
-                  <X className="w-2.5 h-2.5 text-white" />
-                </button>
-              )}
-            </div>
-            <button
-              onClick={() => setShowViewModal(true)}
-              className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
-            >
-              {viewOptions.find(v => v.id === viewMode)?.icon}
-              <span>Vista</span>
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Spacer when sticky */}
-      {showFloatingBtns && <div style={{ height: headerHeight > 0 ? headerHeight + 80 : 123 }} />}
+        )}
+      </div>
 
       {/* View Selection Modal */}
       {showViewModal && (
@@ -331,7 +365,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
             <div className="p-3 space-y-1">
               {categories.map((cat) => {
                 const isActive = selectedCategory === cat;
-                const displayName = cat === 'Medio' ? 'Medio Ambiente' : cat === 'Todos' ? 'Todas las categorías' : cat;
+                const displayName = cat === 'Todos' ? 'Todas las categorías' : categoryLabels[cat] || cat;
                 return (
                   <button
                     key={cat}
@@ -356,7 +390,7 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
       )}
 
       {/* Event Cards Section */}
-      <div className="space-y-4 -mt-[4px]">
+      <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
         {filteredEvents.map((evt) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
@@ -601,6 +635,17 @@ className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border bo
                   }`}
                 >
                   {subscribedEvents[activeEvent.id] ? 'Inscripto ✓' : 'Anotarse al Evento'}
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar eventos..."]');
+                    el?.focus();
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }}
+                  className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Buscar</span>
                 </button>
               </div>
             </div>
