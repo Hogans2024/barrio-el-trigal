@@ -608,17 +608,15 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
                 onClick={() => {
                   const phone = contactPharmacy.phone.replace(/[^0-9]/g, '');
                   const isAndroid = /Android/i.test(navigator.userAgent);
-                  const intentUrl = `intent://send/+${phone}#Intent;scheme=smsto;package=com.whatsapp;action=android.intent.action.SENDTO;end`;
-                  const waUrl = `whatsapp://send?phone=${phone}`;
-                  const fallbackUrl = `https://wa.me/${phone}`;
                   if (isAndroid) {
+                    const intentUrl = `intent://${phone}#Intent;scheme=smsto;package=com.whatsapp;action=android.intent.action.SENDTO;end`;
                     window.location.href = intentUrl;
                   } else {
-                    window.location.href = waUrl;
+                    window.location.href = `whatsapp://send?phone=${phone}`;
                   }
                   setTimeout(() => {
                     if (document.visibilityState !== 'hidden') {
-                      window.location.href = fallbackUrl;
+                      window.location.href = `https://wa.me/${phone}`;
                     }
                   }, 3000);
                   setContactPharmacy(null);

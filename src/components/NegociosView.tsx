@@ -982,17 +982,15 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                       onClick={() => {
                         if (!cleanPhone) return;
                         const isAndroid = /Android/i.test(navigator.userAgent);
-                        const intentUrl = `intent://send/+${cleanPhone}#Intent;scheme=smsto;package=com.whatsapp;action=android.intent.action.SENDTO;end`;
-                        const waUrl = `whatsapp://send?phone=${cleanPhone}`;
-                        const fallbackUrl = `https://wa.me/${cleanPhone}`;
                         if (isAndroid) {
+                          const intentUrl = `intent://${cleanPhone}#Intent;scheme=smsto;package=com.whatsapp;action=android.intent.action.SENDTO;end`;
                           window.location.href = intentUrl;
                         } else {
-                          window.location.href = waUrl;
+                          window.location.href = `whatsapp://send?phone=${cleanPhone}`;
                         }
                         setTimeout(() => {
                           if (document.visibilityState !== 'hidden') {
-                            window.location.href = fallbackUrl;
+                            window.location.href = `https://wa.me/${cleanPhone}`;
                           }
                         }, 3000);
                         setContactBiz(null);
@@ -1005,7 +1003,18 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                     <button
                       onClick={() => {
                         if (!cleanPhone) return;
-                        window.location.href = `sms:${cleanPhone}`;
+                        const isAndroid = /Android/i.test(navigator.userAgent);
+                        if (isAndroid) {
+                          const intentUrl = `intent://${cleanPhone}#Intent;scheme=smsto;action=android.intent.action.SENDTO;end`;
+                          window.location.href = intentUrl;
+                        } else {
+                          window.location.href = `sms:${cleanPhone}`;
+                        }
+                        setTimeout(() => {
+                          if (document.visibilityState !== 'hidden') {
+                            window.location.href = `sms:${cleanPhone}`;
+                          }
+                        }, 2000);
                         setContactBiz(null);
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-blue-500/10 hover:bg-blue-500/20 text-white border border-blue-500/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
