@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Heart, PlusCircle, Upload, ChevronDown, Home } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
 import { LostPet } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
@@ -169,6 +169,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePet, setActivePet] = useState<LostPet | null>(null);
+  const [contactPet, setContactPet] = useState<LostPet | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -301,13 +302,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
     }
     return matchesSearch && matchesCategory;
   });
-
-  const handleContact = (pet: LostPet) => {
-    onShowNotification(
-      '📞 Contactar Dueño',
-      `Llamando al contacto de ${pet.name}: ${pet.contact}.`
-    );
-  };
 
   const getPhoneNumbers = (pet: LostPet): string[] => {
     if (pet.phones && pet.phones.length > 0) return pet.phones;
@@ -769,7 +763,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleContact(pet);
+                    setContactPet(pet);
                   }}
                   className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white"
                 >
@@ -861,15 +855,62 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                   Cerrar
                 </button>
                 <button
-                  onClick={() => {
-                    handleContact(activePet);
-                    setActivePet(null);
-                  }}
+                  onClick={() => setContactPet(activePet)}
                   className="flex-1 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer"
                 >
                   Contactar
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Options Modal */}
+      {contactPet && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#0c101d] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h4 className="text-white text-lg font-bold">Contactar</h4>
+                <p className="text-gray-400 text-xs mt-1">{contactPet.name}</p>
+              </div>
+              {(() => {
+                const phones = getPhoneNumbers(contactPet);
+                const phone = phones[0] || contactPet.contact;
+                if (!phone) return null;
+                return (
+                  <>
+                    <button
+                      onClick={() => {
+                        const clean = phone.replace(/[^0-9]/g, '');
+                        window.open(`https://wa.me/${clean}`, '_blank');
+                        setContactPet(null);
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                      <span>WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        window.location.href = `tel:${phone}`;
+                        setContactPet(null);
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <Phone className="h-5 w-5 text-[#FFD700]" />
+                      <span>Llamar</span>
+                    </button>
+                  </>
+                );
+              })()}
+              <button
+                onClick={() => setContactPet(null)}
+                className="w-full text-gray-500 hover:text-gray-300 py-2 text-xs transition cursor-pointer"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>

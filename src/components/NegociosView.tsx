@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle } from 'lucide-react';
 import { LocalBusiness } from '../types';
 
 interface NegociosViewProps {
@@ -11,6 +11,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeBiz, setActiveBiz] = useState<LocalBusiness | null>(null);
+  const [contactBiz, setContactBiz] = useState<LocalBusiness | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('eventos');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -676,6 +677,16 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    setContactBiz(biz);
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white"
+                >
+                  <Phone className="h-3 w-3" />
+                  <span>Contactar</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setActiveBiz(biz);
                   }}
                   className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer whitespace-nowrap border ${
@@ -788,6 +799,55 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                   {activeBiz.actionText}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Options Modal */}
+      {contactBiz && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#0c101d] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h4 className="text-white text-lg font-bold">Contactar</h4>
+                <p className="text-gray-400 text-xs mt-1">{contactBiz.name}</p>
+              </div>
+              {(() => {
+                const phone = contactBiz.phone || (contactBiz.phones && contactBiz.phones[0]);
+                if (!phone) return null;
+                return (
+                  <>
+                    <button
+                      onClick={() => {
+                        const clean = phone.replace(/[^0-9]/g, '');
+                        window.open(`https://wa.me/${clean}`, '_blank');
+                        setContactBiz(null);
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                      <span>WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        window.location.href = `tel:${phone}`;
+                        setContactBiz(null);
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <Phone className="h-5 w-5 text-[#FFD700]" />
+                      <span>Llamar</span>
+                    </button>
+                  </>
+                );
+              })()}
+              <button
+                onClick={() => setContactBiz(null)}
+                className="w-full text-gray-500 hover:text-gray-300 py-2 text-xs transition cursor-pointer"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
