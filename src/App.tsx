@@ -88,6 +88,7 @@ export default function App() {
   // System triggers a new banner/toast
   const addToast = (title: string, message: string) => {
     const id = Date.now().toString();
+    if (title === 'Sistema' && window.innerWidth < 1024) return;
     setToasts((prev) => [...prev, { id, title, message }]);
     
     // Auto-remove toast after 6 seconds

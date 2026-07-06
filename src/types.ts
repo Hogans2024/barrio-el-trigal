@@ -24,6 +24,26 @@ export interface NeighborhoodEvent {
   location?: string;
 }
 
+export interface DaySchedule {
+  day: string;
+  open: boolean;
+  hours: string;
+}
+
+export interface TransportLine {
+  name: string;
+  flagColor: string;
+  proximity: string;
+  detail?: string;
+}
+
+export interface TransportInfo {
+  micros?: TransportLine[];
+  taxitrufis?: TransportLine[];
+  trufis?: TransportLine[];
+  radioTaxis?: TransportLine[];
+}
+
 export interface LocalBusiness {
   id: string;
   name: string;
@@ -41,11 +61,13 @@ export interface LocalBusiness {
   rating?: string;
   reviewsCount?: number;
   openHours?: string;
+  schedule?: DaySchedule[];
   distanceInfo?: string;
   isFreeDelivery?: boolean;
   actionText: string;
   images?: string[];
   videoUrl?: string;
+  transport?: TransportInfo;
 }
 
 export interface LostPet {

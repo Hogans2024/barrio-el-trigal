@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight, ChevronDown } from 'lucide-react';
 import { LocalBusiness } from '../types';
 
 interface NegociosViewProps {
@@ -12,6 +12,10 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeBiz, setActiveBiz] = useState<LocalBusiness | null>(null);
   const [contactBiz, setContactBiz] = useState<LocalBusiness | null>(null);
+  const [scheduleBiz, setScheduleBiz] = useState<LocalBusiness | null>(null);
+  const [expandedTransport, setExpandedTransport] = useState<string | null>(null);
+  const [transportDetail, setTransportDetail] = useState<{ category: string; index: number } | null>(null);
+  useEffect(() => { setExpandedTransport(null); setTransportDetail(null); }, [activeBiz]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('eventos');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -240,6 +244,28 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
     setSelectedDays({});
     setSelectedShifts({});
     setShiftTimes({});
+  };
+
+  const mapColor = (color: string): string => {
+    const map: Record<string, string> = {
+      Rojo: '#EF4444', Roja: '#EF4444', Amarillo: '#EAB308', Verde: '#22C55E',
+      Azul: '#3B82F6', Blanca: '#F8FAFC', Blanco: '#F8FAFC', Morado: '#A855F7',
+      Naranja: '#F97316', Negra: '#1F2937'
+    };
+    return map[color] || '#6B7280';
+  };
+
+  const getTextColor = (color: string): string => {
+    const map: Record<string, string> = {
+      Rojo: 'text-red-400', Roja: 'text-red-400', Amarillo: 'text-yellow-400',
+      Verde: 'text-green-400', Azul: 'text-blue-400', Blanca: 'text-gray-100',
+      Blanco: 'text-gray-100', Morado: 'text-purple-400', Naranja: 'text-orange-400',
+      Gris: 'text-gray-400', Negra: 'text-gray-700'
+    };
+    if (color.includes('con')) {
+      return map[color.split(' con ')[0]] || 'text-gray-300';
+    }
+    return map[color] || 'text-gray-300';
   };
 
   return (
@@ -494,8 +520,6 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
       {/* Business Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
         {filteredBusinesses.map((biz) => {
-          const open = isOpen(biz);
-
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
@@ -657,6 +681,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
+
               </div>
 
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
@@ -679,23 +704,10 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                     e.stopPropagation();
                     setContactBiz(biz);
                   }}
-                  className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white"
+                  className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20"
                 >
                   <Phone className="h-3 w-3" />
                   <span>Contactar</span>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveBiz(biz);
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer whitespace-nowrap border ${
-                    open
-                      ? 'bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20'
-                      : 'bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20'
-                  }`}
-                >
-                  <span>{open ? 'Abierto' : 'Cerrado'}</span>
                 </button>
                 <span className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-500/40 whitespace-nowrap">
                   {biz.category === 'Papa de comer' ? 'Comida' : biz.category}
@@ -746,39 +758,187 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
               </div>
             </div>
 
-            <div className="p-5 space-y-4 pb-16 sm:pb-5">
+            <div className="p-5 space-y-3 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeBiz.name}</h4>
-              <p className="text-gray-300 text-xs leading-relaxed">{activeBiz.description}</p>
 
-              <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
-                {activeBiz.phone && (
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
-                    <span className="text-white">{activeBiz.phone}</span>
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
+                <p className="text-gray-300 text-xs leading-relaxed">{activeBiz.description}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Dirección</h5>
+                <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
+                  <div className="flex items-start space-x-2 text-gray-400">
+                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
+                    <span className="text-white leading-relaxed flex-1">{activeBiz.address || 'No especificada'}</span>
+                    <button
+                      onClick={() => {
+                        const query = encodeURIComponent(`${activeBiz.name} ${activeBiz.address || ''}`);
+                        window.open(`https://www.google.com/maps/search/${query}`, '_blank');
+                      }}
+                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 min-w-[74px] text-center"
+                    >
+                      Ubicación GPS
+                    </button>
                   </div>
-                )}
-                {activeBiz.address && (
                   <div className="flex items-center space-x-2 text-gray-400">
-                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                    <span className="text-white">{activeBiz.address}</span>
+                    <Clock className="h-4 w-4 text-[#FFD700] shrink-0" />
+                    <span className="text-white flex-1">Horarios</span>
+                    <button
+                      onClick={() => setScheduleBiz(activeBiz)}
+                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 w-[98px] text-center"
+                    >
+                      Ver Horarios
+                    </button>
                   </div>
-                )}
-                {activeBiz.openHours && (
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Clock className="h-4 w-4 text-gray-500 shrink-0" />
-                    <span className="text-white">{activeBiz.openHours}</span>
+                  {(() => {
+                    const phones = activeBiz.phones && activeBiz.phones.length > 0 ? activeBiz.phones : (activeBiz.phone ? [activeBiz.phone] : []);
+                    return phones.map((p, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-gray-400">
+                          <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                          <span className="text-white">{p}</span>
+                        </div>
+                        <button
+                          onClick={() => setContactBiz({ ...activeBiz, phone: p })}
+                          className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[74px] text-center"
+                        >
+                          Enviar Mensaje
+                        </button>
+                      </div>
+                    ));
+                  })()}
+                  {activeBiz.facebook && (
+                    <a
+                      href={activeBiz.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition"
+                    >
+                      <span className="text-[10px] font-bold">f</span>
+                      <span className="text-xs">Ver en Facebook</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Cómo llegar</h5>
+                {!activeBiz.transport ? (
+                  <button className="w-full flex items-center justify-center space-x-2 bg-white/[0.02] border border-white/10 rounded-xl p-3.5 text-xs font-semibold cursor-default">
+                    <Navigation className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-500">No disponible</span>
+                  </button>
+                ) : (
+                  <div className="space-y-1.5">
+                    {[
+                          { key: 'micros', label: 'Micros', value: activeBiz.transport.micros },
+                          { key: 'taxitrufis', label: 'Taxitrufis', value: activeBiz.transport.taxitrufis },
+                          { key: 'trufis', label: 'Trufis', value: activeBiz.transport.trufis },
+                          { key: 'radioTaxis', label: 'Radio Taxis', value: activeBiz.transport.radioTaxis }
+                        ].map(({ key, label, value }) => (
+                          <div key={key} className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden">
+                            <button
+                              onClick={() => setExpandedTransport(expandedTransport === key ? null : key)}
+                              className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-bold text-white hover:bg-white/[0.04] transition cursor-pointer"
+                            >
+                              <span>{label}</span>
+                              {expandedTransport === key ? <ChevronDown className="h-3.5 w-3.5 text-gray-400" /> : <ChevronRight className="h-3.5 w-3.5 text-gray-400" />}
+                            </button>
+                            {expandedTransport === key && value && value.length > 0 && (
+                              <div className="px-3.5 pb-3 pt-1 space-y-1.5">
+                                {(() => {
+                                  const selected = transportDetail?.category === key ? transportDetail.index : -1;
+                                  const maxLines = 4;
+                                  const displayLines = value.slice(0, maxLines);
+                                  const renderLine = (line: TransportLine, i: number, isSelected: boolean) => {
+                                    if (isSelected) {
+                                      return (
+                                        <div key={i} className="flex flex-col items-center space-y-2 bg-white/[0.03] rounded-lg px-4 py-3">
+                                          <div className="flex items-center space-x-2.5">
+                                            {line.flagColor ? (
+                                              <svg width="22" height="22" viewBox="0 0 18 18" className="shrink-0">
+                                                <rect x="3" y="1" width="2" height="16" rx="0.5" fill="#6B7280" />
+                                                {(() => {
+                                                  const c = line.flagColor;
+                                                  if (c.includes('con')) {
+                                                    const parts = c.split(' con ');
+                                                    const col1 = mapColor(parts[0]);
+                                                    const col2 = mapColor(parts[1]);
+                                                    return (<><polygon points="5,2 16,5 5,8" fill={col1} /><polygon points="5,8 16,5 16,9 5,12" fill={col2} /></>);
+                                                  }
+                                                  return <polygon points="5,2 16,5 5,8" fill={mapColor(c)} />;
+                                                })()}
+                                              </svg>
+                                            ) : (
+                                              <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                                            )}
+                                            <span className={`text-sm font-bold ${line.flagColor ? getTextColor(line.flagColor) : 'text-gray-300'}`}>{line.name}</span>
+                                            {line.flagColor && <span className="text-gray-500 text-[11px]">Banderita {line.flagColor}</span>}
+                                            <button
+                                              onClick={() => setTransportDetail(null)}
+                                              className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition cursor-pointer shrink-0"
+                                            >
+                                              <X className="w-3 h-3 text-gray-400" />
+                                            </button>
+                                          </div>
+                                          <p className="text-gray-400 text-xs text-center leading-relaxed max-w-sm">{line.detail || `${line.proximity.toLowerCase()} circula el ${line.name} (Banderita ${line.flagColor}), cerca de mi negocio.`}</p>
+                                        </div>
+                                      );
+                                    }
+                                    return (
+                                      <div key={i} className="flex items-center space-x-2.5 bg-white/[0.03] rounded-lg px-3 py-2">
+                                        {line.flagColor ? (
+                                          <svg width="18" height="18" viewBox="0 0 18 18" className="shrink-0">
+                                            <rect x="3" y="1" width="2" height="16" rx="0.5" fill="#6B7280" />
+                                            {(() => {
+                                              const c = line.flagColor;
+                                              if (c.includes('con')) {
+                                                const parts = c.split(' con ');
+                                                const col1 = mapColor(parts[0]);
+                                                const col2 = mapColor(parts[1]);
+                                                return (<><polygon points="5,2 16,5 5,8" fill={col1} /><polygon points="5,8 16,5 16,9 5,12" fill={col2} /></>);
+                                              }
+                                              return <polygon points="5,2 16,5 5,8" fill={mapColor(c)} />;
+                                            })()}
+                                          </svg>
+                                        ) : (
+                                          <Phone className="h-3.5 w-3.5 text-[#FFD700] shrink-0" />
+                                        )}
+                                        <div className="flex items-center space-x-1.5 min-w-0 flex-1">
+                                          {line.name && <span className={`text-xs font-bold ${line.flagColor ? getTextColor(line.flagColor) : 'text-gray-300'} truncate`}>{line.name}</span>}
+                                          {line.flagColor && <span className="text-gray-500 text-[10px] shrink-0">Banderita {line.flagColor}</span>}
+                                        </div>
+                                        <span className="text-gray-400 text-[10px] text-right shrink-0 max-w-[100px] leading-tight">{line.proximity}</span>
+                                        <button
+                                          onClick={() => setTransportDetail({ category: key, index: i })}
+                                          className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-2 py-1 rounded text-[9px] font-bold transition cursor-pointer shrink-0"
+                                        >
+                                          Detalle
+                                        </button>
+                                      </div>
+                                    );
+                                  };
+                                  return (
+                                    <>
+                                      {/* Selected line with detail centered */}
+                                      {selected >= 0 && renderLine(displayLines[selected], selected, true)}
+                                      {/* All other lines below detail */}
+                                      {displayLines.map((line, i) => i !== selected && selected >= 0 && renderLine(line, i, false))}
+                                      {/* No selection: show all */}
+                                      {selected < 0 && displayLines.map((line, i) => renderLine(line, i, false))}
+                                      {value.length > maxLines && (
+                                        <p className="text-[9px] text-gray-600 text-center">+{value.length - maxLines} líneas más</p>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            )}
+                      </div>
+                    ))}
                   </div>
-                )}
-                {activeBiz.facebook && (
-                  <a
-                    href={activeBiz.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition"
-                  >
-                    <span className="text-[10px] font-bold">f</span>
-                    <span className="text-xs">Ver en Facebook</span>
-                  </a>
                 )}
               </div>
 
@@ -814,25 +974,40 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                 <p className="text-gray-400 text-xs mt-1">{contactBiz.name}</p>
               </div>
               {(() => {
-                const phone = contactBiz.phone || (contactBiz.phones && contactBiz.phones[0]);
-                if (!phone) return null;
+                const phone = contactBiz.phone || (contactBiz.phones && contactBiz.phones[0]) || '';
                 return (
                   <>
                     <button
                       onClick={() => {
-                        const clean = phone.replace(/[^0-9]/g, '');
-                        window.open(`https://wa.me/${clean}`, '_blank');
-                        setContactBiz(null);
+                        if (phone) {
+                          const clean = phone.replace(/[^0-9]/g, '');
+                          window.open(`https://wa.me/${clean}`, '_blank');
+                          setContactBiz(null);
+                        }
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
                     >
                       <MessageCircle className="h-5 w-5 text-[#25D366]" />
-                      <span>WhatsApp</span>
+                      <span>Enviar WhatsApp</span>
                     </button>
                     <button
                       onClick={() => {
-                        window.location.href = `tel:${phone}`;
-                        setContactBiz(null);
+                        if (phone) {
+                          window.location.href = `sms:${phone}`;
+                          setContactBiz(null);
+                        }
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-blue-500/10 hover:bg-blue-500/20 text-white border border-blue-500/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <MessageCircle className="h-5 w-5 text-blue-400" />
+                      <span>Enviar SMS</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (phone) {
+                          window.location.href = `tel:${phone}`;
+                          setContactBiz(null);
+                        }
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
                     >
@@ -844,9 +1019,60 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
               })()}
               <button
                 onClick={() => setContactBiz(null)}
-                className="w-full text-gray-500 hover:text-gray-300 py-2 text-xs transition cursor-pointer"
+                className="w-full flex items-center justify-center space-x-3 text-gray-400 hover:text-gray-200 py-2 text-xs transition cursor-pointer"
               >
-                Cancelar
+                <span className="w-5 h-5 shrink-0 invisible" />
+                <span>Cancelar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Modal */}
+      {scheduleBiz && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#0c101d] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h4 className="text-white text-lg font-bold">Horarios de Atención</h4>
+                <p className="text-gray-400 text-xs mt-1">{scheduleBiz.name}</p>
+              </div>
+              <div className="space-y-1.5">
+                {(scheduleBiz.schedule || []).length > 0 ? (
+                  scheduleBiz.schedule!.map((item, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs ${
+                        item.open
+                          ? 'bg-[#22c55e]/10 border border-[#22c55e]/20'
+                          : 'bg-white/5 border border-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                            item.open ? 'bg-[#22c55e]' : 'bg-gray-500'
+                          }`}
+                        />
+                        <span className={`font-bold ${item.open ? 'text-white' : 'text-gray-500'}`}>
+                          {item.day}
+                        </span>
+                      </div>
+                      <span className={`font-mono text-[11px] ${item.open ? 'text-gray-300' : 'text-gray-500'}`}>
+                        {item.hours}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-xs text-center py-4">No hay horarios disponibles</p>
+                )}
+              </div>
+              <button
+                onClick={() => setScheduleBiz(null)}
+                className="w-full bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
+              >
+                Cerrar
               </button>
             </div>
           </div>

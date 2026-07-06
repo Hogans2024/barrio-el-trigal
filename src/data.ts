@@ -84,37 +84,669 @@ export const BUSINESSES_DATA: LocalBusiness[] = [
     name: 'La Parrilla del Trigal',
     imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
     category: 'Comida',
-    description: 'Los mejores cortes de carne y asados tradicionales con el sabor auténtico del valle tarijeño.',
+    description: 'Disfruta de una experiencia gastronómica única con los mejores cortes de carne, parrilladas artesanales y una atmósfera familiar inigualable en pleno corazón del barrio.',
+    phone: '4 663 2255',
+    phones: ['4 663 2255', '4 663 2256', '4 601 2345'],
+    address: 'Calle Comercio #456, entre Bolívar y Sucre, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '11:00 AM - 11:00 PM' },
+      { day: 'Martes', open: true, hours: '11:00 AM - 11:00 PM' },
+      { day: 'Miércoles', open: true, hours: '11:00 AM - 11:00 PM' },
+      { day: 'Jueves', open: true, hours: '11:00 AM - 11:00 PM' },
+      { day: 'Viernes', open: true, hours: '11:00 AM - 11:00 PM' },
+      { day: 'Sábado', open: true, hours: '11:00 AM - 11:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
     rating: '4.9',
     reviewsCount: 120,
-    actionText: 'Ver Menú'
+    actionText: 'Ver Menú',
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      taxitrufis: [
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
   },
   {
     id: 'b2',
     name: 'Boutique Estilo Real',
     imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&auto=format&fit=crop&q=80',
     category: 'Ropa',
-    description: 'Moda contemporánea para dama y caballero. Encuentra las últimas tendencias internacionales.',
-    openHours: 'Abierto hoy hasta 8:00 PM',
-    actionText: 'Explorar'
+    description: 'Descubre las últimas tendencias en moda para dama y caballero. Ropa de calidad con diseños exclusivos que resaltan tu estilo personal.',
+    phone: '4 664 3322',
+    address: 'Avenida Principal #789, Local 3, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Martes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Miércoles', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Jueves', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Viernes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Sábado', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Domingo', open: true, hours: '10:00 AM - 2:00 PM' }
+    ],
+    actionText: 'Explorar',
+    transport: {
+      micros: [
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
   },
   {
     id: 'b3',
     name: 'Mercado El Campo',
-    imageUrl: 'https://images.unsplash.com/photo-1573244514399-7448d3ab85ae?w=600&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&auto=format&fit=crop&q=80',
     category: 'Papa de comer',
-    description: 'Frutas, verduras y víveres frescos traídos directamente del campo a tu mesa todos los días.',
+    description: 'Frutas frescas, verduras de temporada y víveres de primera necesidad los encuentras aquí. Productos traídos directamente del campo a tu mesa.',
+    phone: '4 665 7788',
+    phones: ['4 665 7788', '4 665 7789'],
+    address: 'Plaza Central #12, Puesto 5, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Martes', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Miércoles', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Jueves', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Viernes', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Sábado', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Domingo', open: true, hours: '6:00 AM - 9:00 PM' }
+    ],
     distanceInfo: 'A 200m de la Plaza Central',
-    actionText: 'Pedir Ya'
+    actionText: 'Pedir Ya',
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos calles' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      taxitrufis: [
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea L', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
   },
   {
     id: 'b4',
     name: 'Vivero Oasis Verde',
     imageUrl: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80',
     category: 'Plantas',
-    description: 'Dale vida a tu hogar con nuestra selección de plantas de interior, macetas decorativas y abono.',
+    description: 'Transforma tu hogar con nuestras plantas de interior y exterior. Macetas decorativas, sustratos y asesoría personalizada para tus espacios verdes.',
+    phone: '4 666 9900',
+    address: 'Calle Las Flores #234, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Martes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Miércoles', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Jueves', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Viernes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Sábado', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
     isFreeDelivery: true,
-    actionText: 'Catálogo'
+    actionText: 'Catálogo',
+    transport: {
+      micros: [
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
+  },
+  {
+    id: 'b5',
+    name: 'Pizzería Don Remigio',
+    imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=80',
+    category: 'Comida',
+    description: 'Las mejores pizzas artesanales horneadas en horno de leña. Masa crujiente, ingredientes frescos y el auténtico sabor italiano en cada bocado.',
+    phone: '4 667 1133',
+    phones: ['4 667 1133', '4 667 1134'],
+    address: 'Calle Bolívar #321, Esquina San Martín, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: false, hours: 'Cerrado' },
+      { day: 'Martes', open: true, hours: '6:00 PM - 11:30 PM' },
+      { day: 'Miércoles', open: true, hours: '6:00 PM - 11:30 PM' },
+      { day: 'Jueves', open: true, hours: '6:00 PM - 11:30 PM' },
+      { day: 'Viernes', open: true, hours: '6:00 PM - 11:30 PM' },
+      { day: 'Sábado', open: true, hours: '6:00 PM - 11:30 PM' },
+      { day: 'Domingo', open: true, hours: '6:00 PM - 11:30 PM' }
+    ],
+    rating: '4.7',
+    reviewsCount: 85,
+    actionText: 'Ver Menú',
+    transport: {
+      micros: [
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea L', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
+  },
+  {
+    id: 'b6',
+    name: 'TechPro Servicios',
+    imageUrl: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&auto=format&fit=crop&q=80',
+    category: 'Tecnología',
+    description: 'Reparación y mantenimiento de computadoras, venta de accesorios tecnológicos y asesoría informática para toda la comunidad del barrio.',
+    phone: '4 668 5544',
+    address: 'Avenida Tecnológica #567, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '9:00 AM - 7:00 PM' },
+      { day: 'Martes', open: true, hours: '9:00 AM - 7:00 PM' },
+      { day: 'Miércoles', open: true, hours: '9:00 AM - 7:00 PM' },
+      { day: 'Jueves', open: true, hours: '9:00 AM - 7:00 PM' },
+      { day: 'Viernes', open: true, hours: '9:00 AM - 7:00 PM' },
+      { day: 'Sábado', open: true, hours: '9:00 AM - 1:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    actionText: 'Ver Equipos',
+    transport: {
+      micros: [
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
+  },
+  {
+    id: 'b7',
+    name: 'Salón y Spa Divino',
+    imageUrl: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&auto=format&fit=crop&q=80',
+    category: 'Belleza',
+    description: 'Cortes de cabello modernos, tratamientos capilares, manicura y pedicura profesional. Relájate y renueva tu imagen con nosotros.',
+    phone: '4 669 8877',
+    phones: ['4 669 8877', '4 669 8878', '4 602 3456'],
+    address: 'Calle Sucre #890, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Martes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Miércoles', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Jueves', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Viernes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Sábado', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    rating: '4.8',
+    reviewsCount: 65,
+    actionText: 'Agendar Cita',
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'A dos calles' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea L', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
+  },
+  {
+    id: 'b8',
+    name: 'Ferretería El Constructor',
+    imageUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&auto=format&fit=crop&q=80',
+    category: 'Ferretería',
+    description: 'Todo lo necesario para tus proyectos de construcción y mejoras del hogar. Herramientas, materiales eléctricos, pintura y tuberías de calidad.',
+    phone: '4 670 3322',
+    address: 'Calle Libertad #123, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '7:30 AM - 7:00 PM' },
+      { day: 'Martes', open: true, hours: '7:30 AM - 7:00 PM' },
+      { day: 'Miércoles', open: true, hours: '7:30 AM - 7:00 PM' },
+      { day: 'Jueves', open: true, hours: '7:30 AM - 7:00 PM' },
+      { day: 'Viernes', open: true, hours: '7:30 AM - 7:00 PM' },
+      { day: 'Sábado', open: true, hours: '7:30 AM - 7:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    actionText: 'Ver Productos',
+    transport: {
+      micros: [
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
+  },
+  {
+    id: 'b9',
+    name: 'Panificadora La Espiga',
+    imageUrl: 'https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=600&auto=format&fit=crop&q=80',
+    category: 'Comida',
+    description: 'Pan artesanal horneado diariamente, facturas rellenas, tortas caseras y masas finas. El aroma del pan recién hecho te espera cada mañana.',
+    phone: '4 671 4466',
+    phones: ['4 671 4466', '4 671 4467'],
+    address: 'Plaza Principal #45, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Martes', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Miércoles', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Jueves', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Viernes', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Sábado', open: true, hours: '6:00 AM - 9:00 PM' },
+      { day: 'Domingo', open: true, hours: '6:00 AM - 9:00 PM' }
+    ],
+    isFreeDelivery: true,
+    actionText: 'Pedir Ahora',
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea L', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
+  },
+  {
+    id: 'b10',
+    name: 'Taller Mecánico El Rápido',
+    imageUrl: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=600&auto=format&fit=crop&q=80',
+    category: 'Mecánica',
+    description: 'Servicio completo de mecánica automotriz, cambio de aceite, frenos, suspensión y diagnóstico computarizado para tu vehículo.',
+    phone: '4 672 9988',
+    address: 'Carretera Panamericana Km 5, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Martes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Miércoles', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Jueves', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Viernes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Sábado', open: true, hours: '8:00 AM - 12:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    rating: '4.6',
+    reviewsCount: 42,
+    actionText: 'Agendar Cita',
+    transport: {
+      micros: [
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
+  },
+  {
+    id: 'b11',
+    name: 'Farmacia San Rafael',
+    imageUrl: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&auto=format&fit=crop&q=80',
+    category: 'Salud',
+    description: 'Amplio surtido en medicamentos genéricos y de marca, productos de cuidado personal, vitaminas y atención farmacéutica personalizada.',
+    phone: '4 673 2211',
+    phones: ['4 673 2211', '4 673 2212', '4 603 4567'],
+    address: 'Calle Junín #678, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '8:00 AM - 10:00 PM' },
+      { day: 'Martes', open: true, hours: '8:00 AM - 10:00 PM' },
+      { day: 'Miércoles', open: true, hours: '8:00 AM - 10:00 PM' },
+      { day: 'Jueves', open: true, hours: '8:00 AM - 10:00 PM' },
+      { day: 'Viernes', open: true, hours: '8:00 AM - 10:00 PM' },
+      { day: 'Sábado', open: true, hours: '8:00 AM - 10:00 PM' },
+      { day: 'Domingo', open: true, hours: '8:00 AM - 10:00 PM' }
+    ],
+    actionText: 'Ver Catálogo',
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'A dos calles' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea L', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
+  },
+  {
+    id: 'b12',
+    name: 'Gimnasio FitMax',
+    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
+    category: 'Deportes',
+    description: 'Equipamiento moderno, clases dirigidas de spinning, zumba y crossfit. Entrenadores certificados te ayudarán a alcanzar tus metas fitness.',
+    phone: '4 674 5566',
+    address: 'Avenida Deportiva #234, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '6:00 AM - 10:00 PM' },
+      { day: 'Martes', open: true, hours: '6:00 AM - 10:00 PM' },
+      { day: 'Miércoles', open: true, hours: '6:00 AM - 10:00 PM' },
+      { day: 'Jueves', open: true, hours: '6:00 AM - 10:00 PM' },
+      { day: 'Viernes', open: true, hours: '6:00 AM - 10:00 PM' },
+      { day: 'Sábado', open: true, hours: '8:00 AM - 8:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    rating: '4.5',
+    reviewsCount: 98,
+    actionText: 'Ver Planes',
+    transport: {
+      micros: [
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
+  },
+  {
+    id: 'b13',
+    name: 'Librería y Papelería El Saber',
+    imageUrl: 'https://images.unsplash.com/photo-1526243741027-444d633d7365?w=600&auto=format&fit=crop&q=80',
+    category: 'Educación',
+    description: 'Útiles escolares, libros de texto, material de oficina y artículos de arte. Todo lo que necesitas para estudiar y crear en un solo lugar.',
+    phone: '4 675 7788',
+    phones: ['4 675 7788', '4 675 7789'],
+    address: 'Calle Educación #456, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '8:30 AM - 7:00 PM' },
+      { day: 'Martes', open: true, hours: '8:30 AM - 7:00 PM' },
+      { day: 'Miércoles', open: true, hours: '8:30 AM - 7:00 PM' },
+      { day: 'Jueves', open: true, hours: '8:30 AM - 7:00 PM' },
+      { day: 'Viernes', open: true, hours: '8:30 AM - 7:00 PM' },
+      { day: 'Sábado', open: true, hours: '9:00 AM - 2:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    actionText: 'Explorar',
+    transport: {
+      micros: [
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
+  },
+  {
+    id: 'b14',
+    name: 'Carpintería Don José',
+    imageUrl: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=600&auto=format&fit=crop&q=80',
+    category: 'Hogar',
+    description: 'Muebles de madera maciza a medida, reparaciones de carpintería, restauración de muebles antiguos y trabajos personalizados para tu hogar.',
+    phone: '4 676 3344',
+    address: 'Calle Artesanal #789, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Martes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Miércoles', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Jueves', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Viernes', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Sábado', open: true, hours: '8:00 AM - 6:00 PM' },
+      { day: 'Domingo', open: false, hours: 'Cerrado' }
+    ],
+    actionText: 'Ver Trabajos',
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea L', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
+  },
+  {
+    id: 'b15',
+    name: 'ElectroHogar Trigal',
+    imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80',
+    category: 'Electrodomésticos',
+    description: 'Venta de electrodomésticos, refrigeradores, lavadoras, cocinas y televisores. Las mejores marcas al mejor precio con entrega a domicilio.',
+    phone: '4 677 9900',
+    phones: ['4 677 9900', '4 677 9901', '4 604 5678'],
+    address: 'Avenida Comercial #1000, Barrio El Trigal',
+    schedule: [
+      { day: 'Lunes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Martes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Miércoles', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Jueves', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Viernes', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Sábado', open: true, hours: '9:00 AM - 8:00 PM' },
+      { day: 'Domingo', open: true, hours: '10:00 AM - 2:00 PM' }
+    ],
+    isFreeDelivery: true,
+    rating: '4.7',
+    reviewsCount: 150,
+    actionText: 'Ver Ofertas',
+    transport: {
+      micros: [
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'A dos cuadras' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos calles' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      taxitrufis: [
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
   }
 ];
 

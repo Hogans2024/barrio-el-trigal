@@ -38,7 +38,25 @@ export function useSheetData(): SheetData {
           proyectos: json.proyectos ?? FALLBACK.proyectos,
           eventos:   json.eventos   ?? FALLBACK.eventos,
           farmacias: json.farmacias ?? FALLBACK.farmacias,
-          negocios:  json.negocios  ?? FALLBACK.negocios,
+          // ═══════════════════════════════════════════════════════════════════════
+          //  IMPORTANTE — Sección "Negocios": datos locales inventados
+          // ═══════════════════════════════════════════════════════════════════════
+          //  Temporalmente NO se usa json.negocios (hoja Google Sheets).
+          //  Se usa BUSINESSES_DATA (src/data.ts) con datos inventados porque:
+          //
+          //  1. La sección Negocios está en construcción y aún no está vinculada
+          //     al CMS de Google Sheets.
+          //  2. Se agregaron NUEVOS CAMPOS al tipo LocalBusiness que la hoja
+          //     actual no tiene: phone, address, openHours, phones, facebook, etc.
+          //  3. Cuando se termine de construir la sección, la hoja Google Sheets
+          //     deberá actualizarse para incluir estos campos y entonces se
+          //     podrá revertir a: json.negocios ?? FALLBACK.negocios
+          //
+          //  Datos actuales inventados en data.ts: 4 negocios (La Parrilla del
+          //  Trigal, Boutique Estilo Real, Mercado El Campo, Vivero Oasis Verde)
+          //  con address, phone, openHours, description personalizadas.
+          // ═══════════════════════════════════════════════════════════════════════
+          negocios:  FALLBACK.negocios,
           mascotas:  json.mascotas  ?? FALLBACK.mascotas,
           noticias:  json.noticias  ?? FALLBACK.noticias,
         });
