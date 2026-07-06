@@ -981,12 +981,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                     <button
                       onClick={() => {
                         if (!cleanPhone) return;
-                        window.location.href = `whatsapp://send?phone=${cleanPhone}`;
-                        setTimeout(() => {
-                          if (document.visibilityState !== 'hidden') {
-                            window.location.href = `https://wa.me/${cleanPhone}`;
-                          }
-                        }, 2000);
+                        window.location.href = `https://wa.me/${cleanPhone}`;
                         setContactBiz(null);
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
@@ -998,6 +993,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                       onClick={() => {
                         if (!cleanPhone) return;
                         window.location.href = `sms:${cleanPhone}`;
+                        navigator.clipboard.writeText(cleanPhone).catch(() => {});
                         setContactBiz(null);
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-blue-500/10 hover:bg-blue-500/20 text-white border border-blue-500/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"

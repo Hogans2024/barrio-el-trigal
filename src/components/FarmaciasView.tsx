@@ -607,12 +607,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
               <button
                 onClick={() => {
                   const phone = contactPharmacy.phone.replace(/[^0-9]/g, '');
-                  window.location.href = `whatsapp://send?phone=${phone}`;
-                  setTimeout(() => {
-                    if (document.visibilityState !== 'hidden') {
-                      window.location.href = `https://wa.me/${phone}`;
-                    }
-                  }, 2000);
+                  window.location.href = `https://wa.me/${phone}`;
                   setContactPharmacy(null);
                 }}
                 className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
