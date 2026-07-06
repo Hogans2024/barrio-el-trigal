@@ -884,7 +884,20 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     <button
                       onClick={() => {
                         const clean = phone.replace(/[^0-9]/g, '');
-                        window.open(`https://wa.me/${clean}`, '_blank');
+                        const isAndroid = /Android/i.test(navigator.userAgent);
+                        const intentUrl = `intent://send/+${clean}#Intent;scheme=smsto;package=com.whatsapp;action=android.intent.action.SENDTO;end`;
+                        const waUrl = `whatsapp://send?phone=${clean}`;
+                        const fallbackUrl = `https://wa.me/${clean}`;
+                        if (isAndroid) {
+                          window.location.href = intentUrl;
+                        } else {
+                          window.location.href = waUrl;
+                        }
+                        setTimeout(() => {
+                          if (document.visibilityState !== 'hidden') {
+                            window.location.href = fallbackUrl;
+                          }
+                        }, 3000);
                         setContactPet(null);
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"

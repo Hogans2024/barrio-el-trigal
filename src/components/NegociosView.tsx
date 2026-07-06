@@ -975,15 +975,27 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
               </div>
               {(() => {
                 const phone = contactBiz.phone || (contactBiz.phones && contactBiz.phones[0]) || '';
+                const cleanPhone = phone.replace(/[^0-9]/g, '');
                 return (
                   <>
                     <button
                       onClick={() => {
-                        if (phone) {
-                          const clean = phone.replace(/[^0-9]/g, '');
-                          window.open(`https://wa.me/${clean}`, '_blank');
-                          setContactBiz(null);
+                        if (!cleanPhone) return;
+                        const isAndroid = /Android/i.test(navigator.userAgent);
+                        const intentUrl = `intent://send/+${cleanPhone}#Intent;scheme=smsto;package=com.whatsapp;action=android.intent.action.SENDTO;end`;
+                        const waUrl = `whatsapp://send?phone=${cleanPhone}`;
+                        const fallbackUrl = `https://wa.me/${cleanPhone}`;
+                        if (isAndroid) {
+                          window.location.href = intentUrl;
+                        } else {
+                          window.location.href = waUrl;
                         }
+                        setTimeout(() => {
+                          if (document.visibilityState !== 'hidden') {
+                            window.location.href = fallbackUrl;
+                          }
+                        }, 3000);
+                        setContactBiz(null);
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
                     >
@@ -992,10 +1004,9 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                     </button>
                     <button
                       onClick={() => {
-                        if (phone) {
-                          window.location.href = `sms:${phone}`;
-                          setContactBiz(null);
-                        }
+                        if (!cleanPhone) return;
+                        window.location.href = `sms:${cleanPhone}`;
+                        setContactBiz(null);
                       }}
                       className="w-full flex items-center justify-center space-x-3 bg-blue-500/10 hover:bg-blue-500/20 text-white border border-blue-500/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
                     >
