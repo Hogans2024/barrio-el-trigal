@@ -102,8 +102,8 @@ export default function CallModal({ isOpen, onClose }: CallModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md font-sans p-0 sm:p-4">
-      <div className="relative w-full sm:w-[520px] max-h-[100dvh] sm:max-h-[90vh] overflow-y-auto bg-[#0c101d] rounded-none sm:rounded-3xl border-y sm:border border-white/10 shadow-2xl custom-scrollbar">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md font-sans pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+      <div className="relative w-full sm:w-[520px] max-h-full overflow-y-auto bg-[#0c101d] rounded-2xl border border-white/10 shadow-2xl custom-scrollbar">
 
         {/* Header (Only if not actively calling) */}
         {!activeCall ? (

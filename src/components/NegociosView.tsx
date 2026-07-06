@@ -500,8 +500,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
             return (
               <div
                 key={biz.id}
-                onClick={() => setActiveBiz(biz)}
-                className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
+                className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
                 <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
@@ -514,7 +513,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                     <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{biz.description}</p>
                   </div>
                   <div className="flex items-center justify-end mt-2 w-full">
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
+                    <span onClick={() => setActiveBiz(biz)} className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
                       {biz.actionText}
                     </span>
                   </div>
@@ -528,8 +527,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
             return (
               <div
                 key={biz.id}
-                onClick={() => setActiveBiz(biz)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -573,8 +571,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
             return (
               <div
                 key={biz.id}
-                onClick={() => setActiveBiz(biz)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
@@ -606,8 +603,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
             return (
               <div
                 key={biz.id}
-                onClick={() => setActiveBiz(biz)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -651,8 +647,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
           return (
             <div
               key={biz.id}
-              onClick={() => setActiveBiz(biz)}
-              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer group"
+              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
               <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
                 <img
@@ -718,8 +713,8 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
 
       {/* Business Detail Modal */}
       {activeBiz && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             <div className="relative h-44 bg-gray-950">
               <img
                 src={activeBiz.imageUrl}
@@ -740,7 +735,7 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
               </div>
             </div>
 
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeBiz.name}</h4>
               <p className="text-gray-300 text-xs leading-relaxed">{activeBiz.description}</p>
 
@@ -800,10 +795,10 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
 
       {/* Register Business Form Modal */}
       {showRegisterForm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <form
             onSubmit={handleRegisterBusiness}
-            className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-150"
+            className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-sm overflow-y-auto max-h-full animate-in fade-in zoom-in duration-150"
           >
             <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
               <h4 className="font-extrabold text-sm tracking-tight flex items-center gap-1.5">

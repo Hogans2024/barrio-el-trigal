@@ -366,8 +366,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
             return (
               <div
                 key={proj.id}
-                onClick={() => setActiveProject(proj)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer group"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
               >
                 <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
                   <img
@@ -397,7 +396,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
                   <span className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-500/40 whitespace-nowrap">
                     {proj.category.charAt(0) + proj.category.slice(1).toLowerCase()}
                   </span>
-                  <span className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap">
+                  <span onClick={() => setActiveProject(proj)} className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap">
                     Ver Detalles
                   </span>
                 </div>
@@ -410,8 +409,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
             return (
               <div
                 key={proj.id}
-                onClick={() => setActiveProject(proj)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -447,8 +445,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
             return (
               <div
                 key={proj.id}
-                onClick={() => setActiveProject(proj)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
@@ -462,7 +459,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
                     <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 text-[10px] font-extrabold px-2.5 py-1 rounded [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">
                       {proj.category.charAt(0) + proj.category.slice(1).toLowerCase()}
                     </span>
-                    <span className="bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] font-extrabold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 border border-[#FFD700]/40 transition cursor-pointer">
+                    <span onClick={() => setActiveProject(proj)} className="bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] font-extrabold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 border border-[#FFD700]/40 transition cursor-pointer">
                       <Phone className="h-3.5 w-3.5" />
                       <span>Ver Detalles</span>
                     </span>
@@ -477,8 +474,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
             return (
               <div
                 key={proj.id}
-                onClick={() => setActiveProject(proj)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
                   <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -496,7 +492,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
                       <MapPin className="h-3.5 w-3.5 text-[#22c55e] shrink-0" />
                       <span>{proj.location}</span>
                     </div>
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
+                    <span onClick={() => setActiveProject(proj)} className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
                       Ver Detalles
                     </span>
                   </div>
@@ -509,8 +505,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
           return (
             <div
               key={proj.id}
-              onClick={() => setActiveProject(proj)}
-              className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
+              className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
             >
               <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
                 <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
@@ -531,7 +526,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
                     <MapPin className="h-3 w-3 shrink-0" />
                     <span className="truncate max-w-[90px]">{proj.location}</span>
                   </div>
-                  <span className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
+                  <span onClick={() => setActiveProject(proj)} className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
                     Ver Detalles
                   </span>
                 </div>
@@ -549,8 +544,8 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
 
       {/* Project Detail Modal Overlay */}
       {activeProject && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden max-h-[85vh] flex flex-col animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden max-h-full flex flex-col animate-in fade-in zoom-in duration-200">
             {/* Header */}
             <div className="relative h-44 bg-gray-950">
               <img
@@ -573,7 +568,7 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
             </div>
 
             {/* Info contents scrolling */}
-            <div className="p-5 overflow-y-auto space-y-4 flex-1">
+            <div className="p-5 overflow-y-auto space-y-4 flex-1 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeProject.title}</h4>
 
               <div>

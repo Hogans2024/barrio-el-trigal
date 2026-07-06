@@ -355,8 +355,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
             return (
               <div
                 key={pharmacy.id}
-                onClick={() => setActivePharmacy(pharmacy)}
-                className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
+                className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
                 <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
                   <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
@@ -369,7 +368,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
                     <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{pharmacy.description}</p>
                   </div>
                   <div className="flex items-center justify-end mt-2 w-full">
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
+                    <span onClick={() => setActivePharmacy(pharmacy)} className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
                       Ver Detalles
                     </span>
                   </div>
@@ -383,8 +382,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
             return (
               <div
                 key={pharmacy.id}
-                onClick={() => setActivePharmacy(pharmacy)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -418,8 +416,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
             return (
               <div
                 key={pharmacy.id}
-                onClick={() => setActivePharmacy(pharmacy)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
@@ -446,8 +443,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
             return (
               <div
                 key={pharmacy.id}
-                onClick={() => setActivePharmacy(pharmacy)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
                   <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -465,7 +461,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
                       <MapPin className="h-3.5 w-3.5 text-[#22c55e] shrink-0" />
                       <span>{pharmacy.address}</span>
                     </div>
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
+                    <span onClick={() => setActivePharmacy(pharmacy)} className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
                       Ver Detalles
                     </span>
                   </div>
@@ -478,8 +474,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
           return (
             <div
               key={pharmacy.id}
-              onClick={() => setActivePharmacy(pharmacy)}
-              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer group"
+              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
               <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
                 <img
@@ -546,8 +541,8 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
 
       {/* Pharmacy Details Expanded Modal */}
       {activePharmacy && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             <div className="relative h-44 bg-gray-950">
               <img
                 src={activePharmacy.imageUrl}
@@ -568,7 +563,7 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
               </div>
             </div>
 
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activePharmacy.name}</h4>
               <p className="text-gray-300 text-xs leading-relaxed">{activePharmacy.description}</p>
 

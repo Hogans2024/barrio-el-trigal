@@ -169,7 +169,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans p-0 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans pt-14 pb-14 md:pt-4 md:pb-4 px-4">
 
       {/* Flashing Warning Visuals (only if alarm is flashing) */}
       {step === 'flashing' && (
@@ -517,7 +517,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
           {/* CUSTOM MODAL FOR UNREGISTERED NEIGHBOR */}
           {showUnregisteredModal && (
-            <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4 overflow-y-auto overscroll-contain animate-fade-in">
+            <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4 overflow-y-auto overscroll-contain animate-fade-in">
               <div className="w-full max-w-sm max-h-[100dvh] overflow-y-auto custom-scrollbar bg-[#0e1324] border border-red-500/30 rounded-3xl p-5 text-center space-y-4 shadow-2xl relative my-auto">
 
                 {/* Botón cerrar (X) superior derecho — mismo estilo que el modal del teclado */}

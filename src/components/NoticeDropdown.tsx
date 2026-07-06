@@ -44,7 +44,7 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
           sin backdrop-blur en ancestros para que `fixed` cubra toda la pantalla.
           Click fuera del panel (en el backdrop) cierra el modal. */}
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-0 sm:p-4 overflow-y-auto overscroll-contain font-sans"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md pt-14 pb-14 md:pt-4 md:pb-4 px-4 overflow-y-auto overscroll-contain font-sans"
         onClick={(e) => { if (e.target === e.currentTarget) { playTone(400, 50); onClose?.(); } }}
       >
         {/* Modal Container */}
@@ -138,7 +138,7 @@ export default function NoticeDropdown({ isOpen, notices, onMarkRead, onClearAll
           contenedor fixed centrado que actúa también de backdrop (click fuera cierra). */}
       {selectedNotice && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 overflow-y-auto overscroll-contain"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md pt-14 pb-14 md:pt-4 md:pb-4 px-4 overflow-y-auto overscroll-contain"
           onClick={(e) => { if (e.target === e.currentTarget) setSelectedNotice(null); }}
         >
           <div className="relative w-full max-w-sm max-h-[100dvh] overflow-y-auto custom-scrollbar bg-[#0c101d] border border-white/10 rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 my-auto">

@@ -372,8 +372,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
             return (
               <div
                 key={evt.id}
-                onClick={() => setActiveEvent(evt)}
-                className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer flex h-[145px] tall:h-[165px] group"
+                className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
                 <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
                   <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
@@ -386,7 +385,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
                     <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{evt.description}</p>
                   </div>
                   <div className="flex items-center justify-end mt-2 w-full">
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
+                    <span onClick={() => setActiveEvent(evt)} className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
                       Ver Detalles
                     </span>
                   </div>
@@ -400,8 +399,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
             return (
               <div
                 key={evt.id}
-                onClick={() => setActiveEvent(evt)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -435,8 +433,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
             return (
               <div
                 key={evt.id}
-                onClick={() => setActiveEvent(evt)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
                   <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
@@ -448,7 +445,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
                   </div>
                   <div className="pt-2 flex items-center justify-between">
                     <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 text-[10px] font-extrabold px-2.5 py-1 rounded [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">{evt.category === 'Medio' ? 'Medio Ambiente' : evt.category}</span>
-                    <span className="bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] font-extrabold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 border border-[#FFD700]/40 transition cursor-pointer">
+                    <span onClick={() => setActiveEvent(evt)} className="bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] font-extrabold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 border border-[#FFD700]/40 transition cursor-pointer">
                       <Phone className="h-3.5 w-3.5" />
                       <span>Ver Detalles</span>
                     </span>
@@ -463,8 +460,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
             return (
               <div
                 key={evt.id}
-                onClick={() => setActiveEvent(evt)}
-                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group cursor-pointer"
+                className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
                   <img src={evt.imageUrl} alt={evt.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
@@ -482,7 +478,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
                       <MapPin className="h-3.5 w-3.5 text-[#22c55e] shrink-0" />
                       <span>Barrio El Trigal</span>
                     </div>
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
+                    <span onClick={() => setActiveEvent(evt)} className="bg-[#FFD700]/10 text-[#FFD700] font-bold px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer">
                       Ver Detalles
                     </span>
                   </div>
@@ -495,8 +491,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
           return (
             <div
               key={evt.id}
-              onClick={() => setActiveEvent(evt)}
-              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition cursor-pointer group"
+              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
               <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
                 <img
@@ -538,7 +533,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
                 <span className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-500/40 whitespace-nowrap">
                   {evt.category === 'Medio' ? 'Medio Ambiente' : evt.category}
                 </span>
-                <span className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap">
+                <span onClick={() => setActiveEvent(evt)} className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap">
                   Ver Detalles
                 </span>
               </div>
@@ -555,8 +550,8 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
 
       {/* Event Details Expanded Modal */}
       {activeEvent && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             <div className="relative h-44 bg-gray-950">
               <img
                 src={activeEvent.imageUrl}
@@ -577,7 +572,7 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
               </div>
             </div>
 
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeEvent.title}</h4>
               <p className="text-gray-300 text-xs leading-relaxed">{activeEvent.description}</p>
 
