@@ -85,8 +85,8 @@ export const BUSINESSES_DATA: LocalBusiness[] = [
     imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
     category: 'Comida',
     description: 'Disfruta de una experiencia gastronómica única con los mejores cortes de carne, parrilladas artesanales y una atmósfera familiar inigualable en pleno corazón del barrio.',
-    phone: '4 663 2255',
-    phones: ['4 663 2255', '4 663 2256', '4 601 2345'],
+    phone: '+591 69835999',
+    phones: ['+591 69835999', '4 663 2256', '4 601 2345'],
     address: 'Calle Comercio #456, entre Bolívar y Sucre, Barrio El Trigal',
     schedule: [
       { day: 'Lunes', open: true, hours: '11:00 AM - 11:00 PM' },
@@ -131,7 +131,7 @@ export const BUSINESSES_DATA: LocalBusiness[] = [
     imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&auto=format&fit=crop&q=80',
     category: 'Ropa',
     description: 'Descubre las últimas tendencias en moda para dama y caballero. Ropa de calidad con diseños exclusivos que resaltan tu estilo personal.',
-    phone: '4 664 3322',
+    phone: '+591 69835999',
     address: 'Avenida Principal #789, Local 3, Barrio El Trigal',
     schedule: [
       { day: 'Lunes', open: true, hours: '9:00 AM - 8:00 PM' },
@@ -174,8 +174,8 @@ export const BUSINESSES_DATA: LocalBusiness[] = [
     imageUrl: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&auto=format&fit=crop&q=80',
     category: 'Papa de comer',
     description: 'Frutas frescas, verduras de temporada y víveres de primera necesidad los encuentras aquí. Productos traídos directamente del campo a tu mesa.',
-    phone: '4 665 7788',
-    phones: ['4 665 7788', '4 665 7789'],
+    phone: '+591 69835999',
+    phones: ['+591 69835999', '4 665 7789'],
     address: 'Plaza Central #12, Puesto 5, Barrio El Trigal',
     schedule: [
       { day: 'Lunes', open: true, hours: '6:00 AM - 9:00 PM' },
