@@ -1,6 +1,42 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight, ChevronDown } from 'lucide-react';
-import { LocalBusiness } from '../types';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight } from 'lucide-react';
+import { LocalBusiness, TransportLine, TransportInfo } from '../types';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  IMPORTANTE — Sección "Negocios": datos locales inventados (NO conectados a
+//  Google Sheets / CMS).
+// ═══════════════════════════════════════════════════════════════════════════════
+//  Actualmente esta sección trabaja EXCLUSIVAMENTE con datos mock definidos en
+//  src/data.ts (BUSINESSES_DATA). NO está vinculada a Google Sheets ni al CMS
+//  del proyecto.
+//
+//  ¿Por qué?
+//  1. El tipo LocalBusiness (src/types.ts) tiene campos adicionales (phone,
+//     address, openHours, phones, facebook, tiktok, instagram, youtube,
+//     rating, reviewsCount, schedule, transport, images, videoUrl, etc.) que
+//     la hoja Google Sheets actual NO contempla.
+//  2. La sección fue desarrollada con datos inventados para poder avanzar en
+//     el frontend mientras el backend (Google Sheets + Apps Script) no se
+//     actualiza con la nueva estructura.
+//  3. El hook useSheetData (src/hooks/useSheetData.ts:41-58) también fuerza
+//     el uso de FALLBACK.negocios ignorando deliberadamente json.negocios.
+//
+//  Conexión futura con el CMS:
+//  - Cuando la hoja Google Sheets se actualice con todos los campos de
+//    LocalBusiness, se deberá modificar useSheetData.ts para que use
+//    json.negocios ?? FALLBACK.negocios (en lugar de FALLBACK.negocios fijo).
+//  - Además, el formulario de registro de negocios (showRegisterForm) que
+//    actualmente guarda en localStorage (barrio_negocios_extra) deberá
+//    integrarse con Google Apps Script para enviar los datos a la hoja
+//    Sheets y luego sincronizarlos de vuelta a GitHub Pages.
+//  - Los negocios registrados localmente (prefijo custom_biz_) y los que
+//    vengan del CMS convivirán en el estado businesses.
+//
+//  Datos actuales en data.ts: 15 negocios mock con horarios, transporte,
+//  teléfonos, dirección, categorías variadas (Comida, Ropa, Papa de comer,
+//  Plantas, Tecnología, Belleza, Ferretería, Salud, Deportes, Educación,
+//  Hogar, Electrodomésticos, Mecánica).
+// ═══════════════════════════════════════════════════════════════════════════════
 
 interface NegociosViewProps {
   negocios: LocalBusiness[];
@@ -13,9 +49,11 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
   const [activeBiz, setActiveBiz] = useState<LocalBusiness | null>(null);
   const [contactBiz, setContactBiz] = useState<LocalBusiness | null>(null);
   const [scheduleBiz, setScheduleBiz] = useState<LocalBusiness | null>(null);
-  const [expandedTransport, setExpandedTransport] = useState<string | null>(null);
+  const [transportModalCategory, setTransportModalCategory] = useState<string | null>(null);
   const [transportDetail, setTransportDetail] = useState<{ category: string; index: number } | null>(null);
-  useEffect(() => { setExpandedTransport(null); setTransportDetail(null); }, [activeBiz]);
+  const [driveAnimIndex, setDriveAnimIndex] = useState<number | null>(null);
+  const driveAnimRef = useRef<number | null>(null);
+  useEffect(() => { setTransportModalCategory(null); setTransportDetail(null); setDriveAnimIndex(null); driveAnimRef.current = null; }, [activeBiz]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('eventos');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -296,6 +334,14 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
           @keyframes beam-sweep {
             0% { transform: translate(0, 0); opacity: 0.65; }
             100% { transform: translate(-220%, 35%); opacity: 0; }
+          }
+          @keyframes vehicle-drive {
+            0% { transform: translateX(0); opacity: 1; }
+            75% { transform: translateX(-120px); opacity: 0.4; }
+            100% { transform: translateX(-160px); opacity: 0; }
+          }
+          .vehicle-drive {
+            animation: vehicle-drive 0.7s ease-in forwards;
           }
           .shimmer-beam {
             position: absolute;
@@ -794,20 +840,29 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                   </div>
                   {(() => {
                     const phones = activeBiz.phones && activeBiz.phones.length > 0 ? activeBiz.phones : (activeBiz.phone ? [activeBiz.phone] : []);
-                    return phones.map((p, i) => (
-                      <div key={i} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2 text-gray-400">
-                          <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
-                          <span className="text-white">{p}</span>
+                    return phones.map((p, i) => {
+                      const cleanPhone = p.replace(/[^0-9]/g, '');
+                      return (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 text-gray-400">
+                            <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                            <span className="text-white">{p}</span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (isMobile) {
+                                window.location.href = `tel:${cleanPhone}`;
+                              } else {
+                                setContactBiz({ ...activeBiz, phone: p });
+                              }
+                            }}
+                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[66px] text-center"
+                          >
+                            {isMobile ? 'Llamar' : 'Enviar Mensaje'}
+                          </button>
                         </div>
-                        <button
-                          onClick={() => setContactBiz({ ...activeBiz, phone: p })}
-                          className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[74px] text-center"
-                        >
-                          Enviar Mensaje
-                        </button>
-                      </div>
-                    ));
+                      );
+                    });
                   })()}
                   {activeBiz.facebook && (
                     <a
@@ -833,110 +888,19 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                 ) : (
                   <div className="space-y-1.5">
                     {[
-                          { key: 'micros', label: 'Micros', value: activeBiz.transport.micros },
-                          { key: 'taxitrufis', label: 'Taxitrufis', value: activeBiz.transport.taxitrufis },
-                          { key: 'trufis', label: 'Trufis', value: activeBiz.transport.trufis },
-                          { key: 'radioTaxis', label: 'Radio Taxis', value: activeBiz.transport.radioTaxis }
-                        ].map(({ key, label, value }) => (
-                          <div key={key} className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden">
-                            <button
-                              onClick={() => setExpandedTransport(expandedTransport === key ? null : key)}
-                              className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-bold text-white hover:bg-white/[0.04] transition cursor-pointer"
-                            >
-                              <span>{label}</span>
-                              {expandedTransport === key ? <ChevronDown className="h-3.5 w-3.5 text-gray-400" /> : <ChevronRight className="h-3.5 w-3.5 text-gray-400" />}
-                            </button>
-                            {expandedTransport === key && value && value.length > 0 && (
-                              <div className="px-3.5 pb-3 pt-1 space-y-1.5">
-                                {(() => {
-                                  const selected = transportDetail?.category === key ? transportDetail.index : -1;
-                                  const maxLines = 4;
-                                  const displayLines = value.slice(0, maxLines);
-                                  const renderLine = (line: TransportLine, i: number, isSelected: boolean) => {
-                                    if (isSelected) {
-                                      return (
-                                        <div key={i} className="flex flex-col items-center space-y-2 bg-white/[0.03] rounded-lg px-4 py-3">
-                                          <div className="flex items-center space-x-2.5">
-                                            {line.flagColor ? (
-                                              <svg width="22" height="22" viewBox="0 0 18 18" className="shrink-0">
-                                                <rect x="3" y="1" width="2" height="16" rx="0.5" fill="#6B7280" />
-                                                {(() => {
-                                                  const c = line.flagColor;
-                                                  if (c.includes('con')) {
-                                                    const parts = c.split(' con ');
-                                                    const col1 = mapColor(parts[0]);
-                                                    const col2 = mapColor(parts[1]);
-                                                    return (<><polygon points="5,2 16,5 5,8" fill={col1} /><polygon points="5,8 16,5 16,9 5,12" fill={col2} /></>);
-                                                  }
-                                                  return <polygon points="5,2 16,5 5,8" fill={mapColor(c)} />;
-                                                })()}
-                                              </svg>
-                                            ) : (
-                                              <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
-                                            )}
-                                            <span className={`text-sm font-bold ${line.flagColor ? getTextColor(line.flagColor) : 'text-gray-300'}`}>{line.name}</span>
-                                            {line.flagColor && <span className="text-gray-500 text-[11px]">Banderita {line.flagColor}</span>}
-                                            <button
-                                              onClick={() => setTransportDetail(null)}
-                                              className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition cursor-pointer shrink-0"
-                                            >
-                                              <X className="w-3 h-3 text-gray-400" />
-                                            </button>
-                                          </div>
-                                          <p className="text-gray-400 text-xs text-center leading-relaxed max-w-sm">{line.detail || `${line.proximity.toLowerCase()} circula el ${line.name} (Banderita ${line.flagColor}), cerca de mi negocio.`}</p>
-                                        </div>
-                                      );
-                                    }
-                                    return (
-                                      <div key={i} className="flex items-center space-x-2.5 bg-white/[0.03] rounded-lg px-3 py-2">
-                                        {line.flagColor ? (
-                                          <svg width="18" height="18" viewBox="0 0 18 18" className="shrink-0">
-                                            <rect x="3" y="1" width="2" height="16" rx="0.5" fill="#6B7280" />
-                                            {(() => {
-                                              const c = line.flagColor;
-                                              if (c.includes('con')) {
-                                                const parts = c.split(' con ');
-                                                const col1 = mapColor(parts[0]);
-                                                const col2 = mapColor(parts[1]);
-                                                return (<><polygon points="5,2 16,5 5,8" fill={col1} /><polygon points="5,8 16,5 16,9 5,12" fill={col2} /></>);
-                                              }
-                                              return <polygon points="5,2 16,5 5,8" fill={mapColor(c)} />;
-                                            })()}
-                                          </svg>
-                                        ) : (
-                                          <Phone className="h-3.5 w-3.5 text-[#FFD700] shrink-0" />
-                                        )}
-                                        <div className="flex items-center space-x-1.5 min-w-0 flex-1">
-                                          {line.name && <span className={`text-xs font-bold ${line.flagColor ? getTextColor(line.flagColor) : 'text-gray-300'} truncate`}>{line.name}</span>}
-                                          {line.flagColor && <span className="text-gray-500 text-[10px] shrink-0">Banderita {line.flagColor}</span>}
-                                        </div>
-                                        <span className="text-gray-400 text-[10px] text-right shrink-0 max-w-[100px] leading-tight">{line.proximity}</span>
-                                        <button
-                                          onClick={() => setTransportDetail({ category: key, index: i })}
-                                          className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-2 py-1 rounded text-[9px] font-bold transition cursor-pointer shrink-0"
-                                        >
-                                          Detalle
-                                        </button>
-                                      </div>
-                                    );
-                                  };
-                                  return (
-                                    <>
-                                      {/* Selected line with detail centered */}
-                                      {selected >= 0 && renderLine(displayLines[selected], selected, true)}
-                                      {/* All other lines below detail */}
-                                      {displayLines.map((line, i) => i !== selected && selected >= 0 && renderLine(line, i, false))}
-                                      {/* No selection: show all */}
-                                      {selected < 0 && displayLines.map((line, i) => renderLine(line, i, false))}
-                                      {value.length > maxLines && (
-                                        <p className="text-[9px] text-gray-600 text-center">+{value.length - maxLines} líneas más</p>
-                                      )}
-                                    </>
-                                  );
-                                })()}
-                              </div>
-                            )}
-                      </div>
+                      { key: 'micros', label: 'Micros' },
+                      { key: 'taxitrufis', label: 'Taxitrufis' },
+                      { key: 'trufis', label: 'Trufis' },
+                      { key: 'radioTaxis', label: 'Radio Taxis' }
+                    ].filter(({ key }) => activeBiz.transport?.[key as keyof TransportInfo]?.length > 0).map(({ key, label }) => (
+                      <button
+                        key={key}
+                        onClick={() => setTransportModalCategory(key)}
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white/[0.02] rounded-xl border border-white/10 text-xs font-bold text-white hover:bg-white/[0.04] transition cursor-pointer"
+                      >
+                        <span>{label}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+                      </button>
                     ))}
                   </div>
                 )}
@@ -959,6 +923,155 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
                   {activeBiz.actionText}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transport Category Modal */}
+      {transportModalCategory && activeBiz?.transport?.[transportModalCategory as keyof TransportInfo] && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-sm overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
+            <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
+              <h4 className="font-bold text-sm flex items-center gap-2">
+                <Bus className="w-4 h-4" />
+                <span>{({ micros: 'Micros', taxitrufis: 'Taxitrufis', trufis: 'Trufis', radioTaxis: 'Radio Taxis' })[transportModalCategory] || transportModalCategory}</span>
+              </h4>
+              <button onClick={() => { setTransportModalCategory(null); setTransportDetail(null); }} className="hover:opacity-75 text-[#FFD700]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-2">
+              {(() => {
+                const key = transportModalCategory;
+                const lines = (activeBiz.transport?.[key as keyof TransportInfo] || []) as TransportLine[];
+                const catFlags = lines.filter(l => l.flagColor && l.flagColor.trim()).map(l => l.flagColor!);
+                const seen = new Set<string>();
+                const unique = catFlags.filter(c => { if (seen.has(c)) return false; seen.add(c); return true; });
+                const singleColors = unique.filter(c => !c.includes('con'));
+                const doubleColors = unique.filter(c => c.includes('con'));
+                const defaultSingles = ['Rojo', 'Amarillo'];
+                const defaultDoubles = ['Morado con Blanco', 'Amarillo con Blanco'];
+                const finalFlags: string[] = [];
+                for (let i = 0; i < 2; i++) finalFlags.push(singleColors[i] || defaultSingles[i]);
+                for (let i = 0; i < 2; i++) finalFlags.push(doubleColors[i] || defaultDoubles[i]);
+                const displayLines = lines.slice(0, 4);
+                const selected = transportDetail?.category === key ? transportDetail.index : -1;
+                const renderFlag = (i: number) => {
+                  const color = finalFlags[i] || 'Rojo';
+                  const hasCon = color.includes('con');
+                  const parts = hasCon ? color.split(' con ') : [color];
+                  return (
+                    <svg width="37" height="22" viewBox="0 -2 30 18" className="shrink-0">
+                      <rect x="3" y="-1.5" width="2.5" height="17" rx="1" fill="#6B7280" />
+                      {hasCon ? (
+                        <><polygon points="5,0.5 23.7,7 5,7" fill={mapColor(parts[0])} /><polygon points="5,7 23.7,7 5,13.5" fill={mapColor(parts[1])} /></>
+                      ) : (
+                        <polygon points="5,0.5 23.7,7 5,13.5" fill={mapColor(color)} />
+                      )}
+                    </svg>
+                  );
+                };
+                const renderLine = (line: TransportLine, i: number, isSelected: boolean) => {
+                  if (isSelected) {
+                    return (
+                      <div key={i} className="flex flex-col items-center space-y-2 bg-white/[0.03] rounded-lg px-4 py-3">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-300 leading-none">Bandera</span>
+                          <span className="text-sm font-bold text-gray-300">{line.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-2.5">
+                          {renderFlag(i)}
+                          <span className="text-gray-500 text-[11px]">{finalFlags[i]}</span>
+                        </div>
+                        <p className="text-gray-400 text-xs text-center leading-relaxed max-w-sm">{line.detail || `${line.proximity.toLowerCase()} circula el ${line.name} (${line.flagColor}), cerca de mi negocio.`}</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={i} className="bg-white/[0.03] rounded-lg px-3 py-2">
+                      <div className="flex items-center justify-center space-x-2 mb-1">
+                        <span className="text-xs text-gray-300 leading-none">Bandera</span>
+                        {line.name && <span className="text-xs font-bold text-gray-300 leading-none">{line.name}</span>}
+                      </div>
+                      <div className="flex items-center space-x-2.5">
+                        {renderFlag(i)}
+                        <span className="text-gray-500 text-[10px] shrink-0">{finalFlags[i]}</span>
+                        <div className="flex items-center space-x-1 ml-auto">
+                          {(() => {
+                            const c = finalFlags[i] || 'Rojo';
+                            const hasCon = c.includes('con');
+                            const parts = hasCon ? c.split(' con ') : [c];
+                            const bodyColor = hasCon ? mapColor(parts[0]) : mapColor(c);
+                            const bottomColor = hasCon ? mapColor(parts[1]) : bodyColor;
+                            const wheelColor = '#1F2937';
+                            if (key === 'micros' || key === 'trufis') {
+                              const size = key === 'trufis' ? 'w-[34px] h-[14px]' : 'w-[46px] h-[18px]';
+                              return (
+                                <svg className={`${size} shrink-0${driveAnimIndex === i ? ' vehicle-drive' : ''}`} viewBox="0 0 40 24" fill="none">
+                                  <rect x="1" y="3" width="38" height="15" rx="3" fill={bottomColor} />
+                                  <rect x="1" y="3" width="38" height="9" fill={bodyColor} />
+                                  <rect x="1" y="3" width="38" height="2" rx="1" fill="white" opacity="0.3" />
+                                  <rect x="4" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="12" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="20" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="28" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="30" y="4" width="7" height="8" rx="1.5" fill="white" opacity="0.4" />
+                                  <circle cx="10" cy="19" r="3" fill={wheelColor} />
+                                  <circle cx="30" cy="19" r="3" fill={wheelColor} />
+                                </svg>
+                              );
+                            }
+                            if (key === 'taxitrufis' || key === 'radioTaxis') {
+                              return (
+                                <svg className={`w-[46px] h-[18px] shrink-0${driveAnimIndex === i ? ' vehicle-drive' : ''}`} viewBox="0 0 40 24" fill="none">
+                                  <rect x="1" y="10" width="38" height="10" rx="2" fill={bottomColor} />
+                                  <rect x="1" y="10" width="38" height="6" fill={bodyColor} />
+                                  <path d="M6 10 L8 4 L32 4 L34 10 Z" fill={bodyColor} />
+                                  <path d="M8 10 L9 5 L11 10 Z" fill="white" opacity="0.4" />
+                                  <path d="M32 10 L31 5 L29 10 Z" fill="white" opacity="0.4" />
+                                  <rect x="11" y="5" width="6" height="5" rx="0.5" fill="white" opacity="0.6" />
+                                  <rect x="18" y="5" width="6" height="5" rx="0.5" fill="white" opacity="0.6" />
+                                  <rect x="25" y="5" width="5" height="5" rx="0.5" fill="white" opacity="0.6" />
+                                  <text x="22" y="16" fontFamily="sans-serif" fontSize="4.5" fill="black" fontWeight="bold" textAnchor="middle">TAXI</text>
+                                  <circle cx="10" cy="20" r="3" fill={wheelColor} />
+                                  <circle cx="30" cy="20" r="3" fill={wheelColor} />
+                                </svg>
+                              );
+                            }
+                            return <span className="text-gray-400 text-[10px] text-right shrink-0 max-w-[100px] leading-tight">{line.proximity}</span>;
+                          })()}
+                          <button
+                            onClick={() => {
+                              setDriveAnimIndex(i);
+                              driveAnimRef.current = i;
+                              setTimeout(() => {
+                                if (driveAnimRef.current !== i) return;
+                                setTransportDetail({ category: key, index: i });
+                                setDriveAnimIndex(null);
+                                driveAnimRef.current = null;
+                              }, 700);
+                            }}
+                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-2 py-1 rounded text-[9px] font-bold transition cursor-pointer shrink-0"
+                          >
+                            Detalle
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                };
+                return (
+                  <>
+                    {selected >= 0 && renderLine(displayLines[selected], selected, true)}
+                    {displayLines.map((line, i) => i !== selected && selected >= 0 && renderLine(line, i, false))}
+                    {selected < 0 && displayLines.map((line, i) => renderLine(line, i, false))}
+                    {lines.length > displayLines.length && (
+                      <p className="text-[9px] text-gray-600 text-center">+{lines.length - displayLines.length} líneas más</p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
