@@ -886,20 +886,12 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                 </div>
               </div>
 
-              <div className="flex space-x-2 pt-2">
+              <div className="flex pt-2">
                 <button
                   onClick={() => setActivePet(null)}
                   className="flex-1 bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
                 >
                   Cerrar
-                </button>
-                <button
-                  onClick={() => {
-                    setContactPet(activePet);
-                  }}
-                  className="flex-1 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer"
-                >
-                  {activePet.actionText || 'Contactar'}
                 </button>
               </div>
             </div>
