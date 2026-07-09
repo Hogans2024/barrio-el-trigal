@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, Navigation, ChevronRight, ShoppingCart, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
@@ -843,31 +843,8 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
               </div>
 
               <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Dirección</h5>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Contactos</h5>
                 <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
-                  <div className="flex items-start space-x-2 text-gray-400">
-                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
-                    <span className="text-white leading-relaxed flex-1">{activePet.lastSeen || 'No especificada'}</span>
-                    <button
-                      onClick={() => {
-                        const query = encodeURIComponent(`${activePet.name} ${activePet.lastSeen || ''}`);
-                        window.open(`https://www.google.com/maps/search/${query}`, '_blank');
-                      }}
-                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 min-w-[74px] text-center"
-                    >
-                      Ubicación GPS
-                    </button>
-                  </div>
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Clock className="h-4 w-4 text-[#FFD700] shrink-0" />
-                    <span className="text-white flex-1">Horarios</span>
-                    <button
-                      onClick={() => setSchedulePet(activePet)}
-                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 w-[98px] text-center"
-                    >
-                      Ver Horarios
-                    </button>
-                  </div>
                   {(() => {
                     const phones = getPhoneNumbers(activePet);
                     return phones.map((p, i) => {
