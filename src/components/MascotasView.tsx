@@ -865,7 +865,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     </div>
                   </div>
                   {slides.length > 1 && (
-                    <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f]">
+                    <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f] justify-center">
                       {slides.map((src, j) => (
                         <button
                           key={j}
