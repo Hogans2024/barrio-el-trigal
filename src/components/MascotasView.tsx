@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, Navigation, ChevronRight, ShoppingCart, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle, Bus } from 'lucide-react';
-import { LostPet, DaySchedule, TransportLine, TransportInfo } from '../types';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, Navigation, ChevronRight, ShoppingCart, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
+import { LostPet, DaySchedule } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
   value: string;
@@ -171,10 +171,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [activePet, setActivePet] = useState<LostPet | null>(null);
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
   const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
-  const [transportModalCategory, setTransportModalCategory] = useState<string | null>(null);
-  const [transportDetail, setTransportDetail] = useState<{ category: string; index: number } | null>(null);
-  const [driveAnimIndex, setDriveAnimIndex] = useState<number | null>(null);
-  const driveAnimRef = useRef<number | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -252,8 +248,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  useEffect(() => { setTransportModalCategory(null); setTransportDetail(null); setDriveAnimIndex(null); driveAnimRef.current = null; }, [activePet]);
-
   useEffect(() => {
     const stored = localStorage.getItem('barrio_mascotas_extra');
     if (stored) {
@@ -313,14 +307,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const getPhoneNumbers = (pet: LostPet): string[] => {
     if (pet.phones && pet.phones.length > 0) return pet.phones;
     return pet.contact ? [pet.contact] : [];
-  };
-  const mapColor = (color: string): string => {
-    const map: Record<string, string> = {
-      Rojo: '#EF4444', Roja: '#EF4444', Amarillo: '#EAB308', Verde: '#22C55E',
-      Azul: '#3B82F6', Blanca: '#F8FAFC', Blanco: '#F8FAFC', Morado: '#A855F7',
-      Naranja: '#F97316', Negra: '#1F2937'
-    };
-    return map[color] || '#6B7280';
   };
 
   const handlePostReport = (e: React.FormEvent) => {
@@ -394,14 +380,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
           .shimmer-beam.buttons {
             background: linear-gradient(135deg, transparent 15%, rgba(255,215,0,0.08) 35%, rgba(255,215,0,0.18) 50%, rgba(255,215,0,0.08) 65%, transparent 85%);
             animation: beam-sweep 2.5s ease-out 2;
-          }
-          @keyframes vehicle-drive {
-            0% { transform: translateX(0); opacity: 1; }
-            75% { transform: translateX(-120px); opacity: 0.4; }
-            100% { transform: translateX(-160px); opacity: 0; }
-          }
-          .vehicle-drive {
-            animation: vehicle-drive 0.7s ease-in forwards;
           }
         `}</style>
       </div>
@@ -845,6 +823,21 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
               <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
 
               <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
+                <p className="text-white text-sm font-semibold">{activePet.name}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Última vez visto</h5>
+                <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 text-xs">
+                  <div className="flex items-start space-x-2 text-gray-400">
+                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
+                    <span className="text-white leading-relaxed">{activePet.lastSeen}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
                 <p className="text-gray-300 text-xs leading-relaxed">{activePet.description}</p>
               </div>
@@ -914,54 +907,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     </a>
                   )}
                 </div>
-              </div>
-
-              {/*
-                ═══════════════════════════════════════════════════════════════════════════════
-                TRANSPORTE / "CÓMO LLEGAR"
-                ───────────────────────────────────────────────────────────────────────────────
-                Esta sección (Micros, Taxitrufis, Trufis, Radio Taxis) está ESTRUCTURADA y
-                LISTA para funcionar, pero actualmente NO está conectada a Google Sheets.
-                Los datos provendrán del CMS cuando se implemente la integración con
-                Google Apps Script y la base de datos de Google Sheets.
-
-                Para activarla en el futuro:
-                  1. Asegurar que el endpoint de Apps Script devuelva el objeto `transport`
-                     con la estructura `TransportInfo` (micros[], taxitrufis[], trufis[],
-                     radioTaxis[]), cada uno con `TransportLine` (name, flagColor, proximity,
-                     detail).
-                  2. Vincular el JSON del endpoint al campo `transport` del objeto LostPet
-                     en el hook que obtiene los datos (useSheetData o similar).
-                  3. Descomentar/quitar el filtro condicional si se desea mostrar todos los
-                     transportes disponibles.
-                =====================================================================
-              */}
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Cómo llegar</h5>
-                {!activePet.transport ? (
-                  <button className="w-full flex items-center justify-center space-x-2 bg-white/[0.02] border border-white/10 rounded-xl p-3.5 text-xs font-semibold cursor-default">
-                    <Navigation className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-500">No disponible</span>
-                  </button>
-                ) : (
-                  <div className="space-y-1.5">
-                    {[
-                      { key: 'micros', label: 'Micros' },
-                      { key: 'taxitrufis', label: 'Taxitrufis' },
-                      { key: 'trufis', label: 'Trufis' },
-                      { key: 'radioTaxis', label: 'Radio Taxis' }
-                    ].filter(({ key }) => activePet.transport?.[key as keyof TransportInfo]?.length > 0).map(({ key, label }) => (
-                      <button
-                        key={key}
-                        onClick={() => setTransportModalCategory(key)}
-                        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white/[0.02] rounded-xl border border-white/10 text-xs font-bold text-white hover:bg-white/[0.04] transition cursor-pointer"
-                      >
-                        <span>{label}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="flex space-x-2 pt-2">
@@ -1080,155 +1025,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
               >
                 Cerrar
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Transport Category Modal */}
-      {transportModalCategory && activePet?.transport?.[transportModalCategory as keyof TransportInfo] && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
-          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-sm overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
-            <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
-              <h4 className="font-bold text-sm flex items-center gap-2">
-                <Bus className="w-4 h-4" />
-                <span>{({ micros: 'Micros', taxitrufis: 'Taxitrufis', trufis: 'Trufis', radioTaxis: 'Radio Taxis' })[transportModalCategory] || transportModalCategory}</span>
-              </h4>
-              <button onClick={() => { setTransportModalCategory(null); setTransportDetail(null); }} className="hover:opacity-75 text-[#FFD700]">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-4 space-y-2">
-              {(() => {
-                const key = transportModalCategory;
-                const lines = (activePet.transport?.[key as keyof TransportInfo] || []) as TransportLine[];
-                const catFlags = lines.filter(l => l.flagColor && l.flagColor.trim()).map(l => l.flagColor!);
-                const seen = new Set<string>();
-                const unique = catFlags.filter(c => { if (seen.has(c)) return false; seen.add(c); return true; });
-                const singleColors = unique.filter(c => !c.includes('con'));
-                const doubleColors = unique.filter(c => c.includes('con'));
-                const defaultSingles = ['Rojo', 'Amarillo'];
-                const defaultDoubles = ['Morado con Blanco', 'Amarillo con Blanco'];
-                const finalFlags: string[] = [];
-                for (let i = 0; i < 2; i++) finalFlags.push(singleColors[i] || defaultSingles[i]);
-                for (let i = 0; i < 2; i++) finalFlags.push(doubleColors[i] || defaultDoubles[i]);
-                const displayLines = lines.slice(0, 4);
-                const selected = transportDetail?.category === key ? transportDetail.index : -1;
-                const renderFlag = (i: number) => {
-                  const color = finalFlags[i] || 'Rojo';
-                  const hasCon = color.includes('con');
-                  const parts = hasCon ? color.split(' con ') : [color];
-                  return (
-                    <svg width="37" height="22" viewBox="0 -2 30 18" className="shrink-0">
-                      <rect x="3" y="-1.5" width="2.5" height="17" rx="1" fill="#6B7280" />
-                      {hasCon ? (
-                        <><polygon points="5,0.5 23.7,7 5,7" fill={mapColor(parts[0])} /><polygon points="5,7 23.7,7 5,13.5" fill={mapColor(parts[1])} /></>
-                      ) : (
-                        <polygon points="5,0.5 23.7,7 5,13.5" fill={mapColor(color)} />
-                      )}
-                    </svg>
-                  );
-                };
-                const renderLine = (line: TransportLine, i: number, isSelected: boolean) => {
-                  if (isSelected) {
-                    return (
-                      <div key={i} className="flex flex-col items-center space-y-2 bg-white/[0.03] rounded-lg px-4 py-3">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-300 leading-none">Bandera</span>
-                          <span className="text-sm font-bold text-gray-300">{line.name}</span>
-                        </div>
-                        <div className="flex items-center space-x-2.5">
-                          {renderFlag(i)}
-                          <span className="text-gray-500 text-[11px]">{finalFlags[i]}</span>
-                        </div>
-                        <p className="text-gray-400 text-xs text-center leading-relaxed max-w-sm">{line.detail || `${line.proximity.toLowerCase()} circula el ${line.name} (${line.flagColor}), cerca de mi negocio.`}</p>
-                      </div>
-                    );
-                  }
-                  return (
-                    <div key={i} className="bg-white/[0.03] rounded-lg px-3 py-2">
-                      <div className="flex items-center justify-center space-x-2 mb-1">
-                        <span className="text-xs text-gray-300 leading-none">Bandera</span>
-                        {line.name && <span className="text-xs font-bold text-gray-300 leading-none">{line.name}</span>}
-                      </div>
-                      <div className="flex items-center space-x-2.5">
-                        {renderFlag(i)}
-                        <span className="text-gray-500 text-[10px] shrink-0">{finalFlags[i]}</span>
-                        <div className="flex items-center space-x-1 ml-auto">
-                          {(() => {
-                            const c = finalFlags[i] || 'Rojo';
-                            const hasCon = c.includes('con');
-                            const parts = hasCon ? c.split(' con ') : [c];
-                            const bodyColor = hasCon ? mapColor(parts[0]) : mapColor(c);
-                            const bottomColor = hasCon ? mapColor(parts[1]) : bodyColor;
-                            const wheelColor = '#1F2937';
-                            if (key === 'micros' || key === 'trufis') {
-                              const size = key === 'trufis' ? 'w-[34px] h-[14px]' : 'w-[46px] h-[18px]';
-                              return (
-                                <svg className={`${size} shrink-0${driveAnimIndex === i ? ' vehicle-drive' : ''}`} viewBox="0 0 40 24" fill="none">
-                                  <rect x="1" y="3" width="38" height="15" rx="3" fill={bottomColor} />
-                                  <rect x="1" y="3" width="38" height="9" fill={bodyColor} />
-                                  <rect x="1" y="3" width="38" height="2" rx="1" fill="white" opacity="0.3" />
-                                  <rect x="4" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
-                                  <rect x="12" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
-                                  <rect x="20" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
-                                  <rect x="28" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
-                                  <rect x="30" y="4" width="7" height="8" rx="1.5" fill="white" opacity="0.4" />
-                                  <circle cx="10" cy="19" r="3" fill={wheelColor} />
-                                  <circle cx="30" cy="19" r="3" fill={wheelColor} />
-                                </svg>
-                              );
-                            }
-                            if (key === 'taxitrufis' || key === 'radioTaxis') {
-                              return (
-                                <svg className={`w-[46px] h-[18px] shrink-0${driveAnimIndex === i ? ' vehicle-drive' : ''}`} viewBox="0 0 40 24" fill="none">
-                                  <rect x="1" y="10" width="38" height="10" rx="2" fill={bottomColor} />
-                                  <rect x="1" y="10" width="38" height="6" fill={bodyColor} />
-                                  <path d="M6 10 L8 4 L32 4 L34 10 Z" fill={bodyColor} />
-                                  <path d="M8 10 L9 5 L11 10 Z" fill="white" opacity="0.4" />
-                                  <path d="M32 10 L31 5 L29 10 Z" fill="white" opacity="0.4" />
-                                  <rect x="11" y="5" width="6" height="5" rx="0.5" fill="white" opacity="0.6" />
-                                  <rect x="18" y="5" width="6" height="5" rx="0.5" fill="white" opacity="0.6" />
-                                  <rect x="25" y="5" width="5" height="5" rx="0.5" fill="white" opacity="0.6" />
-                                  <text x="22" y="16" fontFamily="sans-serif" fontSize="4.5" fill="black" fontWeight="bold" textAnchor="middle">TAXI</text>
-                                  <circle cx="10" cy="20" r="3" fill={wheelColor} />
-                                  <circle cx="30" cy="20" r="3" fill={wheelColor} />
-                                </svg>
-                              );
-                            }
-                            return <span className="text-gray-400 text-[10px] text-right shrink-0 max-w-[100px] leading-tight">{line.proximity}</span>;
-                          })()}
-                          <button
-                            onClick={() => {
-                              setDriveAnimIndex(i);
-                              driveAnimRef.current = i;
-                              setTimeout(() => {
-                                if (driveAnimRef.current !== i) return;
-                                setTransportDetail({ category: key, index: i });
-                                setDriveAnimIndex(null);
-                                driveAnimRef.current = null;
-                              }, 700);
-                            }}
-                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-2 py-1 rounded text-[9px] font-bold transition cursor-pointer shrink-0"
-                          >
-                            Detalle
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                };
-                return (
-                  <>
-                    {selected >= 0 && renderLine(displayLines[selected], selected, true)}
-                    {displayLines.map((line, i) => i !== selected && selected >= 0 && renderLine(line, i, false))}
-                    {selected < 0 && displayLines.map((line, i) => renderLine(line, i, false))}
-                    {lines.length > displayLines.length && (
-                      <p className="text-[9px] text-gray-600 text-center">+{lines.length - displayLines.length} líneas más</p>
-                    )}
-                  </>
-                );
-              })()}
             </div>
           </div>
         </div>
