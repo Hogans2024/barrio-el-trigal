@@ -835,12 +835,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Última vez visto</h5>
-                <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 text-xs">
-                  <div className="flex items-start space-x-2 text-gray-400">
-                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
-                    <span className="text-white leading-relaxed">{activePet.lastSeen}</span>
-                  </div>
-                </div>
+                <p className="text-white text-sm leading-relaxed">{activePet.lastSeen}</p>
               </div>
 
               <div>
