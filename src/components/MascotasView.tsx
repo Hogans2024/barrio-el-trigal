@@ -822,20 +822,14 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
             <div className="p-5 space-y-3 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
 
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
-                  <p className="text-white text-sm font-semibold">{activePet.name}</p>
-                </div>
-                <div className="flex-1">
-                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
-                  <p className="text-white text-sm font-semibold">{activePet.type}</p>
-                </div>
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
+                <p className="text-white text-sm font-semibold">{activePet.type}</p>
               </div>
 
               <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Última vez visto</h5>
-                <p className="text-white text-sm leading-relaxed">{activePet.lastSeen}</p>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
+                <p className="text-white text-sm font-semibold">{activePet.name}</p>
               </div>
 
               <div>
@@ -846,6 +840,11 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Fecha</h5>
                 <p className="text-white text-sm font-semibold">{activePet.date}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Última vez visto</h5>
+                <p className="text-white text-sm leading-relaxed">{activePet.lastSeen}</p>
               </div>
 
               <div>
