@@ -37,27 +37,29 @@ export function useSheetData(): SheetData {
         setData({
           proyectos: json.proyectos ?? FALLBACK.proyectos,
           eventos:   json.eventos   ?? FALLBACK.eventos,
-          farmacias: json.farmacias ?? FALLBACK.farmacias,
           // ═══════════════════════════════════════════════════════════════════════
-          //  IMPORTANTE — Sección "Negocios": datos locales inventados
+          //  IMPORTANTE — Secciones "Farmacias", "Negocios" y "Mascotas":
+          //  datos locales de respaldo
           // ═══════════════════════════════════════════════════════════════════════
-          //  Temporalmente NO se usa json.negocios (hoja Google Sheets).
-          //  Se usa BUSINESSES_DATA (src/data.ts) con datos inventados porque:
+          //  Temporalmente NO se usa json.farmacias / json.negocios / json.mascotas
+          //  (hoja Google Sheets) porque:
           //
-          //  1. La sección Negocios está en construcción y aún no está vinculada
-          //     al CMS de Google Sheets.
-          //  2. Se agregaron NUEVOS CAMPOS al tipo LocalBusiness que la hoja
-          //     actual no tiene: phone, address, openHours, phones, facebook, etc.
-          //  3. Cuando se termine de construir la sección, la hoja Google Sheets
-          //     deberá actualizarse para incluir estos campos y entonces se
-          //     podrá revertir a: json.negocios ?? FALLBACK.negocios
+          //  1. Las secciones están en construcción y aún no están vinculadas
+          //     al CMS de Google Sheets con todos los campos necesarios.
+          //  2. Se agregaron NUEVOS CAMPOS a los tipos (transport, schedule,
+          //     phones, facebook, actionText, etc.) que la hoja actual no tiene.
+          //  3. Cuando se termine de construir la integración con Google Apps
+          //     Script y la hoja se actualice con estos campos, se podrá revertir
+          //     a: json.farmacias ?? FALLBACK.farmacias (igual para negocios y
+          //     mascotas).
           //
-          //  Datos actuales inventados en data.ts: 4 negocios (La Parrilla del
-          //  Trigal, Boutique Estilo Real, Mercado El Campo, Vivero Oasis Verde)
-          //  con address, phone, openHours, description personalizadas.
+          //  Datos actuales en data.ts incluyen transport (Micros, Taxitrufis,
+          //  Trufis, Radio Taxis) para que la sección "Cómo llegar" sea visible
+          //  y funcional durante el desarrollo.
           // ═══════════════════════════════════════════════════════════════════════
+          farmacias: FALLBACK.farmacias,
           negocios:  FALLBACK.negocios,
-          mascotas:  json.mascotas  ?? FALLBACK.mascotas,
+          mascotas:  FALLBACK.mascotas,
           noticias:  json.noticias  ?? FALLBACK.noticias,
         });
         setError(null);
