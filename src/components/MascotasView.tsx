@@ -854,7 +854,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     )}
                     <button
                       onClick={() => setActivePet(null)}
-                      className="absolute top-1 right-1 text-white/70 hover:text-white transition z-10"
+                      className="absolute top-2 right-2 text-emerald-400 hover:text-emerald-300 transition z-10"
                     >
                       <X className="h-4 w-4" />
                     </button>
