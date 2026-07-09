@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
-import { LostPet } from '../types';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, Navigation, ChevronRight, ShoppingCart, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
+import { LostPet, DaySchedule } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
   value: string;
@@ -170,6 +170,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePet, setActivePet] = useState<LostPet | null>(null);
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
+  const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -818,32 +819,78 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
               </div>
             </div>
 
-            <div className="p-5 space-y-4 pb-16 sm:pb-5">
+            <div className="p-5 space-y-3 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
-              <p className="text-gray-300 text-xs leading-relaxed">{activePet.description}</p>
 
-              <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                  <span className="text-white">Visto en: {activePet.lastSeen}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
-                  <div className="flex flex-wrap gap-1">
-                    {getPhoneNumbers(activePet).map((ph, i) => (
-                      <span key={i} className="text-white text-[11px]">
-                        {ph}{i < getPhoneNumbers(activePet).length - 1 ? ',' : ''}
-                      </span>
-                    ))}
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
+                <p className="text-gray-300 text-xs leading-relaxed">{activePet.description}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Dirección</h5>
+                <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
+                  <div className="flex items-start space-x-2 text-gray-400">
+                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
+                    <span className="text-white leading-relaxed flex-1">{activePet.lastSeen || 'No especificada'}</span>
+                    <button
+                      onClick={() => {
+                        const query = encodeURIComponent(`${activePet.name} ${activePet.lastSeen || ''}`);
+                        window.open(`https://www.google.com/maps/search/${query}`, '_blank');
+                      }}
+                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 min-w-[74px] text-center"
+                    >
+                      Ubicación GPS
+                    </button>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Building2 className="h-4 w-4 text-gray-500 shrink-0" />
-                  <span className="text-white">{activePet.neighborhood}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Calendar className="h-4 w-4 text-gray-500 shrink-0" />
-                  <span className="text-white">{activePet.date}</span>
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Clock className="h-4 w-4 text-[#FFD700] shrink-0" />
+                    <span className="text-white flex-1">Horarios</span>
+                    <button
+                      onClick={() => setSchedulePet(activePet)}
+                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 w-[98px] text-center"
+                    >
+                      Ver Horarios
+                    </button>
+                  </div>
+                  {(() => {
+                    const phones = getPhoneNumbers(activePet);
+                    return phones.map((p, i) => {
+                      const cleanPhone = p.replace(/[^0-9]/g, '');
+                      return (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 text-gray-400">
+                            <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                            <span className="text-white">{p}</span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const isMobile = window.innerWidth < 1024;
+                              if (isMobile) {
+                                window.location.href = `tel:${cleanPhone}`;
+                              } else {
+                                setContactPet(activePet);
+                              }
+                            }}
+                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[66px] text-center"
+                          >
+                            {window.innerWidth < 1024 ? 'Llamar' : 'Enviar Mensaje'}
+                          </button>
+                        </div>
+                      );
+                    });
+                  })()}
+                  {activePet.facebook && (
+                    <a
+                      href={activePet.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition"
+                    >
+                      <span className="text-[10px] font-bold">f</span>
+                      <span className="text-xs">Ver en Facebook</span>
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -855,10 +902,12 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                   Cerrar
                 </button>
                 <button
-                  onClick={() => setContactPet(activePet)}
+                  onClick={() => {
+                    setContactPet(activePet);
+                  }}
                   className="flex-1 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer"
                 >
-                  Contactar
+                  {activePet.actionText || 'Contactar'}
                 </button>
               </div>
             </div>
@@ -910,6 +959,56 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                 className="w-full text-gray-500 hover:text-gray-300 py-2 text-xs transition cursor-pointer"
               >
                 Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Modal */}
+      {schedulePet && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#0c101d] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h4 className="text-white text-lg font-bold">Horarios de Atención</h4>
+                <p className="text-gray-400 text-xs mt-1">{schedulePet.name}</p>
+              </div>
+              <div className="space-y-1.5">
+                {(schedulePet.schedule || []).length > 0 ? (
+                  schedulePet.schedule!.map((item, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs ${
+                        item.open
+                          ? 'bg-[#22c55e]/10 border border-[#22c55e]/20'
+                          : 'bg-white/5 border border-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                            item.open ? 'bg-[#22c55e]' : 'bg-gray-500'
+                          }`}
+                        />
+                        <span className={`font-bold ${item.open ? 'text-white' : 'text-gray-500'}`}>
+                          {item.day}
+                        </span>
+                      </div>
+                      <span className={`font-mono text-[11px] ${item.open ? 'text-gray-300' : 'text-gray-500'}`}>
+                        {item.hours}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-xs text-center py-4">No hay horarios disponibles</p>
+                )}
+              </div>
+              <button
+                onClick={() => setSchedulePet(null)}
+                className="w-full bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
+              >
+                Cerrar
               </button>
             </div>
           </div>

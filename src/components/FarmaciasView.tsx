@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Home, MessageCircle } from 'lucide-react';
-import { Pharmacy } from '../types';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, Home, MessageCircle, Bus, Navigation, ChevronRight } from 'lucide-react';
+import { Pharmacy, TransportLine, TransportInfo } from '../types';
 
 interface FarmaciasViewProps {
   farmacias: Pharmacy[];
@@ -12,6 +12,11 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePharmacy, setActivePharmacy] = useState<Pharmacy | null>(null);
   const [contactPharmacy, setContactPharmacy] = useState<Pharmacy | null>(null);
+  const [schedulePharmacy, setSchedulePharmacy] = useState<Pharmacy | null>(null);
+  const [transportModalCategory, setTransportModalCategory] = useState<string | null>(null);
+  const [transportDetail, setTransportDetail] = useState<{ category: string; index: number } | null>(null);
+  const [driveAnimIndex, setDriveAnimIndex] = useState<number | null>(null);
+  const driveAnimRef = useRef<number | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('eventos');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -72,6 +77,8 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  useEffect(() => { setTransportModalCategory(null); setTransportDetail(null); setDriveAnimIndex(null); driveAnimRef.current = null; }, [activePharmacy]);
+
   const categories = ['Todos', 'Centro', 'Medio', 'Exterior'];
 
   const categoryIcons: Record<string, React.ReactNode> = {
@@ -108,6 +115,15 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
     );
   };
 
+  const mapColor = (color: string): string => {
+    const map: Record<string, string> = {
+      Rojo: '#EF4444', Roja: '#EF4444', Amarillo: '#EAB308', Verde: '#22C55E',
+      Azul: '#3B82F6', Blanca: '#F8FAFC', Blanco: '#F8FAFC', Morado: '#A855F7',
+      Naranja: '#F97316', Negra: '#1F2937'
+    };
+    return map[color] || '#6B7280';
+  };
+
   return (
     <div className="flex flex-col space-y-5 relative">
       <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" />
@@ -135,7 +151,15 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
             background: linear-gradient(135deg, transparent 15%, rgba(255,215,0,0.08) 35%, rgba(255,215,0,0.18) 50%, rgba(255,215,0,0.08) 65%, transparent 85%);
             animation: beam-sweep 2.5s ease-out 2;
           }
-        `}</style>
+          @keyframes vehicle-drive {
+            0% { transform: translateX(0); opacity: 1; }
+            75% { transform: translateX(-120px); opacity: 0.4; }
+            100% { transform: translateX(-160px); opacity: 0; }
+          }
+          .vehicle-drive {
+            animation: vehicle-drive 0.7s ease-in forwards;
+          }
+          `}</style>
       </div>
 
       {/* Search + Category Bar — sticky wrapper */}
@@ -557,23 +581,95 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
               </div>
             </div>
 
-            <div className="p-5 space-y-4 pb-16 sm:pb-5">
+            <div className="p-5 space-y-3 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activePharmacy.name}</h4>
-              <p className="text-gray-300 text-xs leading-relaxed">{activePharmacy.description}</p>
 
-              <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                  <span className="text-white">{activePharmacy.address}</span>
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
+                <p className="text-gray-300 text-xs leading-relaxed">{activePharmacy.description}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Dirección</h5>
+                <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
+                  <div className="flex items-start space-x-2 text-gray-400">
+                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0 mt-0.5" />
+                    <span className="text-white leading-relaxed flex-1">{activePharmacy.address || 'No especificada'}</span>
+                    <button
+                      onClick={() => {
+                        const query = encodeURIComponent(`${activePharmacy.name} ${activePharmacy.address || ''}`);
+                        window.open(`https://www.google.com/maps/search/${query}`, '_blank');
+                      }}
+                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 min-w-[74px] text-center"
+                    >
+                      Ubicación GPS
+                    </button>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Clock className="h-4 w-4 text-[#FFD700] shrink-0" />
+                    <span className="text-white flex-1">Horarios</span>
+                    <button
+                      onClick={() => setSchedulePharmacy(activePharmacy)}
+                      className="bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 border border-[#22c55e]/40 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer shrink-0 w-[98px] text-center"
+                    >
+                      Ver Horarios
+                    </button>
+                  </div>
+                  {(() => {
+                    const phones = activePharmacy.phones && activePharmacy.phones.length > 0 ? activePharmacy.phones : (activePharmacy.phone ? [activePharmacy.phone] : []);
+                    return phones.map((p, i) => {
+                      const cleanPhone = p.replace(/[^0-9]/g, '');
+                      return (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 text-gray-400">
+                            <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                            <span className="text-white">{p}</span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (isMobile) {
+                                window.location.href = `tel:${cleanPhone}`;
+                              } else {
+                                setContactPharmacy({ ...activePharmacy, phone: p });
+                              }
+                            }}
+                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[66px] text-center"
+                          >
+                            {isMobile ? 'Llamar' : 'Enviar Mensaje'}
+                          </button>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
-                  <span className="text-white">{activePharmacy.phone}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Building2 className="h-4 w-4 text-gray-500 shrink-0" />
-                  <span className="text-white">{activePharmacy.neighborhood}</span>
-                </div>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Cómo llegar</h5>
+                {!activePharmacy.transport ? (
+                  <button className="w-full flex items-center justify-center space-x-2 bg-white/[0.02] border border-white/10 rounded-xl p-3.5 text-xs font-semibold cursor-default">
+                    <Navigation className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-500">No disponible</span>
+                  </button>
+                ) : (
+                  <div className="space-y-1.5">
+                    {[
+                      { key: 'micros', label: 'Micros' },
+                      { key: 'taxitrufis', label: 'Taxitrufis' },
+                      { key: 'trufis', label: 'Trufis' },
+                      { key: 'radioTaxis', label: 'Radio Taxis' }
+                    ].filter(({ key }) => activePharmacy.transport?.[key as keyof TransportInfo]?.length > 0).map(({ key, label }) => (
+                      <button
+                        key={key}
+                        onClick={() => setTransportModalCategory(key)}
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white/[0.02] rounded-xl border border-white/10 text-xs font-bold text-white hover:bg-white/[0.04] transition cursor-pointer"
+                      >
+                        <span>{label}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex space-x-2 pt-2">
@@ -587,9 +683,158 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
                   onClick={() => setContactPharmacy(activePharmacy)}
                   className="flex-1 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer"
                 >
-                  Contactar
+                  {activePharmacy.actionText || 'Contactar'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transport Category Modal */}
+      {transportModalCategory && activePharmacy?.transport?.[transportModalCategory as keyof TransportInfo] && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-sm overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
+            <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
+              <h4 className="font-bold text-sm flex items-center gap-2">
+                <Bus className="w-4 h-4" />
+                <span>{({ micros: 'Micros', taxitrufis: 'Taxitrufis', trufis: 'Trufis', radioTaxis: 'Radio Taxis' })[transportModalCategory] || transportModalCategory}</span>
+              </h4>
+              <button onClick={() => { setTransportModalCategory(null); setTransportDetail(null); }} className="hover:opacity-75 text-[#FFD700]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-2">
+              {(() => {
+                const key = transportModalCategory;
+                const lines = (activePharmacy.transport?.[key as keyof TransportInfo] || []) as TransportLine[];
+                const catFlags = lines.filter(l => l.flagColor && l.flagColor.trim()).map(l => l.flagColor!);
+                const seen = new Set<string>();
+                const unique = catFlags.filter(c => { if (seen.has(c)) return false; seen.add(c); return true; });
+                const singleColors = unique.filter(c => !c.includes('con'));
+                const doubleColors = unique.filter(c => c.includes('con'));
+                const defaultSingles = ['Rojo', 'Amarillo'];
+                const defaultDoubles = ['Morado con Blanco', 'Amarillo con Blanco'];
+                const finalFlags: string[] = [];
+                for (let i = 0; i < 2; i++) finalFlags.push(singleColors[i] || defaultSingles[i]);
+                for (let i = 0; i < 2; i++) finalFlags.push(doubleColors[i] || defaultDoubles[i]);
+                const displayLines = lines.slice(0, 4);
+                const selected = transportDetail?.category === key ? transportDetail.index : -1;
+                const renderFlag = (i: number) => {
+                  const color = finalFlags[i] || 'Rojo';
+                  const hasCon = color.includes('con');
+                  const parts = hasCon ? color.split(' con ') : [color];
+                  return (
+                    <svg width="37" height="22" viewBox="0 -2 30 18" className="shrink-0">
+                      <rect x="3" y="-1.5" width="2.5" height="17" rx="1" fill="#6B7280" />
+                      {hasCon ? (
+                        <><polygon points="5,0.5 23.7,7 5,7" fill={mapColor(parts[0])} /><polygon points="5,7 23.7,7 5,13.5" fill={mapColor(parts[1])} /></>
+                      ) : (
+                        <polygon points="5,0.5 23.7,7 5,13.5" fill={mapColor(color)} />
+                      )}
+                    </svg>
+                  );
+                };
+                const renderLine = (line: TransportLine, i: number, isSelected: boolean) => {
+                  if (isSelected) {
+                    return (
+                      <div key={i} className="flex flex-col items-center space-y-2 bg-white/[0.03] rounded-lg px-4 py-3">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-300 leading-none">Bandera</span>
+                          <span className="text-sm font-bold text-gray-300">{line.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-2.5">
+                          {renderFlag(i)}
+                          <span className="text-gray-500 text-[11px]">{finalFlags[i]}</span>
+                        </div>
+                        <p className="text-gray-400 text-xs text-center leading-relaxed max-w-sm">{line.detail || `${line.proximity.toLowerCase()} circula el ${line.name} (${line.flagColor}), cerca de mi negocio.`}</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={i} className="bg-white/[0.03] rounded-lg px-3 py-2">
+                      <div className="flex items-center justify-center space-x-2 mb-1">
+                        <span className="text-xs text-gray-300 leading-none">Bandera</span>
+                        {line.name && <span className="text-xs font-bold text-gray-300 leading-none">{line.name}</span>}
+                      </div>
+                      <div className="flex items-center space-x-2.5">
+                        {renderFlag(i)}
+                        <span className="text-gray-500 text-[10px] shrink-0">{finalFlags[i]}</span>
+                        <div className="flex items-center space-x-1 ml-auto">
+                          {(() => {
+                            const c = finalFlags[i] || 'Rojo';
+                            const hasCon = c.includes('con');
+                            const parts = hasCon ? c.split(' con ') : [c];
+                            const bodyColor = hasCon ? mapColor(parts[0]) : mapColor(c);
+                            const bottomColor = hasCon ? mapColor(parts[1]) : bodyColor;
+                            const wheelColor = '#1F2937';
+                            if (key === 'micros' || key === 'trufis') {
+                              const size = key === 'trufis' ? 'w-[34px] h-[14px]' : 'w-[46px] h-[18px]';
+                              return (
+                                <svg className={`${size} shrink-0${driveAnimIndex === i ? ' vehicle-drive' : ''}`} viewBox="0 0 40 24" fill="none">
+                                  <rect x="1" y="3" width="38" height="15" rx="3" fill={bottomColor} />
+                                  <rect x="1" y="3" width="38" height="9" fill={bodyColor} />
+                                  <rect x="1" y="3" width="38" height="2" rx="1" fill="white" opacity="0.3" />
+                                  <rect x="4" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="12" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="20" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="28" y="6" width="7" height="5" rx="1" fill="white" opacity="0.7" />
+                                  <rect x="30" y="4" width="7" height="8" rx="1.5" fill="white" opacity="0.4" />
+                                  <circle cx="10" cy="19" r="3" fill={wheelColor} />
+                                  <circle cx="30" cy="19" r="3" fill={wheelColor} />
+                                </svg>
+                              );
+                            }
+                            if (key === 'taxitrufis' || key === 'radioTaxis') {
+                              return (
+                                <svg className={`w-[46px] h-[18px] shrink-0${driveAnimIndex === i ? ' vehicle-drive' : ''}`} viewBox="0 0 40 24" fill="none">
+                                  <rect x="1" y="10" width="38" height="10" rx="2" fill={bottomColor} />
+                                  <rect x="1" y="10" width="38" height="6" fill={bodyColor} />
+                                  <path d="M6 10 L8 4 L32 4 L34 10 Z" fill={bodyColor} />
+                                  <path d="M8 10 L9 5 L11 10 Z" fill="white" opacity="0.4" />
+                                  <path d="M32 10 L31 5 L29 10 Z" fill="white" opacity="0.4" />
+                                  <rect x="11" y="5" width="6" height="5" rx="0.5" fill="white" opacity="0.6" />
+                                  <rect x="18" y="5" width="6" height="5" rx="0.5" fill="white" opacity="0.6" />
+                                  <rect x="25" y="5" width="5" height="5" rx="0.5" fill="white" opacity="0.6" />
+                                  <text x="22" y="16" fontFamily="sans-serif" fontSize="4.5" fill="black" fontWeight="bold" textAnchor="middle">TAXI</text>
+                                  <circle cx="10" cy="20" r="3" fill={wheelColor} />
+                                  <circle cx="30" cy="20" r="3" fill={wheelColor} />
+                                </svg>
+                              );
+                            }
+                            return <span className="text-gray-400 text-[10px] text-right shrink-0 max-w-[100px] leading-tight">{line.proximity}</span>;
+                          })()}
+                          <button
+                            onClick={() => {
+                              setDriveAnimIndex(i);
+                              driveAnimRef.current = i;
+                              setTimeout(() => {
+                                if (driveAnimRef.current !== i) return;
+                                setTransportDetail({ category: key, index: i });
+                                setDriveAnimIndex(null);
+                                driveAnimRef.current = null;
+                              }, 700);
+                            }}
+                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-2 py-1 rounded text-[9px] font-bold transition cursor-pointer shrink-0"
+                          >
+                            Detalle
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                };
+                return (
+                  <>
+                    {selected >= 0 && renderLine(displayLines[selected], selected, true)}
+                    {displayLines.map((line, i) => i !== selected && selected >= 0 && renderLine(line, i, false))}
+                    {selected < 0 && displayLines.map((line, i) => renderLine(line, i, false))}
+                    {lines.length > displayLines.length && (
+                      <p className="text-[9px] text-gray-600 text-center">+{lines.length - displayLines.length} líneas más</p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -604,32 +849,105 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
                 <h4 className="text-white text-lg font-bold">Contactar</h4>
                 <p className="text-gray-400 text-xs mt-1">{contactPharmacy.name}</p>
               </div>
-              <button
-                onClick={() => {
-                  const phone = contactPharmacy.phone.replace(/[^0-9]/g, '');
-                  window.location.href = `https://wa.me/${phone}`;
-                  setContactPharmacy(null);
-                }}
-                className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
-              >
-                <MessageCircle className="h-5 w-5 text-[#25D366]" />
-                <span>WhatsApp</span>
-              </button>
-              <button
-                onClick={() => {
-                  window.location.href = `tel:${contactPharmacy.phone}`;
-                  setContactPharmacy(null);
-                }}
-                className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
-              >
-                <Phone className="h-5 w-5 text-[#FFD700]" />
-                <span>Llamar</span>
-              </button>
+              {(() => {
+                const phone = contactPharmacy.phone || (contactPharmacy.phones && contactPharmacy.phones[0]) || '';
+                const cleanPhone = phone.replace(/[^0-9]/g, '');
+                return (
+                  <>
+                    <button
+                      onClick={() => {
+                        if (!cleanPhone) return;
+                        window.location.href = `https://wa.me/${cleanPhone}`;
+                        setContactPharmacy(null);
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-white border border-[#25D366]/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                      <span>Enviar WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!cleanPhone) return;
+                        window.location.href = `sms:${cleanPhone}`;
+                        navigator.clipboard.writeText(cleanPhone).catch(() => {});
+                        setContactPharmacy(null);
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-blue-500/10 hover:bg-blue-500/20 text-white border border-blue-500/40 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <MessageCircle className="h-5 w-5 text-blue-400" />
+                      <span>Enviar SMS</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (phone) {
+                          window.location.href = `tel:${phone}`;
+                          setContactPharmacy(null);
+                        }
+                      }}
+                      className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      <Phone className="h-5 w-5 text-[#FFD700]" />
+                      <span>Llamar</span>
+                    </button>
+                  </>
+                );
+              })()}
               <button
                 onClick={() => setContactPharmacy(null)}
-                className="w-full text-gray-500 hover:text-gray-300 py-2 text-xs transition cursor-pointer"
+                className="w-full flex items-center justify-center space-x-3 text-gray-400 hover:text-gray-200 py-2 text-xs transition cursor-pointer"
               >
-                Cancelar
+                <span className="w-5 h-5 shrink-0 invisible" />
+                <span>Cancelar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Modal */}
+      {schedulePharmacy && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+          <div className="bg-[#0c101d] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h4 className="text-white text-lg font-bold">Horarios de Atención</h4>
+                <p className="text-gray-400 text-xs mt-1">{schedulePharmacy.name}</p>
+              </div>
+              <div className="space-y-1.5">
+                {(schedulePharmacy.schedule || []).length > 0 ? (
+                  schedulePharmacy.schedule!.map((item, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs ${
+                        item.open
+                          ? 'bg-[#22c55e]/10 border border-[#22c55e]/20'
+                          : 'bg-white/5 border border-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                            item.open ? 'bg-[#22c55e]' : 'bg-gray-500'
+                          }`}
+                        />
+                        <span className={`font-bold ${item.open ? 'text-white' : 'text-gray-500'}`}>
+                          {item.day}
+                        </span>
+                      </div>
+                      <span className={`font-mono text-[11px] ${item.open ? 'text-gray-300' : 'text-gray-500'}`}>
+                        {item.hours}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-xs text-center py-4">No hay horarios disponibles</p>
+                )}
+              </div>
+              <button
+                onClick={() => setSchedulePharmacy(null)}
+                className="w-full bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
+              >
+                Cerrar
               </button>
             </div>
           </div>

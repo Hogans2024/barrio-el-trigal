@@ -11,6 +11,11 @@ export interface Pharmacy {
   neighborhood: string;
   description: string;
   isOnDuty: boolean;
+  phones?: string[];
+  schedule?: DaySchedule[];
+  transport?: TransportInfo;
+  facebook?: string;
+  actionText?: string;
 }
 
 export interface NeighborhoodEvent {
@@ -83,6 +88,10 @@ export interface LostPet {
   images?: string[];
   videoUrl?: string;
   phones?: string[];
+  schedule?: DaySchedule[];
+  actionText?: string;
+  address?: string;
+  facebook?: string;
 }
 
 export interface Project {
