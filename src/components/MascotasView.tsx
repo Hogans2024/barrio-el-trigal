@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Heart, PlusCircle, Upload, ChevronDown, Home, MessageCircle } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, Heart, PlusCircle, Upload, Home, MessageCircle } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
@@ -822,9 +822,27 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
             <div className="p-5 space-y-3 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
 
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
-                <p className="text-white text-sm font-semibold">{activePet.name}</p>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
+                  <p className="text-white text-sm font-semibold">{activePet.name}</p>
+                </div>
+                <div className="flex-1">
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Especie</h5>
+                  <div className="relative">
+                    <select
+                      value={activePet.type}
+                      className="w-full bg-[#080a0f] text-white text-sm font-semibold border border-white/10 rounded-lg px-2 py-1 appearance-none cursor-pointer focus:outline-none focus:border-[#FFD700]"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#555 transparent' }}
+                    >
+                      <option value="Perro">Perro</option>
+                      <option value="Gato">Gato</option>
+                      <option value="Ave">Ave</option>
+                      <option value="Otros">Otros</option>
+                    </select>
+                    <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500 pointer-events-none" />
+                  </div>
+                </div>
               </div>
 
               <div>
