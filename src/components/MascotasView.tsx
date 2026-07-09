@@ -172,6 +172,8 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
   const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const autoPlayRef = useRef(true);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -249,7 +251,15 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  useEffect(() => { setSlideIdx(0); }, [activePet]);
+  useEffect(() => { setSlideIdx(0); setAutoPlay(true); autoPlayRef.current = true; }, [activePet]);
+  useEffect(() => {
+    if (!autoPlay) return;
+    const id = setInterval(() => setSlideIdx(prev => {
+      const slides = activePet?.images?.length && activePet.images.length >= 5 ? activePet.images.slice(0, 5) : Array(5);
+      return prev >= slides.length - 1 ? 0 : prev + 1;
+    }), 4000);
+    return () => clearInterval(id);
+  }, [autoPlay, activePet]);
 
   useEffect(() => {
     const stored = localStorage.getItem('barrio_mascotas_extra');
@@ -813,46 +823,61 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
                   ];
               return (
-                <div className="relative h-44 bg-gray-950 overflow-hidden">
-                  <img
-                    src={slides[slideIdx]}
-                    alt={activePet.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover transition-opacity duration-300"
-                  />
-                  {slides.length > 1 && (
-                    <>
-                      <button
-                        onClick={() => setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1)}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
-                        {slides.map((_, j) => (
-                          <span key={j} className={`w-1.5 h-1.5 rounded-full transition ${j === slideIdx ? 'bg-white' : 'bg-white/40'}`} />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  <button
-                    onClick={() => setActivePet(null)}
-                    className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none z-10"
+                <>
+                  <div
+                    className="relative h-44 bg-gray-950 overflow-hidden"
+                    onMouseEnter={() => { setAutoPlay(false); autoPlayRef.current = false; }}
+                    onMouseLeave={() => { setAutoPlay(true); autoPlayRef.current = true; }}
                   >
-                    <X className="h-4 w-4" />
-                  </button>
-                  <div className="absolute bottom-4 left-4 z-10">
-                    <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                      {activePet.type}
-                    </span>
+                    <img
+                      src={slides[slideIdx]}
+                      alt={activePet.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer"
+                      onClick={() => { setAutoPlay(false); autoPlayRef.current = false; }}
+                    />
+                    {slides.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1); setAutoPlay(false); autoPlayRef.current = false; }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => setActivePet(null)}
+                      className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none z-10"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <div className="absolute bottom-4 left-4 z-10">
+                      <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
+                        {activePet.type}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                  {slides.length > 1 && (
+                    <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f]">
+                      {slides.map((src, j) => (
+                        <button
+                          key={j}
+                          onClick={() => { setSlideIdx(j); setAutoPlay(false); autoPlayRef.current = false; }}
+                          className={`shrink-0 rounded overflow-hidden border-2 transition cursor-pointer ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
+                        >
+                          <img src={src} alt="" className="w-12 h-8 object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
               );
             })()}
 
