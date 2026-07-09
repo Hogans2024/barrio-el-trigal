@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, Heart, PlusCircle, Upload, Home, MessageCircle } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
@@ -171,6 +171,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [activePet, setActivePet] = useState<LostPet | null>(null);
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
   const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
+  const [slideIdx, setSlideIdx] = useState(0);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -247,6 +248,8 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  useEffect(() => { setSlideIdx(0); }, [activePet]);
 
   useEffect(() => {
     const stored = localStorage.getItem('barrio_mascotas_extra');
@@ -799,25 +802,59 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
       {activePet && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
-            <div className="relative h-44 bg-gray-950">
-              <img
-                src={activePet.imageUrl}
-                alt={activePet.name}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => setActivePet(null)}
-                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <div className="absolute bottom-4 left-4">
-                <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                  {activePet.type}
-                </span>
-              </div>
-            </div>
+            {(() => {
+              const slides = activePet.images && activePet.images.length >= 5
+                ? activePet.images.slice(0, 5)
+                : [
+                    'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
+                  ];
+              return (
+                <div className="relative h-44 bg-gray-950 overflow-hidden">
+                  <img
+                    src={slides[slideIdx]}
+                    alt={activePet.name}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover transition-opacity duration-300"
+                  />
+                  {slides.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1)}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                        {slides.map((_, j) => (
+                          <span key={j} className={`w-1.5 h-1.5 rounded-full transition ${j === slideIdx ? 'bg-white' : 'bg-white/40'}`} />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  <button
+                    onClick={() => setActivePet(null)}
+                    className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none z-10"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <div className="absolute bottom-4 left-4 z-10">
+                    <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
+                      {activePet.type}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="p-5 space-y-3 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
