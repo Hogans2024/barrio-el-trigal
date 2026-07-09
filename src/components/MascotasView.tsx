@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle, Play } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
@@ -174,6 +174,8 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const [slideIdx, setSlideIdx] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const autoPlayRef = useRef(true);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -254,9 +256,15 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   useEffect(() => { setSlideIdx(0); setAutoPlay(true); autoPlayRef.current = true; }, [activePet]);
   useEffect(() => {
     if (!autoPlay) return;
+    const VIDEO_URL = 'https://www.w3schools.com/html/mov_bbb.mp4';
+    const isVideo = (src: string) => src.includes('.mp4') || src.includes('video');
+    const slides = activePet?.images && activePet.images.length >= 5
+      ? [...activePet.images.slice(0, 5), VIDEO_URL]
+      : Array(6);
     const id = setInterval(() => setSlideIdx(prev => {
-      const slides = activePet?.images?.length && activePet.images.length >= 5 ? activePet.images.slice(0, 5) : Array(5);
-      return prev >= slides.length - 1 ? 0 : prev + 1;
+      let next = prev >= slides.length - 1 ? 0 : prev + 1;
+      if (isVideo(slides[next] as string)) next = next >= slides.length - 1 ? 0 : next + 1;
+      return next;
     }), 4000);
     return () => clearInterval(id);
   }, [autoPlay, activePet]);
@@ -813,15 +821,18 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
+              const VIDEO_URL = 'https://www.w3schools.com/html/mov_bbb.mp4';
               const slides = activePet.images && activePet.images.length >= 5
-                ? activePet.images.slice(0, 5)
+                ? [...activePet.images.slice(0, 5), VIDEO_URL]
                 : [
                     'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600&auto=format&fit=crop&q=80',
                     'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80',
                     'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
                     'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
+                    'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80',
+                    VIDEO_URL
                   ];
+              const isVideo = (src: string) => src.includes('.mp4') || src.includes('video');
               return (
                 <>
                   <div
@@ -829,24 +840,48 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     onMouseEnter={() => { setAutoPlay(false); autoPlayRef.current = false; }}
                     onMouseLeave={() => { setAutoPlay(true); autoPlayRef.current = true; }}
                   >
-                    <img
-                      src={slides[slideIdx]}
-                      alt={activePet.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer"
-                      onClick={() => { setAutoPlay(false); autoPlayRef.current = false; }}
-                    />
+                    {isVideo(slides[slideIdx]) ? (
+                      <div className="relative w-full h-full">
+                        <video
+                          ref={videoRef}
+                          src={slides[slideIdx]}
+                          className="w-full h-full object-cover"
+                          onPlay={() => setVideoPlaying(true)}
+                          onPause={() => setVideoPlaying(false)}
+                          onEnded={() => setVideoPlaying(false)}
+                          controls={videoPlaying}
+                        />
+                        {!videoPlaying && (
+                          <button
+                            onClick={() => { videoRef.current?.play(); setAutoPlay(false); autoPlayRef.current = false; }}
+                            className="absolute inset-0 flex items-center justify-center bg-black/30 transition cursor-pointer z-10"
+                          >
+                            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                              <Play className="h-6 w-6 text-white ml-0.5" />
+                            </div>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <img
+                        src={slides[slideIdx]}
+                        alt={activePet.name}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer"
+                        onClick={() => { setAutoPlay(false); autoPlayRef.current = false; }}
+                      />
+                    )}
                     {slides.length > 1 && (
                       <>
                         <button
                           onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1); setAutoPlay(false); autoPlayRef.current = false; }}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-20"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-20"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>
@@ -854,25 +889,34 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     )}
                     <button
                       onClick={() => setActivePet(null)}
-                      className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none z-10"
+                      className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none z-20"
                     >
                       <X className="h-4 w-4" />
                     </button>
-                    <div className="absolute bottom-4 left-4 z-10">
+                    <div className="absolute bottom-4 left-4 z-20">
                       <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
                         {activePet.type}
                       </span>
                     </div>
                   </div>
                   {slides.length > 1 && (
-                    <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f]">
+                    <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f] overflow-x-auto">
                       {slides.map((src, j) => (
                         <button
                           key={j}
                           onClick={() => { setSlideIdx(j); setAutoPlay(false); autoPlayRef.current = false; }}
-                          className={`shrink-0 rounded overflow-hidden border-2 transition cursor-pointer ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
+                          className={`shrink-0 rounded overflow-hidden border-2 transition cursor-pointer relative ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
                         >
-                          <img src={src} alt="" className="w-12 h-8 object-cover" />
+                          {isVideo(src) ? (
+                            <div className="relative w-12 h-8">
+                              <img src={slides[0]} alt="" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                <Play className="h-3 w-3 text-white" />
+                              </div>
+                            </div>
+                          ) : (
+                            <img src={src} alt="" className="w-12 h-8 object-cover" />
+                          )}
                         </button>
                       ))}
                     </div>
