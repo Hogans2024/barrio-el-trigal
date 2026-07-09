@@ -644,6 +644,26 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
                 </div>
               </div>
 
+              {/*
+                ═══════════════════════════════════════════════════════════════════════════════
+                TRANSPORTE / "CÓMO LLEGAR"
+                ───────────────────────────────────────────────────────────────────────────────
+                Esta sección (Micros, Taxitrufis, Trufis, Radio Taxis) está ESTRUCTURADA y
+                LISTA para funcionar, pero actualmente NO está conectada a Google Sheets.
+                Los datos provendrán del CMS cuando se implemente la integración con
+                Google Apps Script y la base de datos de Google Sheets.
+
+                Para activarla en el futuro:
+                  1. Asegurar que el endpoint de Apps Script devuelva el objeto `transport`
+                     con la estructura `TransportInfo` (micros[], taxitrufis[], trufis[],
+                     radioTaxis[]), cada uno con `TransportLine` (name, flagColor, proximity,
+                     detail).
+                  2. Vincular el JSON del endpoint al campo `transport` del objeto Pharmacy
+                     en el hook que obtiene los datos (useSheetData o similar).
+                  3. Descomentar/quitar el filtro condicional si se desea mostrar todos los
+                     transportes disponibles.
+                =====================================================================
+              */}
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Cómo llegar</h5>
                 {!activePharmacy.transport ? (
