@@ -828,7 +828,7 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                   <p className="text-white text-sm font-semibold">{activePet.name}</p>
                 </div>
                 <div className="flex-1">
-                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Especie</h5>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
                   <div className="relative">
                     <select
                       value={activePet.type}
@@ -853,6 +853,16 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     <span className="text-white leading-relaxed">{activePet.lastSeen}</span>
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Barrio / Zona</h5>
+                <p className="text-white text-sm font-semibold">{activePet.neighborhood}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Fecha</h5>
+                <p className="text-white text-sm font-semibold">{activePet.date}</p>
               </div>
 
               <div>
