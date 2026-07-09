@@ -9,7 +9,31 @@ export const PHARMACIES_DATA: Pharmacy[] = [
     phone: '4 664 1234',
     neighborhood: 'Centro',
     description: 'Atención las 24 horas con una amplia variedad de medicamentos y productos de cuidado personal.',
-    isOnDuty: true
+    isOnDuty: true,
+    transport: {
+      micros: [
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'Pasa por la puerta' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      taxitrufis: [
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'A dos cuadras' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 1', flagColor: 'Roja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos calles' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Taxi Tarija', flagColor: '', proximity: '4 622 2222' },
+        { name: 'Radio Móvil', flagColor: '', proximity: '4 633 3333' }
+      ]
+    }
   },
   {
     id: 'p2',
@@ -19,7 +43,31 @@ export const PHARMACIES_DATA: Pharmacy[] = [
     phone: '4 665 5678',
     neighborhood: 'San Roque',
     description: 'Comprometidos con tu bienestar y tu economía. Servicio rápido y seguro para toda la vecindad.',
-    isOnDuty: true
+    isOnDuty: true,
+    transport: {
+      micros: [
+        { name: 'Línea B', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'A dos cuadras' },
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'A dos cuadras' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'Pasa por la puerta' }
+      ],
+      taxitrufis: [
+        { name: 'Línea H', flagColor: 'Verde', proximity: 'Pasa por la puerta' },
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'A dos calles' },
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'A dos calles' },
+        { name: 'Línea 6', flagColor: 'Naranja', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Sur', flagColor: '', proximity: '4 644 4444' },
+        { name: 'Radio Taxi Central', flagColor: '', proximity: '4 655 5555' }
+      ]
+    }
   },
   {
     id: 'p3',
@@ -29,7 +77,31 @@ export const PHARMACIES_DATA: Pharmacy[] = [
     phone: '4 611 2233',
     neighborhood: 'El Molino',
     description: 'Medicamentos originales, atención profesional y los mejores precios de la zona sur.',
-    isOnDuty: true
+    isOnDuty: true,
+    transport: {
+      micros: [
+        { name: 'Línea D', flagColor: 'Azul', proximity: 'Pasa por la puerta' },
+        { name: 'Línea F', flagColor: 'Morado', proximity: 'A una cuadra' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos calles' },
+        { name: 'Línea E', flagColor: 'Verde', proximity: 'A tres cuadras' }
+      ],
+      taxitrufis: [
+        { name: 'Línea T', flagColor: 'Rojo con Blanco', proximity: 'Pasa por la puerta' },
+        { name: 'Línea S', flagColor: 'Azul', proximity: 'A dos cuadras' },
+        { name: 'Línea R', flagColor: 'Verde', proximity: 'A dos cuadras' },
+        { name: 'Línea Q', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 7', flagColor: 'Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 8', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 9', flagColor: 'Roja', proximity: 'A una calle' },
+        { name: 'Línea 10', flagColor: 'Azul', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Norte', flagColor: '', proximity: '4 677 7777' },
+        { name: 'Radio Express', flagColor: '', proximity: '4 688 8888' }
+      ]
+    }
   },
   {
     id: 'p4',
@@ -39,7 +111,31 @@ export const PHARMACIES_DATA: Pharmacy[] = [
     phone: '4 622 3344',
     neighborhood: 'Lourdes',
     description: 'Cuidamos tu salud y la de tu familia con productos de calidad y asesoramiento farmacéutico.',
-    isOnDuty: true
+    isOnDuty: true,
+    transport: {
+      micros: [
+        { name: 'Línea G', flagColor: 'Naranja', proximity: 'Pasa por la puerta' },
+        { name: 'Línea A', flagColor: 'Rojo', proximity: 'A una cuadra' },
+        { name: 'Línea H', flagColor: 'Gris', proximity: 'A dos calles' },
+        { name: 'Línea C', flagColor: 'Amarillo', proximity: 'A dos cuadras' }
+      ],
+      taxitrufis: [
+        { name: 'Línea M', flagColor: 'Morado', proximity: 'Pasa por la puerta' },
+        { name: 'Línea Z', flagColor: 'Blanco con Morado', proximity: 'A dos cuadras' },
+        { name: 'Línea D', flagColor: 'Roja', proximity: 'A dos calles' },
+        { name: 'Línea N', flagColor: 'Naranja', proximity: 'Pasa por la puerta' }
+      ],
+      trufis: [
+        { name: 'Línea 4', flagColor: 'Blanco', proximity: 'Pasa por la puerta' },
+        { name: 'Línea 5', flagColor: 'Amarillo', proximity: 'A dos cuadras' },
+        { name: 'Línea 2', flagColor: 'Azul', proximity: 'A dos calles' },
+        { name: 'Línea 3', flagColor: 'Verde', proximity: 'A dos cuadras' }
+      ],
+      radioTaxis: [
+        { name: 'Radio Lourdes', flagColor: '', proximity: '4 699 9999' },
+        { name: 'Radio Centro', flagColor: '', proximity: '4 600 0000' }
+      ]
+    }
   }
 ];
 
