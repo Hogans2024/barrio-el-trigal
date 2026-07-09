@@ -37,26 +37,51 @@ export function useSheetData(): SheetData {
         setData({
           proyectos: json.proyectos ?? FALLBACK.proyectos,
           eventos:   json.eventos   ?? FALLBACK.eventos,
-          // ═══════════════════════════════════════════════════════════════════════
-          //  IMPORTANTE — Secciones "Farmacias", "Negocios" y "Mascotas":
-          //  datos locales de respaldo
-          // ═══════════════════════════════════════════════════════════════════════
-          //  Temporalmente NO se usa json.farmacias / json.negocios / json.mascotas
-          //  (hoja Google Sheets) porque:
+          // ═══════════════════════════════════════════════════════════════════════════════════
+          //  WORKAROUND — Datos locales de respaldo para Farmacias, Negocios y Mascotas
+          // ═══════════════════════════════════════════════════════════════════════════════════
           //
-          //  1. Las secciones están en construcción y aún no están vinculadas
-          //     al CMS de Google Sheets con todos los campos necesarios.
-          //  2. Se agregaron NUEVOS CAMPOS a los tipos (transport, schedule,
-          //     phones, facebook, actionText, etc.) que la hoja actual no tiene.
-          //  3. Cuando se termine de construir la integración con Google Apps
-          //     Script y la hoja se actualice con estos campos, se podrá revertir
-          //     a: json.farmacias ?? FALLBACK.farmacias (igual para negocios y
-          //     mascotas).
+          //  PROBLEMA IDENTIFICADO:
+          //  ──────────────────────
+          //  El archivo `public/data.json` es servido por el CMS y contiene los datos
+          //  actuales provenientes de Google Sheets. Sin embargo, dicho archivo NO incluye
+          //  los campos `transport` (ni `schedule`, `phones`, `facebook`, `actionText`)
+          //  en sus objetos `farmacias` y `mascotas`, porque la hoja de cálculo vinculada
+          //  al endpoint de Apps Script aún no ha sido actualizada con estas columnas.
           //
-          //  Datos actuales en data.ts incluyen transport (Micros, Taxitrufis,
-          //  Trufis, Radio Taxis) para que la sección "Cómo llegar" sea visible
-          //  y funcional durante el desarrollo.
-          // ═══════════════════════════════════════════════════════════════════════
+          //  Como consecuencia directa, al usar `json.farmacias ?? FALLBACK.farmacias`,
+          //  el operador `??` (Nullish coalescing) **no** activaba el fallback, ya que
+          //  `json.farmacias` sí existía como un arreglo válido —aunque careciera de los
+          //  campos requeridos—. Esto provocaba que la sección "Cómo llegar" dentro del
+          //  modal de detalle mostrara invariablemente "No disponible", al no encontrar
+          //  la propiedad `transport` en los objetos de farmacia/mascota.
+          //
+          //  SOLUCIÓN APLICADA:
+          //  ──────────────────
+          //  Se fuerza el uso de `FALLBACK.farmacias` y `FALLBACK.mascotas` (datos mock
+          //  definidos en `src/data.ts`) que sí incluyen la estructura `TransportInfo`
+          //  completa con sus rutas `micros[]`, `taxitrufis[]`, `trufis[]` y
+          //  `radioTaxis[]`. Esto permite visualizar y probar la funcionalidad de
+          //  transporte durante el desarrollo.
+          //
+          //  MIGRACIÓN FUTURA (cuando se conecte al CMS):
+          //  ────────────────────────────────────────────
+          //  1. Actualizar la hoja Google Sheets agregando las columnas necesarias:
+          //     - `transport.micros`, `transport.taxitrufis`, `transport.trufis`,
+          //       `transport.radioTaxis` (cada una como un arreglo de objetos con
+          //       `name`, `flagColor`, `proximity`, `detail`).
+          //     - `schedule[]` (arreglo de objetos con `day`, `open`, `hours`).
+          //     - `phones[]`, `facebook`, `actionText` según corresponda.
+          //  2. Modificar el endpoint de Google Apps Script para que devuelva estos
+          //     campos en el JSON de respuesta.
+          //  3. Revertir esta línea a: `farmacias: json.farmacias ?? FALLBACK.farmacias`
+          //     (y lo mismo para `mascotas`).
+          //
+          //  NOTA: La sección "Negocios" sigue el mismo patrón (`FALLBACK.negocios`)
+          //  porque sus tipos también fueron extendidos con campos que la hoja actual
+          //  no posee. Una vez que el CMS esté completo, se unificará el tratamiento
+          //  de todas las secciones.
+          // ═══════════════════════════════════════════════════════════════════════════════════
           farmacias: FALLBACK.farmacias,
           negocios:  FALLBACK.negocios,
           mascotas:  FALLBACK.mascotas,
