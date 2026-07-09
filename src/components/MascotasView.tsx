@@ -858,11 +858,6 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
                     >
                       <X className="h-4 w-4" />
                     </button>
-                    <div className="absolute bottom-4 left-4 z-10">
-                      <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                        {activePet.type}
-                      </span>
-                    </div>
                   </div>
                   {slides.length > 1 && (
                     <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f] justify-center">
