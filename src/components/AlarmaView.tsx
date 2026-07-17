@@ -447,7 +447,7 @@ export default function AlarmaView({ onNavigate, onShowNotification, globalSearc
         type={activeAlarmType}
       />
 
-      {/* EMERGENCY VOIP TELEPHONE DIALER MODAL */}
+      {/* EMERGENCY DIRECT DIALER MODAL */}
       <CallModal
         isOpen={isDialerOpen}
         onClose={() => setIsDialerOpen(false)}

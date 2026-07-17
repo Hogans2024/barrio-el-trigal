@@ -48,12 +48,35 @@ export interface QuickAccessItem {
   imageUrl: string;
 }
 
+// ──────────────────────────────────────────────────────────────────────
+//  EmergencyContact — Tipo para contactos de emergencia
+// ──────────────────────────────────────────────────────────────────────
+//  🔮  INTEGRACIÓN FUTURA CON GOOGLE SHEETS:
+//     Todos los campos vendrán de la hoja "Contactos_Emergencia"
+//     en Google Sheets. El programador debe:
+//       1. Crear la hoja con columnas: id, name, number, category, icon, label
+//       2. Añadir "Contactos_Emergencia" al array HOJAS_PARA_LA_WEB (hojas que se publican en la web) en Code.gs
+//       3. Code.gs leerá la hoja → sheetToObjects() → exportDataToGitHub()
+//       4. El frontend consumirá: json.emergencyContacts ?? EMERGENCY_CONTACTS
+//
+//     Desde Sheets se podrá:
+//       - Agregar nuevas tarjetas de contacto (nuevas filas)
+//       - Eliminar tarjetas existentes (borrar filas)
+//       - Editar name, number, category, icon, label de cualquier fila
+//
+//  📌  Por ahora este tipo se usa con datos de ejemplo (mock)
+//     definidos en data.alarma.ts.
+// ──────────────────────────────────────────────────────────────────────
+// `label`    → Texto que se muestra junto al número (ej: "Número directo:").
+//              Es opcional; si no se define, el frontend muestra "Número directo:" por defecto.
+//              Desde Sheets se podrá cambiar a cualquier texto (ej: "Número a llamar").
 export interface EmergencyContact {
   id: string;
   name: string;
   number: string;
-  category: 'policia' | 'serenazgo' | 'bomberos' | 'salud' | 'vecinal';
+  category: 'policia' | 'serenazgo' | 'transito' | 'bomberos' | 'salud' | 'vecinal' | 'ambulancia';
   icon: string;
+  label?: string;
 }
 
 export interface AlarmLog {

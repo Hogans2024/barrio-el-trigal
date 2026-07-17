@@ -66,41 +66,104 @@ export const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════
+//  CONTACTOS DE EMERGENCIA — DATOS DE EJEMPLO (MUESTRA)
+// ═══════════════════════════════════════════════════════════════════════
+//  ⚠  IMPORTANTE: Estos números son SOLO DATOS DE EJEMPLO (mock).
+//     NO son los números reales de emergencia. Son placeholders
+//     para mostrar la funcionalidad de la Central de Llamadas.
+//
+//  🔮  INTEGRACIÓN FUTURA CON GOOGLE SHEETS (FASE BACKEND):
+//     Toda esta información se editará, agregará o eliminará
+//     directamente desde la hoja "Contactos_Emergencia" en
+//     Google Sheets, sin necesidad de modificar el código fuente.
+//
+//     Lo que se podrá controlar desde Sheets:
+//       - name       → nombre del contacto
+//       - number     → número telefónico
+//       - category   → determina color del icono
+//       - icon       → qué icono de lucide-react mostrar
+//       - label      → texto junto al número (opcional)
+//
+//     También se podrán agregar o quitar filas para mostrar
+//     más o menos tarjetas de contacto en la modal.
+//
+//     Proceso técnico:
+//       1. Code.gs lee la hoja "Contactos_Emergencia" en Sheets
+//       2. sheetToObjects() convierte filas a objetos JSON
+//       3. exportDataToGitHub() publica el JSON en GitHub Pages
+//       4. Frontend usa: json.emergencyContacts ?? EMERGENCY_CONTACTS
+//
+//  📌  MIENTRAS TANTO: Los datos siguientes son estáticos y sirven
+//     únicamente para desarrollo y pruebas visuales. El programador
+//     debe crear la hoja "Contactos_Emergencia" en Google Sheets
+//     con las columnas: id, name, number, category, icon, label
+//     y añadirla al array HOJAS_PARA_LA_WEB (hojas que se publican en la web) en Code.gs.
+// ═══════════════════════════════════════════════════════════════════════
 export const EMERGENCY_CONTACTS: EmergencyContact[] = [
   {
     id: '1',
-    name: 'Serenazgo de Tarija',
-    number: '110',
+    name: 'Activar alarma llamando',
+    number: '72944411',
     category: 'serenazgo',
-    icon: 'Shield',
+    icon: 'Phone',
+    label: 'Número directo:',
   },
   {
     id: '2',
     name: 'Policía Nacional (EPIC)',
-    number: '911',
+    number: '110',
     category: 'policia',
-    icon: 'PhoneCall',
+    icon: 'Shield',
+    label: 'Número directo:',
   },
   {
     id: '3',
-    name: 'Bomberos Voluntarios Brasschaat',
-    number: '119',
-    category: 'bomberos',
-    icon: 'Flame',
+    name: 'Tránsito Emergencias',
+    number: '111',
+    category: 'transito',
+    icon: 'Car',
+    label: 'Número directo:',
   },
   {
     id: '4',
-    name: 'Ambulancias Hospital San Juan de Dios',
-    number: '168',
-    category: 'salud',
-    icon: 'Heart',
+    name: 'Bomberos Voluntarios',
+    number: '119',
+    category: 'bomberos',
+    icon: 'Flame',
+    label: 'Número directo:',
   },
   {
     id: '5',
-    name: 'Coordinadora de Seguridad El Trigal',
-    number: '+591 729 44810',
+    name: 'Ambulancias Emergencias',
+    number: '118',
+    category: 'ambulancia',
+    icon: 'Cross',
+    label: 'Número directo:',
+  },
+  {
+    id: '6',
+    name: 'Hospital San Juan de Dios',
+    number: '4 664-5555',
+    category: 'salud',
+    icon: 'Heart',
+    label: 'Número directo:',
+  },
+  {
+    id: '7',
+    name: 'Hospital San Juan de Dios',
+    number: '4 664-2883',
+    category: 'salud',
+    icon: 'Heart',
+    label: 'Número directo:',
+  },
+  {
+    id: '8',
+    name: 'Coordinador de Seguridad',
+    number: '72944810',
     category: 'vecinal',
     icon: 'User',
+    label: 'Número directo:',
   },
 ];
 
