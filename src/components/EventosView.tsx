@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 
 interface EventosViewProps {
@@ -97,11 +97,11 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
   };
 
   const viewOptions = [
-    { id: 'eventos', label: 'Eventos', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'proyectos', label: 'Proyectos', icon: <PanelLeft className="w-4 h-4" /> },
-    { id: 'farmacias', label: 'Farmacias', icon: <Pill className="w-4 h-4" /> },
-    { id: 'mascotas', label: 'Mascotas', icon: <PawPrint className="w-4 h-4" /> },
-    { id: 'negocios', label: 'Negocios', icon: <Store className="w-4 h-4" /> },
+    { id: 'eventos', label: 'Vista Rápida', icon: <Zap className="w-4 h-4" /> },
+    { id: 'proyectos', label: 'Vista Galería', icon: <Images className="w-4 h-4" /> },
+    { id: 'farmacias', label: 'Vista Ficha Técnica', icon: <FileText className="w-4 h-4" /> },
+    { id: 'mascotas', label: 'Vista Perfil', icon: <UserCircle2 className="w-4 h-4" /> },
+    { id: 'negocios', label: 'Vista Tarjeta', icon: <IdCard className="w-4 h-4" /> },
   ];
 
   const filteredEvents = eventos.filter((evt) => {

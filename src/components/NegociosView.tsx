@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
 import { LocalBusiness, TransportLine, TransportInfo } from '../types';
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -201,11 +201,11 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
   };
 
   const viewOptions = [
-    { id: 'eventos', label: 'Eventos', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'proyectos', label: 'Proyectos', icon: <PanelLeft className="w-4 h-4" /> },
-    { id: 'farmacias', label: 'Farmacias', icon: <Pill className="w-4 h-4" /> },
-    { id: 'mascotas', label: 'Mascotas', icon: <PawPrint className="w-4 h-4" /> },
-    { id: 'negocios', label: 'Negocios', icon: <Store className="w-4 h-4" /> },
+    { id: 'eventos', label: 'Vista Rápida', icon: <Zap className="w-4 h-4" /> },
+    { id: 'proyectos', label: 'Vista Galería', icon: <Images className="w-4 h-4" /> },
+    { id: 'farmacias', label: 'Vista Ficha Técnica', icon: <FileText className="w-4 h-4" /> },
+    { id: 'mascotas', label: 'Vista Perfil', icon: <UserCircle2 className="w-4 h-4" /> },
+    { id: 'negocios', label: 'Vista Tarjeta', icon: <IdCard className="w-4 h-4" /> },
   ];
 
   const isOpen = (biz: LocalBusiness) => biz.openHours && biz.openHours.length > 0;
