@@ -5,9 +5,11 @@ import { Pharmacy, TransportLine, TransportInfo } from '../types';
 interface FarmaciasViewProps {
   farmacias: Pharmacy[];
   onShowNotification: (title: string, message: string) => void;
+  highlightId?: string | null;
+  onClearHighlight?: () => void;
 }
 
-export default function FarmaciasView({ farmacias, onShowNotification }: FarmaciasViewProps) {
+export default function FarmaciasView({ farmacias, onShowNotification, highlightId, onClearHighlight }: FarmaciasViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePharmacy, setActivePharmacy] = useState<Pharmacy | null>(null);
@@ -32,6 +34,15 @@ export default function FarmaciasView({ farmacias, onShowNotification }: Farmaci
     const t3 = setTimeout(() => setShimmer(false), 7900);
     return () => { clearTimeout(t2); clearTimeout(t3); };
   }, []);
+
+  useEffect(() => {
+    if (!highlightId || !onClearHighlight) return;
+    const id = highlightId.split('::')[1];
+    if (!id) return;
+    const match = farmacias.find((p) => p.id === id);
+    if (match) setActivePharmacy(match);
+    onClearHighlight();
+  }, [highlightId]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;

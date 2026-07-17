@@ -5,9 +5,11 @@ import { NeighborhoodEvent } from '../types';
 interface NoticiasViewProps {
   noticias: NeighborhoodEvent[];
   onShowNotification: (title: string, message: string) => void;
+  highlightId?: string | null;
+  onClearHighlight?: () => void;
 }
 
-export default function NoticiasView({ noticias, onShowNotification }: NoticiasViewProps) {
+export default function NoticiasView({ noticias, onShowNotification, highlightId, onClearHighlight }: NoticiasViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeNews, setActiveNews] = useState<NeighborhoodEvent | null>(null);
@@ -21,6 +23,15 @@ export default function NoticiasView({ noticias, onShowNotification }: NoticiasV
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
+
+  useEffect(() => {
+    if (!highlightId || !onClearHighlight) return;
+    const id = highlightId.split('::')[1];
+    if (!id) return;
+    const match = noticias.find((n) => n.id === id);
+    if (match) setActiveNews(match);
+    onClearHighlight();
+  }, [highlightId]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);

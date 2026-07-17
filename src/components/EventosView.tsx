@@ -5,9 +5,11 @@ import { NeighborhoodEvent } from '../types';
 interface EventosViewProps {
   eventos: NeighborhoodEvent[];
   onShowNotification: (title: string, message: string) => void;
+  highlightId?: string | null;
+  onClearHighlight?: () => void;
 }
 
-export default function EventosView({ eventos, onShowNotification }: EventosViewProps) {
+export default function EventosView({ eventos, onShowNotification, highlightId, onClearHighlight }: EventosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeEvent, setActiveEvent] = useState<NeighborhoodEvent | null>(null);
@@ -21,6 +23,15 @@ export default function EventosView({ eventos, onShowNotification }: EventosView
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
+
+  useEffect(() => {
+    if (!highlightId || !onClearHighlight) return;
+    const id = highlightId.split('::')[1];
+    if (!id) return;
+    const match = eventos.find((e) => e.id === id);
+    if (match) setActiveEvent(match);
+    onClearHighlight();
+  }, [highlightId]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);

@@ -156,6 +156,8 @@ function YearPicker({ value, onChange }: { value: string; onChange: (v: string) 
 interface MascotasViewProps {
   mascotas: LostPet[];
   onShowNotification: (title: string, message: string) => void;
+  highlightId?: string | null;
+  onClearHighlight?: () => void;
 }
 
 const DEFAULT_IMAGES: Record<string, string> = {
@@ -165,7 +167,7 @@ const DEFAULT_IMAGES: Record<string, string> = {
   Otras: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600&auto=format&fit=crop&q=80',
 };
 
-export default function MascotasView({ mascotas, onShowNotification }: MascotasViewProps) {
+export default function MascotasView({ mascotas, onShowNotification, highlightId, onClearHighlight }: MascotasViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePet, setActivePet] = useState<LostPet | null>(null);
@@ -200,6 +202,15 @@ export default function MascotasView({ mascotas, onShowNotification }: MascotasV
   const petFileRef = useRef<HTMLInputElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
+
+  useEffect(() => {
+    if (!highlightId || !onClearHighlight) return;
+    const id = highlightId.split('::')[1];
+    if (!id) return;
+    const match = mascotas.find((m) => m.id === id);
+    if (match) setActivePet(match);
+    onClearHighlight();
+  }, [highlightId]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);

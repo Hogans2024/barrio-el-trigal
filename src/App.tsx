@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Siren, LayoutGrid, Calendar, Users, Heart, Store, PlusSquare,
-  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, Newspaper
+  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, ChevronRight, Newspaper, Pill, PawPrint, Building2, Phone, AlertTriangle
 } from 'lucide-react';
 
 // Sub-views
@@ -22,8 +22,20 @@ import { useSheetData } from './hooks/useSheetData';
 import NoticeDropdown from './components/NoticeDropdown';
 import ProfileModal from './components/ProfileModal';
 import { playTone } from './components/AudioSiren';
-import { NOTICES } from './data.alarma';
+import { NOTICES, EMERGENCY_CONTACTS, CAROUSEL_SLIDES, QUICK_ACCESS_ITEMS, DEFAULT_VECINOS, ALARM_LOGS } from './data.alarma';
 import { Notice } from './types.alarma';
+import { Pharmacy, NeighborhoodEvent, LocalBusiness, LostPet, Project } from './types';
+
+interface SearchResult {
+  id: string;
+  section: string;
+  sectionLabel: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  matchField: string;
+  relevance: number;
+}
 
 interface NotificationToast {
   id: string;
@@ -36,8 +48,147 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('alarma');
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const mainScrollRef = useRef<HTMLElement>(null);
-  const [isTopSearchOpen, setIsTopSearchOpen] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const [highlightCardId, setHighlightCardId] = useState<string | null>(null);
+
+  const sectionIcons: Record<string, React.ReactNode> = {
+    farmacias: <Pill className="h-4 w-4 text-emerald-400" />,
+    mascotas: <PawPrint className="h-4 w-4 text-orange-400" />,
+    eventos: <Calendar className="h-4 w-4 text-blue-400" />,
+    negocios: <Store className="h-4 w-4 text-yellow-400" />,
+    proyectos: <LayoutGrid className="h-4 w-4 text-purple-400" />,
+    noticias: <Newspaper className="h-4 w-4 text-red-400" />,
+    alarma: <AlertTriangle className="h-4 w-4 text-amber-400" />,
+  };
+
+  const getSectionLabel = (s: string) => {
+    const map: Record<string, string> = {
+      farmacias: 'Farmacias',
+      mascotas: 'Mascotas Perdidas',
+      eventos: 'Eventos',
+      negocios: 'Negocios Locales',
+      proyectos: 'Proyectos',
+      noticias: 'Noticias',
+      alarma: 'Central Alarma',
+    };
+    return map[s] ?? s;
+  };
+
+  const searchResults = useMemo<SearchResult[]>(() => {
+    const q = globalSearchQuery.toLowerCase().trim();
+    if (!q || q.length < 1) return [];
+
+    const results: SearchResult[] = [];
+    const addIfMatch = (section: string, id: string, title: string, desc: string, fields: string[]) => {
+      const lowerTitle = title.toLowerCase();
+      const lowerDesc = desc.toLowerCase();
+      const lowerQuery = q;
+      for (const f of fields) {
+        const lf = f.toLowerCase();
+        if (lowerTitle.includes(lf) || lowerDesc.includes(lf)) {
+          const relevance = calcRelevance(lowerTitle, lowerDesc, lowerQuery, lf);
+          results.push({
+            id,
+            section,
+            sectionLabel: getSectionLabel(section),
+            icon: sectionIcons[section] ?? null,
+            title,
+            description: desc.length > 100 ? desc.slice(0, 100) + '…' : desc,
+            matchField: f,
+            relevance,
+          });
+          return;
+        }
+      }
+    };
+
+    const calcRelevance = (lowerTitle: string, lowerDesc: string, query: string, matchField: string): number => {
+      let score = 0;
+      if (lowerTitle === query) score += 100;
+      else if (lowerTitle.startsWith(query)) score += 80;
+      else if (lowerTitle.includes(query)) score += 60;
+      else if (lowerDesc.includes(query)) score += 40;
+      else score += 20;
+      if (matchField === query) score += 15;
+      return score;
+    };
+
+    // Farmacias
+    farmacias.forEach((p: Pharmacy) =>
+      addIfMatch('farmacias', p.id, p.name, p.description, [q, p.name, p.address, p.phone, p.neighborhood].filter(Boolean))
+    );
+
+    // Mascotas
+    mascotas.forEach((m: LostPet) =>
+      addIfMatch('mascotas', m.id, m.name, m.description, [q, m.name, m.type, m.neighborhood, m.lastSeen, m.contact].filter(Boolean))
+    );
+
+    // Eventos
+    eventos.forEach((e: NeighborhoodEvent) =>
+      addIfMatch('eventos', e.id, e.title, e.description, [q, e.title, e.category, e.location].filter(Boolean))
+    );
+
+    // Negocios
+    negocios.forEach((b: LocalBusiness) =>
+      addIfMatch('negocios', b.id, b.name, b.description, [q, b.name, b.category, b.phone, b.address].filter(Boolean))
+    );
+
+    // Proyectos
+    proyectos.forEach((pr: Project) =>
+      addIfMatch('proyectos', pr.id, pr.title, pr.description, [q, pr.title, pr.location].filter(Boolean))
+    );
+
+    // Noticias
+    noticias.forEach((n: NeighborhoodEvent) =>
+      addIfMatch('noticias', n.id, n.title, n.description, [q, n.title, n.category, n.location].filter(Boolean))
+    );
+
+    // Alarma — contactos
+    EMERGENCY_CONTACTS.forEach((c) =>
+      addIfMatch('alarma', `emergencia-${c.id}`, c.name, `${c.name} — Tel: ${c.number}`, [q, c.name, c.number].filter(Boolean))
+    );
+
+    // Alarma — vecinos
+    DEFAULT_VECINOS.forEach((v, i) =>
+      addIfMatch('alarma', `vecino-${i}`, v.nombre, `${v.calle} | CI: ${v.ci} | Cel: ${v.celular}`, [q, v.nombre, v.ci, v.celular, v.calle].filter(Boolean))
+    );
+
+    // Alarma — logs
+    ALARM_LOGS.forEach((l) =>
+      addIfMatch('alarma', `log-${l.id}`, l.user, `Tipo: ${l.type} | ${l.timestamp}`, [q, l.user, l.type].filter(Boolean))
+    );
+
+    // Alarma — carrusel
+    CAROUSEL_SLIDES.forEach((s) =>
+      addIfMatch('alarma', `slide-${s.id}`, s.title, s.description, [q, s.title, s.subtitle].filter(Boolean))
+    );
+
+    // Alarma — acceso rápido
+    QUICK_ACCESS_ITEMS.forEach((qa) =>
+      addIfMatch('alarma', `qa-${qa.id}`, qa.title, qa.subtitle, [q, qa.title, qa.subtitle].filter(Boolean))
+    );
+
+    results.sort((a, b) => b.relevance - a.relevance);
+    return results.slice(0, 20);
+  }, [globalSearchQuery, farmacias, mascotas, eventos, negocios, proyectos, noticias]);
+
+  // Click outside to collapse search bar
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    }
+    if (isSearchFocused) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSearchFocused]);
 
   // --- Cabecera global: avisos (NoticeDropdown) + perfil (ProfileModal) ---
   // Reemplazan a la campana + drawer de mockAlerts y al perfil anteriores.
@@ -65,23 +216,6 @@ export default function App() {
     }
   }, [activeTab]);
 
-  // Click outside para cerrar la barra superior
-  const topSearchRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (topSearchRef.current && !topSearchRef.current.contains(event.target as Node)) {
-        setIsTopSearchOpen(false);
-      }
-    }
-    
-    if (isTopSearchOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isTopSearchOpen]);
-  
   // Custom states for toast alerts
   const [toasts, setToasts] = useState<NotificationToast[]>([]);
 
@@ -184,7 +318,7 @@ export default function App() {
         <header className="relative z-30 bg-[#070707]/85 px-5 py-0 flex items-center shrink-0 backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.08)] will-change-transform">
           
           {/* Left: Back button (non-Alarma) / Logo (Alarma) */}
-          <div className="flex-1 flex justify-start items-center">
+          <div className={`${activeTab === 'alarma' ? 'flex-none' : 'flex-1'} flex justify-start items-center`}>
             {activeTab !== 'alarma' ? (
               <button
                 onClick={() => setActiveTab('alarma')}
@@ -246,97 +380,125 @@ export default function App() {
           )}
 
           {/* Right controls */}
-          <div ref={topSearchRef} className={`flex items-center justify-end ${isTopSearchOpen ? 'flex-1 ml-3' : 'space-x-1.5'}`}>
-            {isTopSearchOpen ? (
-              <div className="flex items-center w-full bg-black/60 border border-brand-yellow/50 rounded-xl px-3 py-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
+          <div className={`flex items-center justify-end ${activeTab === 'alarma' ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? 'ml-3 space-x-1.5' : 'space-x-1.5'}`}>
+            {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
+            {activeTab === 'alarma' && (
+            <div ref={searchRef} className={`md:hidden relative ${isSearchFocused ? 'flex-1 -mr-5' : 'flex-1 max-w-[200px]'}`}>
+              <div className={`flex items-center w-full bg-black/60 border border-gray-800 ${isSearchFocused ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl'} px-2 py-1.5`}>
+                <Search className="h-4 w-4 text-gray-400 shrink-0" />
                 <input
                   type="text"
-                  autoFocus
-                  placeholder="Buscar en Alarma..."
-                  className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 text-sm ml-1 font-sans"
+                  placeholder="Buscar en todo…"
+                  className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 text-xs ml-1.5 font-sans placeholder:text-white/30"
                   value={globalSearchQuery}
                   onChange={(e) => setGlobalSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setIsTopSearchOpen(false);
-                      // TODO: Implementar lógica de búsqueda a futuro
-                    }
-                  }}
+                  onFocus={() => setIsSearchFocused(true)}
                 />
                 {globalSearchQuery === '' ? (
-                  <button 
-                    onClick={() => setIsTopSearchOpen(false)}
-                    className="ml-2 p-1 text-gray-400 hover:text-white shrink-0"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <span className="text-[11px] font-sans text-white/30 ml-1 shrink-0">Buscar</span>
                 ) : (
                   <button 
-                    onClick={() => {
-                      setIsTopSearchOpen(false);
-                      // TODO: Implementar lógica de búsqueda a futuro
-                    }}
-                    className="ml-2 px-3 py-1 text-[10px] font-bold text-brand-yellow border border-brand-yellow rounded-lg hover:bg-brand-yellow/10 transition-colors uppercase shrink-0"
+                    onClick={() => { setGlobalSearchQuery(''); setIsSearchFocused(false); }}
+                    className="ml-2 px-3 py-1 text-[10px] font-bold text-gray-400 border border-gray-400 rounded-lg hover:bg-white/5 transition-colors uppercase shrink-0"
                   >
                     BUSCAR
                   </button>
                 )}
               </div>
-            ) : (
-              <>
-                {/* Lupa (Mobile Only) - Activa la barra superior */}
-                {activeTab === 'alarma' && (
-                  <button 
-                    onClick={() => setIsTopSearchOpen(true)}
-                    className="md:hidden flex items-center bg-black/60 border border-gray-800 hover:border-brand-yellow/50 rounded-xl px-2 py-1.5 transition-all focus:outline-none cursor-pointer w-[75px]"
-                  >
-                    <Search className="h-4 w-4 text-gray-400 shrink-0" />
-                    <span className="text-[11px] font-sans text-white/30 ml-1">Buscar</span>
-                  </button>
-                )}
 
-                {/* Notifications bell → NoticeDropdown (cabecera global migrada) */}
-                <div className="relative">
-                  <button
-                    onClick={() => { playTone(500, 50); setIsNoticeOpen(!isNoticeOpen); }}
-                    className={`relative p-1.5 md:px-4 md:py-2 transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border flex items-center gap-2 ${
-                      isNoticeOpen
-                        ? 'border-[#FFD700]/40 text-white'
-                        : 'border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    <Bell className="h-5 w-5" />
-                    <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </button>
-
+              {(searchResults.length > 0 || (globalSearchQuery.length > 0 && isSearchFocused)) && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c101d] border border-white/10 rounded-2xl shadow-xl z-50 animate-fade-in max-h-[70vh] overflow-y-auto">
+                  {searchResults.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-xs text-gray-500">
+                      No se encontraron resultados para <span className="text-gray-400 font-semibold">"{globalSearchQuery}"</span>
+                    </div>
+                  ) : (
+                    (() => {
+                      const grouped: Record<string, SearchResult[]> = {};
+                      searchResults.forEach((r) => {
+                        if (!grouped[r.section]) grouped[r.section] = [];
+                        grouped[r.section].push(r);
+                      });
+                      const sortedSections = Object.keys(grouped).sort((a, b) =>
+                        grouped[b][0].relevance - grouped[a][0].relevance
+                      );
+                      return (
+                        <div className="py-2">
+                          {sortedSections.map((sec) => {
+                            const items = grouped[sec];
+                            return (
+                              <div key={sec}>
+                                <div className="flex items-center gap-1.5 px-4 py-1.5 border-b border-white/5">
+                                  {sectionIcons[sec] ?? null}
+                                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">{getSectionLabel(sec)}</span>
+                                  <span className="text-[10px] text-gray-600 font-mono ml-auto">{items.length}</span>
+                                </div>
+                                {items.map((r) => (
+                                  <button
+                                    key={`${r.section}-${r.id}`}
+                                    onClick={() => {
+                                      setGlobalSearchQuery('');
+                                      setIsSearchFocused(false);
+                                      setHighlightCardId(`${r.section}::${r.id}`);
+                                      setActiveTab(r.section);
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 hover:bg-white/[0.03] transition cursor-pointer border-b border-white/[0.02] last:border-b-0"
+                                  >
+                                    <div className="text-xs font-semibold text-white truncate">{r.title}</div>
+                                    <div className="text-[11px] text-gray-400 leading-snug mt-0.5 line-clamp-2">{r.description}</div>
+                                  </button>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()
+                  )}
                 </div>
+              )}
+            </div>
+            )}
 
-                {/* Profile trigger → ProfileModal (cabecera global migrada) */}
-                <button
-                  onClick={() => { playTone(500, 50); setIsProfileOpen(true); }}
-                  className="hidden md:flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3"
-                  title="Credencial digital"
-                >
-                  <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-[11px] font-bold border border-white/10 text-white">
-                    <User className="h-4 w-4 text-brand-yellow" />
-                  </div>
-                  <ChevronDown className="hidden md:block w-4 h-4 text-gray-500" />
-                </button>
+            {/* Notifications bell → NoticeDropdown (cabecera global migrada) */}
+            <div className={`relative ${isSearchFocused ? 'hidden' : ''}`}>
+              <button
+                onClick={() => { playTone(500, 50); setIsNoticeOpen(!isNoticeOpen); }}
+                className={`relative p-1.5 md:px-4 md:py-2 transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border flex items-center gap-2 ${
+                  isNoticeOpen
+                    ? 'border-[#FFD700]/40 text-white'
+                    : 'border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white'
+                }`}
+              >
+                <Bell className="h-5 w-5" />
+                <span className="hidden md:inline font-mono font-bold text-xs">Avisos</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 md:relative md:top-0 md:right-0 bg-brand-yellow text-gray-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#111] animate-pulse shadow-lg">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            </div>
 
-                {/* Hamburger menu (Mobile Only) */}
-                <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  className="md:hidden p-1.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600"
-                >
+            {/* Profile trigger → ProfileModal (cabecera global migrada) */}
+            <button
+              onClick={() => { playTone(500, 50); setIsProfileOpen(true); }}
+              className={`hidden md:flex items-center space-x-2.5 cursor-pointer hover:opacity-80 transition-all focus:outline-none bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 p-1.5 md:pr-3 ${isSearchFocused ? 'hidden' : ''}`}
+              title="Credencial digital"
+            >
+              <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-[11px] font-bold border border-white/10 text-white">
+                <User className="h-4 w-4 text-brand-yellow" />
+              </div>
+              <ChevronDown className="hidden md:block w-4 h-4 text-gray-500" />
+            </button>
+
+            {/* Hamburger menu (Mobile Only) */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`md:hidden p-1.5 text-gray-400 hover:text-white transition focus:outline-none cursor-pointer bg-black/40 rounded-xl border border-gray-800 hover:border-gray-600 ${isSearchFocused ? 'hidden' : ''}`}
+            >
                   {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
-              </>
-            )}
           </div>
         </header>
 
@@ -359,13 +521,13 @@ export default function App() {
               </div>
             ) : (
               <>
-            {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} globalSearchQuery={globalSearchQuery} />}
-            {activeTab === 'proyectos' && <ProyectosView projects={proyectos} />}
-            {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} />}
-            {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} />}
-            {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} />}
-            {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} />}
-            {activeTab === 'noticias' && <NoticiasView noticias={noticias} onShowNotification={addToast} />}
+            {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
+            {activeTab === 'proyectos' && <ProyectosView projects={proyectos} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'noticias' && <NoticiasView noticias={noticias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
               </>
             )}

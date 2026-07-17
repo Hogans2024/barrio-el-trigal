@@ -4,9 +4,11 @@ import { Project } from '../types';
 
 interface ProyectosViewProps {
   projects: Project[];
+  highlightId?: string | null;
+  onClearHighlight?: () => void;
 }
 
-export default function ProyectosView({ projects }: ProyectosViewProps) {
+export default function ProyectosView({ projects, highlightId, onClearHighlight }: ProyectosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -25,6 +27,15 @@ export default function ProyectosView({ projects }: ProyectosViewProps) {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
+
+  useEffect(() => {
+    if (!highlightId || !onClearHighlight) return;
+    const id = highlightId.split('::')[1];
+    if (!id) return;
+    const match = projects.find((pr) => pr.id === id);
+    if (match) setActiveProject(match);
+    onClearHighlight();
+  }, [highlightId]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);

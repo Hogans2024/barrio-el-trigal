@@ -41,9 +41,11 @@ import { LocalBusiness, TransportLine, TransportInfo } from '../types';
 interface NegociosViewProps {
   negocios: LocalBusiness[];
   onShowNotification: (title: string, message: string) => void;
+  highlightId?: string | null;
+  onClearHighlight?: () => void;
 }
 
-export default function NegociosView({ negocios, onShowNotification }: NegociosViewProps) {
+export default function NegociosView({ negocios, onShowNotification, highlightId, onClearHighlight }: NegociosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeBiz, setActiveBiz] = useState<LocalBusiness | null>(null);
@@ -108,6 +110,15 @@ export default function NegociosView({ negocios, onShowNotification }: NegociosV
   const setShiftTime = (shift: string, field: 'from' | 'until', value: string) => {
     setShiftTimes(prev => ({ ...prev, [shift]: { ...prev[shift], [field]: value } }));
   };
+
+  useEffect(() => {
+    if (!highlightId || !onClearHighlight) return;
+    const id = highlightId.split('::')[1];
+    if (!id) return;
+    const match = negocios.find((b) => b.id === id);
+    if (match) setActiveBiz(match);
+    onClearHighlight();
+  }, [highlightId]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);

@@ -30,8 +30,6 @@ interface AlarmaViewProps {
   onNavigate: (tab: string) => void;
   /** Muestra un toast flotante global (equivalente a onToast del proyecto origen). */
   onShowNotification: (title: string, message: string) => void;
-  /** Búsqueda global desde el header (mobile) */
-  globalSearchQuery?: string;
 }
 
 /**
@@ -47,7 +45,7 @@ interface AlarmaViewProps {
  *  - tall: celular grande (≥ 700px de alto)
  *  - sm: tablet/escritorio (≥ 640px de ancho) — fiel al diseño del origen.
  */
-export default function AlarmaView({ onNavigate, onShowNotification, globalSearchQuery = '' }: AlarmaViewProps) {
+export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaViewProps) {
   // Main interactive modals toggles
   const [isAlarmActive, setIsAlarmActive] = useState(false);
   const [activeAlarmType, setActiveAlarmType] = useState<'panic' | 'suspicious' | 'test' | 'medical'>('panic');
@@ -57,11 +55,6 @@ export default function AlarmaView({ onNavigate, onShowNotification, globalSearc
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [logs, setLogs] = useState<AlarmLog[]>(ALARM_LOGS);
-
-  // Update local search query if global changes
-  useEffect(() => {
-    setSearchQuery(globalSearchQuery);
-  }, [globalSearchQuery]);
 
   // Tipos de alarma seleccionables (panic / suspicious / test / medical)
   const ALARM_TYPES: { id: 'panic' | 'suspicious' | 'test' | 'medical'; label: string; icon: React.ReactNode; color: string }[] = [
@@ -102,12 +95,6 @@ export default function AlarmaView({ onNavigate, onShowNotification, globalSearc
     setIsAlarmActive(false);
     onShowNotification('Sistema', `Alarma desactivada correctamente. Registro #${newLog.id} guardado.`);
   };
-
-  // Filtramos los items rápidos si hay búsqueda
-  const filteredItems = QUICK_ACCESS_ITEMS.filter(item => 
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    item.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
@@ -241,7 +228,7 @@ export default function AlarmaView({ onNavigate, onShowNotification, globalSearc
 
       {/* ============ 3. ACCESOS RÁPIDOS (grid mock → DetailModal) ============ */}
       <section className="grid grid-cols-2 tall:grid-cols-4 sm:grid-cols-4 gap-[5px] tall:gap-[9px] sm:gap-[13px] select-none shrink-0 -mt-[3px]">
-        {filteredItems.map((item) => (
+        {QUICK_ACCESS_ITEMS.map((item) => (
           <div
             key={item.id}
             onClick={() => { playTone(600, 80); onNavigate(item.id); }}
