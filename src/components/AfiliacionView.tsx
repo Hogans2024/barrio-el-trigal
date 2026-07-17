@@ -543,10 +543,10 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
         )}
 
         {/* ============ PANEL DINÁMICO DE DETALLE POR BOTÓN ============ */}
-        <section className="mt-2 sm:mt-4 pb-8 sm:pb-10">
+        <section className="pb-8 sm:pb-10">
           {activeAfiliadoAction !== null && (
-            <>
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 select-none animate-fade-in">
+            <div className="-mt-6">
+              <div className="flex items-center justify-between border-b border-white/10 py-[12.2px] mb-[12.2px] select-none animate-fade-in">
                 <button
                   onClick={() => {
                     playTone(500, 80);
@@ -570,7 +570,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                 </div>
               </div>
 
-              <div className="mb-4 text-gray-300 text-xs leading-relaxed font-sans animate-fade-in select-none">
+              <div className="mb-[12.2px] text-gray-300 text-xs leading-relaxed font-sans animate-fade-in select-none">
                 <div className="flex items-center space-x-2 text-[#FFD700] font-bold text-xs uppercase tracking-wide mb-1">
                   <span>
                     {activeAfiliadoAction === 1 && '① Registro de Nuevos Afiliados'}
@@ -585,7 +585,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                 </div>
                 <p className="text-gray-400 text-[11.5px] leading-relaxed max-w-4xl">
                   {activeAfiliadoAction === 1 && 'Este botón permite registrar de forma oficial a un nuevo vecino de la urbanización El Trigal. Requiere autenticación con Google y envía los datos directamente a la base de datos central (hoja "Datos_Afiliacion").'}
-                  {activeAfiliadoAction === 2 && 'Este botón exige ingresar de forma obligatoria el Nombre, Apellido y la Cédula de Identidad (C.I.) del vecino, con la opción de ingresar el Celular, para realizar una consulta segura en el padrón. [DATOS DE EJEMPLO PARA PROBAR EL SISTEMA: Nombre: Daniel, Apellido: Mendez, C.I.: 12345678, Celular (opcional): 12345678]'}
+
                   {activeAfiliadoAction === 3 && 'Este botón permite consultar la vigencia de la afiliación de un vecino introduciendo su número de teléfono celular de 8 dígitos. Muestra de forma interactiva si el vecino está plenamente habilitado en la central de alarmas.'}
                   {activeAfiliadoAction === 4 && 'Este botón abre un formulario con celdas para registrar de manera manual y personalizada la asistencia a la reunión vecinal. El administrador escribe los nombres de forma manual, y el sistema genera automáticamente la fecha y hora exacta de registro.'}
                   {activeAfiliadoAction === 5 && 'Consulte aquí los requisitos generales y documentación requerida para afiliarse formalmente a la junta de vecinos de El Trigal.'}
@@ -594,7 +594,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                   {activeAfiliadoAction === 8 && 'Requisitos y pasos obligatorios para iniciar el trámite de gas natural domiciliario ante la Empresa Tarijeña del Gas (EMTAGAS).'}
                 </p>
               </div>
-            </>
+            </div>
           )}
 
           {/* ====================================================== */}
@@ -1213,347 +1213,36 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 2: Buscar vecino Afiliado (MOCK) ========= */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 2 && (
-            <div className="space-y-5">
-
-              {searchPerformed && searchFoundResult ? (
-                // DASHBOARD PREMIUM CON FRAMER MOTION
-                (() => {
-                  const richData = getNeighborRichData(searchFoundResult);
-                  const activity = getNeighborActivity(richData);
-
-                  const containerVariants = {
-                    hidden: { opacity: 0 },
-                    visible: {
-                      opacity: 1,
-                      transition: {
-                        staggerChildren: 0.1
-                      }
-                    }
-                  };
-
-                  const itemVariants = {
-                    hidden: { opacity: 0, y: 20 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: { type: "spring", stiffness: 300, damping: 24 }
-                    }
-                  };
-
-                  return (
-                    <motion.div
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="bg-[#0b101c] rounded-2xl sm:rounded-[32px] p-5 sm:p-8 flex flex-col gap-6 sm:gap-8 shadow-2xl border border-white/[0.03]"
-                    >
-                      {/* HEADER - BENTO TOP */}
-                      <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6">
-                        <div className="flex gap-4 sm:gap-6 items-center">
-                          <div className="h-16 w-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                            <UserPlus className="w-8 h-8 text-white" />
-                          </div>
-                          <div className="space-y-1 min-w-0">
-                            <h3 className="text-xl sm:text-3xl font-bold text-white tracking-tight truncate">{richData?.nombre}</h3>
-                            <div className="flex flex-wrap items-center gap-3">
-                              <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider">
-                                Padrón Activo
-                              </span>
-                              <span className="text-gray-400 text-xs font-mono">C.I. {richData?.ci}</span>
-                              <span className="text-gray-400 text-xs font-mono">• {richData?.celular || 'Sin Celular'}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => {
-                            playTone(500, 80);
-                            setSearchFirstName('');
-                            setSearchLastName('');
-                            setSearchCI('');
-                            setSearchPhone('');
-                            setSearchPerformed(false);
-                            setSearchFoundResult(null);
-                          }}
-                          className="bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl px-5 py-3 text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer shrink-0"
-                        >
-                          <ArrowLeft className="w-4 h-4" />
-                          Volver a Buscar
-                        </motion.button>
-                      </motion.div>
-
-                      {/* BENTO GRID */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-
-                        {/* STATUS - BIG WIDGET */}
-                        <motion.div variants={itemVariants} className="md:col-span-1 bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors relative overflow-hidden">
-                          <div className="space-y-1 z-10">
-                            <h4 className="text-gray-400 text-xs font-mono uppercase tracking-wider font-bold">Nivel de Compromiso</h4>
-                            <div className="flex items-end gap-2">
-                              <span className="text-5xl font-bold text-white tracking-tighter leading-none">
-                                {activity.pct === 100 ? '94' : Math.round(activity.pct)}
-                              </span>
-                              <span className="text-emerald-400 font-mono font-bold text-sm mb-1">/100</span>
-                            </div>
-                          </div>
-                          <div className="mt-8 z-10 space-y-3">
-                            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${activity.pct === 100 ? 94 : Math.round(activity.pct)}%` }}
-                                transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-                                className="h-full bg-emerald-400 rounded-full"
-                              />
-                            </div>
-                            <p className="text-xs text-gray-400 font-medium">Asistencia regular a asambleas. Vigencia comunitaria al día.</p>
-                          </div>
-                        </motion.div>
-
-                        {/* ALARMS & FINANCIALS - 2 SMALLER WIDGETS */}
-                        <div className="md:col-span-1 flex flex-col gap-6">
-                          <motion.div variants={itemVariants} className="flex-1 bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col justify-center group hover:bg-white/[0.04] transition-colors">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                                <Shield className="w-5 h-5 text-blue-400" />
-                              </div>
-                              <div>
-                                <span className="text-2xl font-bold text-white leading-none block mb-1">17</span>
-                                <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider font-bold">Activaciones de Alarma</span>
-                              </div>
-                            </div>
-                          </motion.div>
-                          <motion.div variants={itemVariants} className="flex-1 bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col justify-center group hover:bg-white/[0.04] transition-colors">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
-                                <Coins className="w-5 h-5 text-yellow-400" />
-                              </div>
-                              <div>
-                                <span className="text-2xl font-bold text-white leading-none block mb-1">Al Día</span>
-                                <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider font-bold">Estado Financiero</span>
-                              </div>
-                            </div>
-                          </motion.div>
-                        </div>
-
-                        {/* DOCUMENTS LIST */}
-                        <motion.div variants={itemVariants} className="md:col-span-1 bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors">
-                          <div className="flex justify-between items-center mb-4">
-                            <h4 className="text-gray-400 text-xs font-mono uppercase tracking-wider font-bold">Documentación</h4>
-                            <FileCheck className="w-4 h-4 text-gray-500" />
-                          </div>
-                          <div className="space-y-4 flex-1 flex flex-col justify-center">
-                            {[
-                              { name: 'Minuta / Título', done: richData?.reqMinuta },
-                              { name: 'Cédula de Identidad', done: richData?.reqCI },
-                              { name: 'Croquis Ubicación', done: richData?.reqCroquis },
-                              { name: 'Aporte Afiliación', done: richData?.reqCuota }
-                            ].map((doc, idx) => (
-                              <div key={idx} className="flex justify-between items-center text-sm">
-                                <span className="text-gray-300 text-xs">{doc.name}</span>
-                                {doc.done ? (
-                                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                                ) : (
-                                  <X className="w-4 h-4 text-red-400" />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-
-                      </div>
-
-                      {/* BOTTOM WIDE CHART PLACEHOLDER */}
-                      <motion.div variants={itemVariants} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 h-56 sm:h-64 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors relative overflow-hidden">
-                        <div className="flex justify-between items-center z-10">
-                          <h4 className="text-gray-400 text-xs font-mono uppercase tracking-wider font-bold">Historial de Asistencia (Últimos 6 Meses)</h4>
-                          <span className="text-emerald-400 font-bold text-xs bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20 hidden sm:inline">100% Presencia Global</span>
-                        </div>
-                        <div className="w-full flex-1 flex items-end justify-between mt-6 gap-2 sm:gap-4 z-10">
-                          {[90, 100, 95, 80, 100, 100].map((val, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center gap-3 group/bar">
-                              <div className="w-full h-24 sm:h-32 bg-black/20 rounded-t-lg relative flex items-end justify-center">
-                                <motion.div
-                                  initial={{ height: 0 }}
-                                  animate={{ height: `${val}%` }}
-                                  transition={{ duration: 1, ease: "easeOut", delay: 0.6 + (idx * 0.1) }}
-                                  className="w-full mx-1 sm:mx-4 bg-emerald-500/50 rounded-t-md group-hover/bar:bg-emerald-400 transition-colors relative"
-                                >
-                                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-white opacity-0 group-hover/bar:opacity-100 transition-opacity">
-                                    {val}%
-                                  </div>
-                                </motion.div>
-                              </div>
-                              <span className="text-[10px] font-mono text-gray-500 uppercase font-bold tracking-wider">
-                                {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'][idx]}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </motion.div>
-
-                    </motion.div>
-                  );
-                })()
-              ) : (
-                // RENDERIZA EL FORMULARIO DE BÚSQUEDA NORMAL
-                <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-5 animate-fade-in shadow-xl">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5 col-span-1 sm:col-span-2 md:col-span-1">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono">Nombre</label>
-                      <input
-                        type="text"
-                        placeholder="Ej. Daniel"
-                        value={searchFirstName}
-                        onChange={(e) => {
-                          playTone(1200, 15);
-                          setSearchFirstName(e.target.value);
-                          setSearchPerformed(false);
-                        }}
-                        className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-sans"
-                      />
-                    </div>
-                    <div className="space-y-1.5 col-span-1 sm:col-span-2 md:col-span-1">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono">Apellido</label>
-                      <input
-                        type="text"
-                        placeholder="Ej. Mendez"
-                        value={searchLastName}
-                        onChange={(e) => {
-                          playTone(1200, 15);
-                          setSearchLastName(e.target.value);
-                          setSearchPerformed(false);
-                        }}
-                        className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-sans"
-                      />
-                    </div>
-                    <div className="space-y-1.5 col-span-1 sm:col-span-2 md:col-span-1">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono">Documento de Identidad C.I.</label>
-                      <input
-                        type="text"
-                        placeholder="Ej. 12345678"
-                        value={searchCI}
-                        onChange={(e) => {
-                          playTone(1200, 15);
-                          setSearchCI(e.target.value);
-                          setSearchPerformed(false);
-                        }}
-                        className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-mono"
-                      />
-                    </div>
-                    <div className="space-y-1.5 col-span-1 sm:col-span-2 md:col-span-1">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono">Celular (Opcional)</label>
-                      <input
-                        type="text"
-                        placeholder="Ej. 12345678"
-                        value={searchPhone}
-                        onChange={(e) => {
-                          playTone(1200, 15);
-                          setSearchPhone(e.target.value);
-                          setSearchPerformed(false);
-                        }}
-                        className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row justify-end gap-2 pt-1">
-                    {(searchFirstName || searchLastName || searchCI || searchPhone || searchPerformed) && (
-                      <button
-                        onClick={() => {
-                          playTone(500, 80);
-                          setSearchFirstName('');
-                          setSearchLastName('');
-                          setSearchCI('');
-                          setSearchPhone('');
-                          setSearchPerformed(false);
-                          setSearchFoundResult(null);
-                        }}
-                        className="bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg px-3.5 py-2 text-xs font-bold transition-all font-sans cursor-pointer"
-                      >
-                        Limpiar Consulta
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        if (!searchFirstName.trim() || !searchLastName.trim() || !searchCI.trim()) {
-                          playTone(220, 250);
-                          onShowNotification('⚠️ Error', 'Se exige ingresar Nombre, Apellido y Documento de Identidad C.I. para realizar la búsqueda.');
-                          return;
-                        }
-
-                        const normalizeText = (text: string) => {
-                          if (!text) return '';
-                          return text
-                            .normalize("NFD")
-                            .replace(/[\u0300-\u036f]/g, "")
-                            .toLowerCase()
-                            .trim();
-                        };
-
-                        let found = vecinos.find((v: Vecino) => {
-                          const matchCI = normalizeText(v.ci) === normalizeText(searchCI);
-
-                          const fullNameNormalized = normalizeText(v.nombre);
-                          const fNameNormalized = normalizeText(searchFirstName);
-                          const lNameNormalized = normalizeText(searchLastName);
-
-                          const matchName = fullNameNormalized.includes(fNameNormalized) && fullNameNormalized.includes(lNameNormalized);
-
-                          let matchPhone = true;
-                          if (searchPhone.trim()) {
-                            matchPhone = normalizeText(v.celular) === normalizeText(searchPhone);
-                          }
-
-                          return matchCI && matchName && matchPhone;
-                        });
-
-                        // Bulletproof fallback: if searching for "Daniel Mendez" with C.I. "12345678", always return the model data
-                        if (!found && normalizeText(searchFirstName) === 'daniel' && normalizeText(searchLastName) === 'mendez' && normalizeText(searchCI) === '12345678') {
-                          found = {
-                            nombre: 'Daniel Mendez',
-                            ci: '12345678',
-                            celular: searchPhone.trim() || '12345678',
-                            calle: 'Calle Las Acacias #44',
-                            estado: 'Activo'
-                          };
-
-                          setVecinos((prev: Vecino[]) => {
-                            if (!prev.some((v: Vecino) => normalizeText(v.ci) === '12345678')) {
-                              return [...prev, found as Vecino];
-                            }
-                            return prev;
-                          });
-                        }
-
-                        setSearchPerformed(true);
-                        if (found) {
-                          playTone(880, 200);
-                          setSearchFoundResult(found);
-                        } else {
-                          playTone(220, 400);
-                          setSearchFoundResult(null);
-                        }
-                      }}
-                      className="bg-[#FFD700] hover:bg-[#ffe16d] text-black font-bold px-5 py-2 rounded-lg text-xs flex items-center justify-center space-x-2 transition-all active:scale-95 shadow-md shadow-[#FFD700]/10 font-sans cursor-pointer"
-                    >
-                      <Search className="w-4 h-4" />
-                      <span>Realizar Búsqueda</span>
-                    </button>
-                  </div>
-
-                  {/* MENSAJE DE VECINO NO ENCONTRADO */}
-                  {searchPerformed && !searchFoundResult && (
-                    <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 sm:p-6 text-center space-y-2 animate-fade-in">
-                      <span className="inline-block mb-1 text-2xl">⚠️</span>
-                      <h4 className="text-sm font-bold text-white font-sans uppercase">Vecino No Encontrado</h4>
-                      <p className="text-xs text-gray-300 max-w-md mx-auto leading-relaxed font-sans">
-                        Por motivos de seguridad, no se encontraron coincidencias exactas con el Nombre <span className="font-sans text-red-400 font-bold">"{searchFirstName} {searchLastName}"</span>, C.I. <span className="font-mono text-red-400 font-bold">"{searchCI}"</span> {searchPhone.trim() && <span>y Celular <span className="font-mono text-red-400 font-bold">"{searchPhone}"</span></span>} en el padrón. Verifique los datos e intente nuevamente.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+            <div className="space-y-[12.2px]">
+              <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">NOMBRE</label>
+                <input
+                  type="text"
+                  placeholder="Ej. Daniel"
+                  className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-sans"
+                />
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">APELLIDO</label>
+                <input
+                  type="text"
+                  placeholder="Ej. Mendez"
+                  className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-sans"
+                />
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">DOCUMENTO DE IDENTIDAD C.I.</label>
+                <input
+                  type="text"
+                  placeholder="Ej. 12345678"
+                  className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-mono"
+                />
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">CELULAR (OPCIONAL)</label>
+                <input
+                  type="text"
+                  placeholder="Ej. 12345678"
+                  className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-mono"
+                />
+              </div>
+              <p className="text-gray-400 text-[11.5px] leading-relaxed max-w-4xl">
+                Este botón exige ingresar de forma obligatoria el Nombre, Apellido y la Cédula de Identidad (C.I.) del vecino, con la opción de ingresar el Celular, para realizar una consulta segura en el padrón. [DATOS DE EJEMPLO PARA PROBAR EL SISTEMA: Nombre: Daniel, Apellido: Mendez, C.I.: 12345678, Celular (opcional): 12345678]
+              </p>
             </div>
           )}
 
@@ -1599,7 +1288,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                         });
                       }
                     }}
-                    className="bg-[#FFD700] hover:bg-[#ffe16d] text-black font-bold px-5 rounded-xl text-xs transition-all active:scale-95 font-sans"
+                    className="bg-[#FFD700] hover:bg-[#ffe16d] text-black font-bold px-5 py-2 rounded-lg text-xs flex items-center justify-center transition-all active:scale-95 shadow-md shadow-[#FFD700]/10 font-sans cursor-pointer"
                   >
                     Verificar Estado
                   </button>
