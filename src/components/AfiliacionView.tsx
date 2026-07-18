@@ -308,6 +308,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [deleteRowData, setDeleteRowData] = useState<any | null>(null);
   const [editRowData, setEditRowData] = useState<any | null>(null);
   const [navHeight, setNavHeight] = useState(0);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const fullListRef = useRef<any[] | null>(null);
   const INITIAL_ROW_COUNT = 5;
 
@@ -1635,8 +1636,12 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                                 return item;
                               }));
                             }}
-                            onFocus={() => setEditingRowId(row.id)}
-                            onBlur={() => setEditingRowId(null)}
+                            onFocus={(e) => {
+                              setEditingRowId(row.id);
+                              setIsKeyboardOpen(true);
+                              setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+                            }}
+                            onBlur={() => { setEditingRowId(null); setIsKeyboardOpen(false); }}
                             className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
                           />
                         </td>
@@ -1669,7 +1674,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
             </div>
 
               {/* Fixed bottom bar */}
-              <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[77px] md:pb-[7.2px]" style={navHeight ? { paddingBottom: `calc(${navHeight}px + env(safe-area-inset-bottom, 0px))` } : {}}>
+              <div className={`fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[77px] md:pb-[7.2px] transition-transform duration-200 ${isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'}`} style={navHeight ? { paddingBottom: `calc(${navHeight}px + env(safe-area-inset-bottom, 0px))` } : {}}>
                 <div className="max-w-5xl mx-auto flex items-center justify-center gap-2">
                   <button
                     onClick={() => {
