@@ -724,7 +724,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
 
               {/* --- FORMULARIO REAL (si hay token y no hay registro reciente) --- */}
               {tokenUsuario && !lastRegistered && (
-                <div className="flex flex-col space-y-5 animate-fade-in">
+                <div className="flex flex-col gap-[12.2px] animate-fade-in">
                   {/* Barra de sesión activa */}
                   <div className="flex justify-between items-center bg-white/[0.02] rounded-xl border border-white/10 px-4 py-3">
                     <div className="flex items-center space-x-3 min-w-0">
@@ -753,16 +753,16 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                     </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-[7.2px]">
                     {/* 1. DATOS PERSONALES */}
-                    <div className="bg-white/[0.02] rounded-xl border border-white/10 p-4 sm:p-5 space-y-4">
+                    <div className="bg-white/[0.02] rounded-xl border border-white/10 pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px]">
                       <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
                         <User className="h-4 w-4 text-brand-green" />
                         <span>DATOS PERSONALES</span>
                       </h3>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-[7.2px]">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Nombres *</label>
                           <div className="relative">
                             <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -777,7 +777,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Apellidos *</label>
                           <div className="relative">
                             <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -792,7 +792,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">C.I. Identidad *</label>
                           <div className="relative">
                             <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -807,7 +807,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Fecha de Nacimiento *</label>
                           <div className="relative">
                             <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -821,7 +821,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Sexo *</label>
                           <select
                             required
@@ -835,7 +835,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </select>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Estado Civil *</label>
                           <select
                             required
@@ -852,7 +852,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </select>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Profesión / Ocupación *</label>
                           <div className="relative">
                             <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -867,7 +867,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Fecha de Registro</label>
                           <div className="relative">
                             <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -884,14 +884,14 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                     </div>
 
                     {/* 2. CONTACTO Y AFILIACIÓN */}
-                    <div className="bg-white/[0.02] rounded-xl border border-white/10 p-4 sm:p-5 space-y-4">
+                    <div className="bg-white/[0.02] rounded-xl border border-white/10 pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px]">
                       <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
                         <Smartphone className="h-4 w-4 text-brand-green" />
                         <span>CONTACTO Y AFILIACIÓN</span>
                       </h3>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-[7.2px]">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Teléfono-Celular *</label>
                           <div className="relative">
                             <Smartphone className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -906,7 +906,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Correo Electrónico *</label>
                           <div className="relative">
                             <Mail className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -921,7 +921,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Fecha de Afiliación *</label>
                           <div className="relative">
                             <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -935,7 +935,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Número de Afiliado *</label>
                           <input
                             type="text"
@@ -947,7 +947,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           />
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Estado de Afiliación *</label>
                           <select
                             required
@@ -962,7 +962,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </select>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Tipo de Afiliado *</label>
                           <input
                             type="text"
@@ -974,7 +974,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           />
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Monto Pagado (Bs.) *</label>
                           <div className="relative">
                             <FileText className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -989,7 +989,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Número de Recibo *</label>
                           <input
                             type="text"
@@ -1001,7 +1001,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           />
                         </div>
 
-                        <div className="space-y-1 md:col-span-2">
+                        <div className="flex flex-col gap-[7.2px] md:col-span-2">
                           <label className="text-gray-400 text-xs">Observaciones</label>
                           <textarea
                             rows={3}
@@ -1015,14 +1015,14 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                     </div>
 
                     {/* 3. UBICACIÓN Y VIVIENDA */}
-                    <div className="bg-white/[0.02] rounded-xl border border-white/10 p-4 sm:p-5 space-y-4">
+                    <div className="bg-white/[0.02] rounded-xl border border-white/10 pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px]">
                       <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
                         <MapPin className="h-4 w-4 text-brand-green" />
                         <span>UBICACIÓN Y VIVIENDA</span>
                       </h3>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1 md:col-span-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-[7.2px]">
+                        <div className="flex flex-col gap-[7.2px] md:col-span-2">
                           <label className="text-gray-400 text-xs">Dirección *</label>
                           <div className="relative">
                             <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -1037,7 +1037,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Número de Casa *</label>
                           <div className="relative">
                             <Home className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -1052,7 +1052,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Manzano *</label>
                           <div className="relative">
                             <Home className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -1067,7 +1067,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Zona *</label>
                           <div className="relative">
                             <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -1082,7 +1082,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-[7.2px]">
                           <label className="text-gray-400 text-xs">Referencia *</label>
                           <div className="relative">
                             <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -1097,7 +1097,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </div>
                         </div>
 
-                        <div className="space-y-1 md:col-span-2">
+                        <div className="flex flex-col gap-[7.2px] md:col-span-2">
                           <label className="text-gray-400 text-xs">Tiempo de Residencia *</label>
                           <div className="relative">
                             <Clock className="absolute left-3 top-3.5 h-4 w-4 text-gray-500" />
@@ -1115,15 +1115,15 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                     </div>
 
                     {/* 4. PARTICIPACIÓN VECINAL */}
-                    <div className="bg-white/[0.02] rounded-xl border border-white/10 p-4 sm:p-5 space-y-4">
+                    <div className="bg-white/[0.02] rounded-xl border border-white/10 pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px]">
                       <h3 className="text-brand-green font-bold text-xs uppercase tracking-wider flex items-center space-x-2 pb-2.5 border-b border-gray-900">
                         <Users className="h-4 w-4 text-brand-green" />
                         <span>PARTICIPACIÓN COMUNITARIA</span>
                       </h3>
 
-                      <div className="space-y-4 text-xs select-none">
+                      <div className="flex flex-col gap-[7.2px] text-xs select-none">
                         <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-gray-900">
-                          <div className="space-y-0.5">
+                          <div className="flex flex-col gap-[7.2px]">
                             <p className="text-white font-semibold">¿Participa en Reuniones? *</p>
                             <p className="text-gray-500 text-[11px]">Compromiso con asambleas ordinarias y zonales</p>
                           </div>
@@ -1143,7 +1143,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                         </div>
 
                         <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-gray-900">
-                          <div className="space-y-0.5">
+                          <div className="flex flex-col gap-[7.2px]">
                             <p className="text-white font-semibold">¿Desea formar parte de Comisiones? *</p>
                             <p className="text-gray-500 text-[11px]">Comisiones de seguridad, deportes u obras</p>
                           </div>
@@ -1162,8 +1162,8 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                           </button>
                         </div>
 
-                        <div className="space-y-1.5 pt-1">
-                          <p className="text-gray-400 font-semibold mb-1">Interés en Comisión de Seguridad *</p>
+                        <div className="flex flex-col gap-[7.2px]">
+                          <p className="text-gray-400 font-semibold">Interés en Comisión de Seguridad *</p>
                           <div className="grid grid-cols-3 gap-2">
                             {['Bajo', 'Medio', 'Alto'].map((lvl) => (
                               <button
@@ -1250,12 +1250,11 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 3: Estado de Afiliación (MOCK) =========== */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 3 && (
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-4 animate-fade-in shadow-xl">
-              <div className="space-y-3">
-                <p className="text-xs text-gray-300 leading-relaxed">
-                  Ingrese su número celular de 8 dígitos para corroborar si está registrado en el padrón del barrio y habilitado para activar/desactivar la sirena disuasiva de Tarija.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Ingrese su número celular de 8 dígitos para corroborar si está registrado en el padrón del barrio y habilitado para activar/desactivar la sirena disuasiva de Tarija.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-[7.2px]">
                   <input
                     type="text"
                     maxLength={8}
@@ -1295,7 +1294,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                 </div>
 
                 {statusCheckResult && (
-                  <div className="mt-4 animate-fade-in">
+                  <div className="animate-fade-in">
                     {statusCheckResult.found ? (
                       // DASHBOARD PREMIUM DE AFILIACIÓN CON FRAMER MOTION
                       (() => {
@@ -1529,7 +1528,6 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                     )}
                   </div>
                 )}
-              </div>
             </div>
           )}
 
@@ -1537,7 +1535,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 4: Tomar Lista de Reunión barrial (MOCK) == */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 4 && (
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-4 animate-fade-in shadow-xl">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
               <p className="text-xs text-gray-300 font-sans leading-relaxed">
                 Ingrese nombres y apellidos de los vecinos de forma manual en las celdas de abajo. El sistema registrará la fecha y la hora exacta de ingreso en el mismo instante en que comience a escribir.
               </p>
@@ -1624,7 +1622,7 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
                 </table>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-white/5 gap-4">
+              <div className="flex items-center justify-between pt-[7.2px] border-t border-white/5 gap-[7.2px]">
                 <div className="flex space-x-2">
                   <button
                     onClick={() => {
@@ -1648,12 +1646,12 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 5: Requisitos para la afiliación ========== */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 5 && (
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-4 animate-fade-in shadow-xl">
-              <h3 className="text-white font-bold text-base sm:text-lg mb-4 flex items-center gap-2">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+              <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-[#FFD700]" />
                 Requisitos para Afiliación a la Junta de Vecinos
               </h3>
-              <ul className="space-y-3 text-sm text-gray-300">
+              <ul className="flex flex-col gap-[7.2px] text-sm text-gray-300">
                 <li className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#FFD700] mt-1.5 shrink-0" />
                   <span>Fotocopia de Cédula de Identidad del propietario.</span>
@@ -1678,12 +1676,12 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 6: Requisitos Luz (SETAR) ================= */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 6 && (
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-4 animate-fade-in shadow-xl">
-              <h3 className="text-white font-bold text-base sm:text-lg mb-4 flex items-center gap-2">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+              <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
                 <Zap className="w-5 h-5 text-[#FFD700]" />
                 Requisitos Solicitud de Luz (SETAR)
               </h3>
-              <ul className="space-y-3 text-sm text-gray-300">
+              <ul className="flex flex-col gap-[7.2px] text-sm text-gray-300">
                 <li className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#FFD700] mt-1.5 shrink-0" />
                   <span>Fotocopia de Cédula de Identidad del titular.</span>
@@ -1708,12 +1706,12 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 7: Requisitos Agua Potable (COSAALT) ====== */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 7 && (
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-4 animate-fade-in shadow-xl">
-              <h3 className="text-white font-bold text-base sm:text-lg mb-4 flex items-center gap-2">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+              <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
                 <Droplet className="w-5 h-5 text-[#FFD700]" />
                 Requisitos Agua Potable (COSAALT)
               </h3>
-              <ul className="space-y-3 text-sm text-gray-300">
+              <ul className="flex flex-col gap-[7.2px] text-sm text-gray-300">
                 <li className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#FFD700] mt-1.5 shrink-0" />
                   <span>Fotocopia de Cédula de Identidad.</span>
@@ -1738,12 +1736,12 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
           {/* === ACCIÓN 8: Requisitos Gas Domiciliario (EMTAGAS) == */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 8 && (
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 space-y-4 animate-fade-in shadow-xl">
-              <h3 className="text-white font-bold text-base sm:text-lg mb-4 flex items-center gap-2">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+              <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
                 <Flame className="w-5 h-5 text-[#FFD700]" />
                 Requisitos Gas Domiciliario (EMTAGAS)
               </h3>
-              <ul className="space-y-3 text-sm text-gray-300">
+              <ul className="flex flex-col gap-[7.2px] text-sm text-gray-300">
                 <li className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#FFD700] mt-1.5 shrink-0" />
                   <span>Fotocopia de C.I. vigente.</span>
