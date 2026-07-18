@@ -1639,10 +1639,9 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
-                                const inputs = e.currentTarget.closest('tbody')?.querySelectorAll('input[type="text"]');
-                                if (!inputs) return;
-                                const currentIdx = Array.from(inputs).indexOf(e.currentTarget);
-                                const nextInput = inputs[currentIdx + 1];
+                                const trs = e.currentTarget.closest('tbody')?.querySelectorAll('tr');
+                                if (!trs || idx + 1 >= trs.length) return;
+                                const nextInput = trs[idx + 1]?.querySelector('input[type="text"]');
                                 if (nextInput) {
                                   nextInput.focus();
                                   nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
