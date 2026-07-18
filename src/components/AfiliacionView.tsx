@@ -1636,6 +1636,19 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
                             }}
                             onBlur={() => { setEditingRowId(null); setIsKeyboardOpen(false); }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const inputs = e.currentTarget.closest('tbody')?.querySelectorAll('input[type="text"]');
+                                if (!inputs) return;
+                                const currentIdx = Array.from(inputs).indexOf(e.currentTarget);
+                                const nextInput = inputs[currentIdx + 1];
+                                if (nextInput) {
+                                  nextInput.focus();
+                                  nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                              }
+                            }}
                             className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
                           />
                         </td>
