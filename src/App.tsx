@@ -563,7 +563,7 @@ export default function App() {
       </div>
 
       {/* -------------------- BOTTOM NAVIGATION BAR (MOBILE ONLY) -------------------- */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-1.5 tall:py-3 flex justify-around items-center z-40">
+      <nav id="bottom-nav" className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-1.5 tall:py-3 flex justify-around items-center z-40">
         <div className="w-full max-w-md mx-auto flex justify-around items-center">
           <button onClick={() => navigateToTab('alarma')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Siren className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />

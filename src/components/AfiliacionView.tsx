@@ -307,8 +307,19 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [deleteRowData, setDeleteRowData] = useState<any | null>(null);
   const [editRowData, setEditRowData] = useState<any | null>(null);
+  const [navHeight, setNavHeight] = useState(0);
   const fullListRef = useRef<any[] | null>(null);
   const INITIAL_ROW_COUNT = 5;
+
+  useEffect(() => {
+    const nav = document.getElementById('bottom-nav');
+    if (!nav) return;
+    const measure = () => setNavHeight(nav.getBoundingClientRect().height);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, []);
 
   const getNextRowNum = (list: any[]) => list.reduce((max, r) => Math.max(max, r.num || 0), 0) + 1;
 
@@ -1658,7 +1669,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
             </div>
 
               {/* Fixed bottom bar */}
-              <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[calc(77px+env(safe-area-inset-bottom))] tall:pb-[calc(93px+env(safe-area-inset-bottom))] md:pb-[7.2px]">
+              <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[77px] md:pb-[7.2px]" style={navHeight ? { paddingBottom: `calc(${navHeight}px + env(safe-area-inset-bottom, 0px))` } : {}}>
                 <div className="max-w-5xl mx-auto flex items-center justify-center gap-2">
                   <button
                     onClick={() => {
