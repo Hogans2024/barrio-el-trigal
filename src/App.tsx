@@ -530,7 +530,7 @@ export default function App() {
         </header>
 
         {/* Central scrolling panel area */}
-        <main ref={mainScrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:p-8 scrollbar-none relative w-full pb-28 md:pb-8 -mt-px">
+        <main ref={mainScrollRef} className={`flex-1 overflow-y-auto px-4 scrollbar-none relative w-full pb-28 md:pb-8 -mt-px ${isAfiliadoActionActive ? 'pt-0 md:pt-0 md:px-8' : 'py-6 md:p-8'}`}>
           <div className="relative z-10 w-full max-w-5xl mx-auto">
             {/* Banner sutil si falló la carga del JSON dinámico (se sigue mostrando data fallback) */}
             {error && (

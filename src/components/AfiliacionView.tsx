@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import {
   ChevronLeft,
@@ -289,11 +289,23 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [statusCheckResult, setStatusCheckResult] = useState<{ found: boolean; name?: string; phone?: string; ci?: string; address?: string } | null>(null);
 
   // Manual attendance list state for action 4 (botón 4)
-  const [manualAttendanceList, setManualAttendanceList] = useState<any[]>([
-    { id: '1', nombre: '', fecha: '', hora: '' },
-    { id: '2', nombre: '', fecha: '', hora: '' },
-    { id: '3', nombre: '', fecha: '', hora: '' },
-  ]);
+  const [manualAttendanceList, setManualAttendanceList] = useState<any[]>(
+    Array.from({ length: 10 }, (_, i) => ({
+      id: String(i + 1),
+      num: i + 1,
+      nombre: '',
+      fecha: '',
+      hora: ''
+    }))
+  );
+
+  const [showBatchModal, setShowBatchModal] = useState(false);
+  const [batchModalCount, setBatchModalCount] = useState('');
+  const [addedRowsHidden, setAddedRowsHidden] = useState(false);
+  const fullListRef = useRef<any[] | null>(null);
+  const INITIAL_ROW_COUNT = 5;
+
+  const getNextRowNum = (list: any[]) => list.reduce((max, r) => Math.max(max, r.num || 0), 0) + 1;
 
   // Helper to get affiliation date
   const getAffiliationDate = (v: any) => {
@@ -391,7 +403,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   };
 
   return (
-    <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-4">
+    <div className={`flex flex-col ${activeAfiliadoAction !== null ? 'space-y-0' : 'space-y-2.5 tall:space-y-4 sm:space-y-4'}`}>
 
       {/* ============ 1. CARRUSEL HERO ============ */}
       {activeAfiliadoAction !== null ? null : (
@@ -548,17 +560,15 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           </>
         )}
 
-        {/* ============ PANEL DINÁMICO DE DETALLE POR BOTÓN ============ */}
-        <section className="pb-8 sm:pb-10">
-          {activeAfiliadoAction !== null && (
-            <div className="-mt-6">
+          {/* ============ PANEL DINÁMICO DE DETALLE POR BOTÓN ============ */}
+          <section className="pb-8 sm:pb-10">
+            {activeAfiliadoAction !== null && (
+            <div style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#070707' }}>
               <div className="flex items-center justify-between border-b border-white/10 py-[12.2px] mb-[12.2px] select-none animate-fade-in">
                 <button
                   onClick={() => {
                     playTone(500, 80);
                     setActiveAfiliadoAction(null);
-                    // Al salir del botón 1, NO tocamos tokenUsuario (se mantiene la sesión
-                    // si el usuario ya se logueó; puede volver sin re-autenticarse).
                     setSearchFirstName('');
                     setSearchLastName('');
                     setSearchCI('');
@@ -593,7 +603,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                   {activeAfiliadoAction === 1 && 'Este botón permite registrar de forma oficial a un nuevo vecino de la urbanización El Trigal. Requiere autenticación con Google y envía los datos directamente a la base de datos central (hoja "Datos_Afiliacion").'}
 
                   {activeAfiliadoAction === 3 && 'Este botón permite consultar la vigencia de la afiliación de un vecino introduciendo su número de teléfono celular de 8 dígitos. Muestra de forma interactiva si el vecino está plenamente habilitado en la central de alarmas.'}
-                  {activeAfiliadoAction === 4 && 'Este botón abre un formulario con celdas para registrar de manera manual y personalizada la asistencia a la reunión vecinal. El administrador escribe los nombres de forma manual, y el sistema genera automáticamente la fecha y hora exacta de registro.'}
+
                   {activeAfiliadoAction === 5 && 'Consulte aquí los requisitos generales y documentación requerida para afiliarse formalmente a la junta de vecinos de El Trigal.'}
                   {activeAfiliadoAction === 6 && 'Guía de requisitos y trámites necesarios para la instalación del servicio de energía eléctrica ante Servicios Eléctricos de Tarija (SETAR).'}
                   {activeAfiliadoAction === 7 && 'Información de documentación indispensable para tramitar la conexión de agua potable ante la cooperativa COSAALT.'}
@@ -1220,7 +1230,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {/* ====================================================== */}
           {activeAfiliadoAction === 2 && (
             <div className="space-y-[12.2px]">
-              <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[60px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">NOMBRE</label>
                 <input
                   type="text"
@@ -1541,6 +1551,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {/* === ACCIÓN 4: Tomar Lista de Reunión barrial (MOCK) == */}
           {/* ====================================================== */}
           {activeAfiliadoAction === 4 && (
+            <>
             <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
               <p className="text-xs text-gray-300 font-sans leading-relaxed">
                 Ingrese nombres y apellidos de los vecinos de forma manual en las celdas de abajo. El sistema registrará la fecha y la hora exacta de ingreso en el mismo instante en que comience a escribir.
@@ -1561,7 +1572,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                     {manualAttendanceList.map((row, idx) => (
                       <tr key={row.id} className="hover:bg-white/[0.01] transition-colors">
                         <td className="p-3 text-center font-mono text-gray-500 text-[11px]">
-                          {idx + 1}
+                          {row.num}
                         </td>
                         <td className="p-2">
                           <input
@@ -1611,7 +1622,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             onClick={() => {
                               playTone(300, 80);
                               if (manualAttendanceList.length <= 1) {
-                                setManualAttendanceList([{ id: String(Date.now()), nombre: '', fecha: '', hora: '' }]);
+                                setManualAttendanceList([{ id: String(Date.now()), num: 1, nombre: '', fecha: '', hora: '' }]);
                               } else {
                                 setManualAttendanceList(prev => prev.filter(item => item.id !== row.id));
                               }
@@ -1628,24 +1639,113 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                 </table>
               </div>
 
-              <div className="flex items-center justify-between pt-[7.2px] border-t border-white/5 gap-[7.2px]">
-                <div className="flex space-x-2">
+            </div>
+
+              {/* Fixed bottom bar */}
+              <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[77px] tall:pb-[93px] md:pb-[7.2px]">
+                <div className="max-w-5xl mx-auto flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      playTone(500, 80);
+                      setBatchModalCount('');
+                      setShowBatchModal(true);
+                    }}
+                    className="inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40 hover:bg-[#FFD700]/20 transition"
+                  >
+                    Crear Filas
+                  </button>
                   <button
                     onClick={() => {
                       playTone(700, 80);
                       setManualAttendanceList(prev => [
                         ...prev,
-                        { id: String(Date.now()), nombre: '', fecha: '', hora: '' }
+                        { id: String(Date.now()), num: getNextRowNum(prev), nombre: '', fecha: '', hora: '' }
                       ]);
                     }}
-                    className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white rounded-lg px-3 py-1.5 text-xs font-bold font-sans transition-all flex items-center space-x-1.5 cursor-pointer"
+                    className="inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/20 transition"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>Añadir Fila de Vecino</span>
+                    <span>Añadir Fila</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      playTone(500, 80);
+                      if (addedRowsHidden) {
+                        setManualAttendanceList(fullListRef.current || []);
+                        fullListRef.current = null;
+                        setAddedRowsHidden(false);
+                      } else {
+                        fullListRef.current = manualAttendanceList;
+                        setManualAttendanceList(prev => prev.filter(row => !row.nombre.trim()));
+                        setAddedRowsHidden(true);
+                      }
+                    }}
+                    className={`inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition ${
+                      addedRowsHidden
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/20'
+                        : 'bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20'
+                    }`}
+                  >
+                    {addedRowsHidden ? 'Ver Añadidos' : 'Ocultar Añadidos'}
                   </button>
                 </div>
               </div>
-            </div>
+
+              {/* Modal para crear filas */}
+              {showBatchModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                  <div className="bg-[#121212] border border-[#FFD700]/20 rounded-2xl p-6 w-[280px] shadow-2xl animate-fade-in flex flex-col gap-4">
+                    <h3 className="text-white text-sm font-bold text-center">¿Cuántas filas crear?</h3>
+                    <input
+                      type="number"
+                      min="1"
+                      max="999"
+                      value={batchModalCount}
+                      onChange={(e) => setBatchModalCount(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Ej. 10"
+                      className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white text-center font-mono focus:outline-none focus:border-[#FFD700] placeholder-gray-600"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          playTone(400, 80);
+                          setShowBatchModal(false);
+                        }}
+                        className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => {
+                          const count = parseInt(batchModalCount, 10);
+                          if (!count || count < 1) {
+                            onShowNotification('⚠️ Cantidad inválida', 'Ingrese un número válido de filas a crear.');
+                            return;
+                          }
+                          playTone(700, 80);
+                          setManualAttendanceList(prev => {
+                            let nextNum = getNextRowNum(prev);
+                            const newRows = Array.from({ length: count }, () => ({
+                              id: String(Date.now() + nextNum),
+                              num: nextNum++,
+                              nombre: '',
+                              fecha: '',
+                              hora: ''
+                            }));
+                            return [...prev, ...newRows];
+                          });
+                          setShowBatchModal(false);
+                        }}
+                        className="flex-1 bg-[#FFD700] hover:bg-[#ffe16d] text-black font-bold rounded-xl py-2.5 text-xs transition-all active:scale-95 cursor-pointer"
+                      >
+                        Crear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* ====================================================== */}
