@@ -304,12 +304,12 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [batchModalCount, setBatchModalCount] = useState('');
   const [addedRowsHidden, setAddedRowsHidden] = useState(false);
-  const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [deleteRowData, setDeleteRowData] = useState<any | null>(null);
   const [editRowData, setEditRowData] = useState<any | null>(null);
   const [navHeight, setNavHeight] = useState(0);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [hideInstruction, setHideInstruction] = useState(false);
+  const [modalEditRowId, setModalEditRowId] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeAfiliadoAction === 4) setHideInstruction(false);
@@ -1606,52 +1606,20 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                         <td className="px-1 py-2 text-center font-mono text-gray-500 text-[11px]">
                           {row.num}
                         </td>
-                        <td className="px-0" colSpan={editingRowId === row.id ? 2 : undefined}>
+                        <td className="px-0">
                           <input
                             type="text"
+                            readOnly
                             placeholder="Escriba nombres y apellidos del vecino..."
                             value={row.nombre}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setManualAttendanceList(prev => prev.map(item => {
-                                if (item.id === row.id) {
-                                  const now = new Date();
-                                  const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                                  const dateStr = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                                  return {
-                                    ...item,
-                                    nombre: val,
-                                    fecha: item.fecha || dateStr,
-                                    hora: item.hora || timeStr
-                                  };
-                                }
-                                return item;
-                              }));
-                            }}
-                            onFocus={(e) => {
+                            onFocus={() => {
                               setHideInstruction(true);
-                              setEditingRowId(row.id);
+                              setModalEditRowId(row.id);
                               setIsKeyboardOpen(true);
-                              const container = e.currentTarget.closest('.overflow-auto');
-                              if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
                             }}
-                            onBlur={() => { setEditingRowId(null); setIsKeyboardOpen(false); }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const trs = e.currentTarget.closest('tbody')?.querySelectorAll('tr');
-                                if (!trs || idx + 1 >= trs.length) return;
-                                const nextInput = trs[idx + 1]?.querySelector('input[type="text"]');
-                                if (nextInput) {
-                                  nextInput.focus();
-                                  nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                              }
-                            }}
-                            className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
+                            className="w-full bg-black/30 border border-white/5 hover:border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium cursor-pointer"
                           />
                         </td>
-                        {!(editingRowId === row.id) && (
                         <td className="pr-1 py-2 text-center">
                           <div className="flex items-center justify-center gap-0">
                             <button
@@ -1678,7 +1646,6 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             </button>
                           </div>
                         </td>
-                        )}
                         <td className="px-1 py-2 font-mono text-gray-400 text-xs">
                           {row.nombre ? (
                             <span className="bg-white/5 px-2.5 py-1 rounded border border-white/5 text-gray-300 font-semibold">
@@ -1917,6 +1884,78 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                   </div>
                 </div>
               )}
+
+              {modalEditRowId && (() => {
+                const modalRow = manualAttendanceList.find(r => r.id === modalEditRowId);
+                if (!modalRow) return null;
+                const modalIdx = manualAttendanceList.indexOf(modalRow);
+                return (
+                  <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/60 backdrop-blur-sm" onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}>
+                    <div className="bg-[#121212] border border-[#FFD700]/20 rounded-2xl p-5 w-[320px] shadow-2xl animate-fade-in flex flex-col gap-4" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center gap-2 text-xs text-gray-400 font-mono">
+                        <span className="text-gray-500">Nro</span>
+                        <span className="text-white font-semibold">{modalRow.num}</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-gray-500 font-mono text-xs">Nombres y Apellidos</span>
+                        <input
+                          type="text"
+                          value={modalRow.nombre}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setManualAttendanceList(prev => prev.map(item => {
+                              if (item.id === modalRow.id) {
+                                const now = new Date();
+                                const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                                const dateStr = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                return { ...item, nombre: val, fecha: item.fecha || dateStr, hora: item.hora || timeStr };
+                              }
+                              return item;
+                            }));
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const nextRow = manualAttendanceList[modalIdx + 1];
+                              if (nextRow) {
+                                setModalEditRowId(nextRow.id);
+                              } else {
+                                setModalEditRowId(null);
+                                setIsKeyboardOpen(false);
+                              }
+                            }
+                          }}
+                          className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#FFD700] placeholder-gray-700 font-sans"
+                          autoFocus
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}
+                          className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
+                        >
+                          Cerrar
+                        </button>
+                        <button
+                          onClick={() => {
+                            const nextRow = manualAttendanceList[modalIdx + 1];
+                            if (nextRow) {
+                              setModalEditRowId(nextRow.id);
+                            } else {
+                              setModalEditRowId(null);
+                              setIsKeyboardOpen(false);
+                            }
+                          }}
+                          className="flex-1 bg-[#FFD700] hover:bg-yellow-500 text-black rounded-xl py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                        >
+                          {modalIdx + 1 < manualAttendanceList.length ? 'Siguiente \u2192' : 'Listo'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
             </>
           )}
 
