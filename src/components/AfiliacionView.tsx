@@ -1911,7 +1911,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                 if (!modalRow) return null;
                 const modalIdx = manualAttendanceList.indexOf(modalRow);
                 return (
-                  <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/60 backdrop-blur-sm" onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}>
+                  <div key={modalRow.id} className="fixed inset-0 z-50 flex items-start justify-center pt-[30vh] bg-black/60 backdrop-blur-sm" onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}>
                     <div className="bg-black/20 border border-white/5 rounded-xl w-[340px] shadow-2xl animate-fade-in overflow-hidden" onClick={e => e.stopPropagation()}>
                       <div className="bg-[#070707] px-3 py-2.5 flex items-center gap-3 border-b border-white/5">
                         <span className="text-gray-500 font-mono text-[11px] text-center w-8 shrink-0">{modalRow.num}</span>
