@@ -41,6 +41,7 @@ import { playTone } from './AudioSiren';
 
 interface AfiliacionViewProps {
   onShowNotification: (title: string, message: string) => void;
+  onAfiliadoActionChange?: (isActive: boolean) => void;
 }
 
 // ============================================================
@@ -70,7 +71,7 @@ function decodificarJWT(token: string) {
   }
 }
 
-export default function AfiliacionView({ onShowNotification }: AfiliacionViewProps) {
+export default function AfiliacionView({ onShowNotification, onAfiliadoActionChange }: AfiliacionViewProps) {
   const currentSlides = AFILIADOS_SLIDES;
 
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -168,6 +169,11 @@ export default function AfiliacionView({ onShowNotification }: AfiliacionViewPro
       }
     }
   }, [tokenUsuario, onShowNotification, activeAfiliadoAction]);
+
+  // Notificar a App.tsx cuando se activa/desactiva una sub-acción
+  useEffect(() => {
+    onAfiliadoActionChange?.(activeAfiliadoAction !== null);
+  }, [activeAfiliadoAction, onAfiliadoActionChange]);
 
   const handleLogout = () => {
     setTokenUsuario(null);

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Siren, LayoutGrid, Calendar, Users, Heart, Store, PlusSquare,
-  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, ChevronRight, Newspaper, Pill, PawPrint, Building2, Phone, AlertTriangle
+  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, Newspaper, Pill, PawPrint, Building2, Phone, AlertTriangle
 } from 'lucide-react';
 
 // Sub-views
@@ -53,6 +53,28 @@ export default function App() {
   const searchRef = useRef<HTMLDivElement>(null);
 
   const [highlightCardId, setHighlightCardId] = useState<string | null>(null);
+  const [isAfiliadoActionActive, setIsAfiliadoActionActive] = useState(false);
+  const [navHistory, setNavHistory] = useState<string[]>(['alarma']);
+  const backHandlerRef = useRef<(() => boolean) | null>(null);
+
+  const registerBackHandler = useCallback((handler: (() => boolean) | null) => {
+    backHandlerRef.current = handler;
+  }, []);
+
+  const navigateToTab = (tab: string) => {
+    setNavHistory(prev => prev[prev.length - 1] !== tab ? [...prev, tab] : prev);
+    setActiveTab(tab);
+  };
+
+  const goBackTab = () => {
+    if (backHandlerRef.current?.()) return;
+    if (navHistory.length > 1) {
+      const newHistory = [...navHistory];
+      newHistory.pop();
+      setActiveTab(newHistory[newHistory.length - 1]);
+      setNavHistory(newHistory);
+    }
+  };
 
   const sectionIcons: Record<string, React.ReactNode> = {
     farmacias: <Pill className="h-4 w-4 text-emerald-400" />,
@@ -250,6 +272,7 @@ export default function App() {
     const handler = (e: Event) => {
       const customEvent = e as CustomEvent;
       setActiveTab(customEvent.detail);
+      setNavHistory(prev => prev[prev.length - 1] !== customEvent.detail ? [...prev, customEvent.detail] : prev);
     };
     window.addEventListener('navigate', handler);
     return () => window.removeEventListener('navigate', handler);
@@ -290,7 +313,7 @@ export default function App() {
             ].map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => navigateToTab(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition cursor-pointer ${
                   activeTab === item.id 
                     ? 'bg-brand-yellow text-gray-950 font-bold shadow-md' 
@@ -317,39 +340,42 @@ export default function App() {
         {/* APP STATUS HEADER (Mobile & Desktop) */}
         <header className="relative z-30 bg-[#070707]/85 px-5 py-0 flex items-center shrink-0 backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.08)] will-change-transform">
           
-          {/* Left: Back button (non-Alarma) / Logo (Alarma) */}
+          {/* Left: Back button with text (non-Alarma, excepto cuando hay sub-acción activa en Afiliación) / Logo (Alarma) */}
           <div className={`${activeTab === 'alarma' ? 'flex-none' : 'flex-1'} flex justify-start items-center`}>
-            {activeTab !== 'alarma' ? (
+            {activeTab !== 'alarma' && !(activeTab === 'afiliacion' && isAfiliadoActionActive) ? (
               <button
-                onClick={() => setActiveTab('alarma')}
-                className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-gradient-to-b from-[#1a1a1d] to-[#0C0C0E] border border-[#2a3547] hover:border-[#686D75] cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 shadow-lg shadow-black/40"
+                onClick={goBackTab}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-b from-[#1a1a1d] to-[#0C0C0E] border border-[#2a3547] hover:border-[#686D75] cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 shadow-lg shadow-black/40"
                 title="Volver"
               >
                 <ChevronLeft className="w-[18px] h-[18px] text-[#D1D5DB]" />
+                <span className="text-[11px] text-[#D1D5DB] font-semibold font-sans">Volver Atrás</span>
               </button>
             ) : (
-              <>
-                <div className="flex items-center space-x-2.5 md:hidden">
-                    <span>
-                    <img 
-                      src={`${import.meta.env.BASE_URL}logo_01.svg`} 
-                      alt="Logo Barrio El Trigal" 
-                      className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
-                    />
-                  </span>
-                  <div className="relative">
-                    <div className="flex flex-col space-y-[2px]">
-                      <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
-                      <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
+              activeTab === 'alarma' && (
+                <>
+                  <div className="flex items-center space-x-2.5 md:hidden">
+                      <span>
+                      <img 
+                        src={`${import.meta.env.BASE_URL}logo_01.svg`} 
+                        alt="Logo Barrio El Trigal" 
+                        className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
+                      />
+                    </span>
+                    <div className="relative">
+                      <div className="flex flex-col space-y-[2px]">
+                        <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
+                        <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="hidden md:flex items-center space-x-2">
-                  <Activity className="h-5 w-5 text-brand-green animate-pulse" />
-                  <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
-                  <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
-                </div>
-              </>
+                  <div className="hidden md:flex items-center space-x-2">
+                    <Activity className="h-5 w-5 text-brand-green animate-pulse" />
+                    <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
+                    <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
+                  </div>
+                </>
+              )
             )}
           </div>
 
@@ -441,6 +467,7 @@ export default function App() {
                                       setIsSearchFocused(false);
                                       setHighlightCardId(`${r.section}::${r.id}`);
                                       setActiveTab(r.section);
+                                      setNavHistory(prev => prev[prev.length - 1] !== r.section ? [...prev, r.section] : prev);
                                     }}
                                     className="w-full text-left px-4 py-2.5 hover:bg-white/[0.03] transition cursor-pointer border-b border-white/[0.02] last:border-b-0"
                                   >
@@ -521,14 +548,14 @@ export default function App() {
               </div>
             ) : (
               <>
-            {activeTab === 'alarma' && <AlarmaView onNavigate={setActiveTab} onShowNotification={addToast} />}
-            {activeTab === 'proyectos' && <ProyectosView projects={proyectos} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'alarma' && <AlarmaView onNavigate={navigateToTab} onShowNotification={addToast} />}
+            {activeTab === 'proyectos' && <ProyectosView projects={proyectos} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} onRegisterBackHandler={registerBackHandler} />}
             {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'noticias' && <NoticiasView noticias={noticias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
-            {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} />}
+            {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} onAfiliadoActionChange={setIsAfiliadoActionActive} />}
               </>
             )}
           </div>
@@ -538,23 +565,23 @@ export default function App() {
       {/* -------------------- BOTTOM NAVIGATION BAR (MOBILE ONLY) -------------------- */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-xl border-t border-gray-900/80 px-2 py-1.5 tall:py-3 flex justify-around items-center z-40">
         <div className="w-full max-w-md mx-auto flex justify-around items-center">
-          <button onClick={() => setActiveTab('alarma')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
+          <button onClick={() => navigateToTab('alarma')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'alarma' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Siren className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Alarma</span>
           </button>
-          <button onClick={() => setActiveTab('proyectos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
+          <button onClick={() => navigateToTab('proyectos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'proyectos' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <LayoutGrid className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Proyectos</span>
           </button>
-          <button onClick={() => setActiveTab('eventos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
+          <button onClick={() => navigateToTab('eventos')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'eventos' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Calendar className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Eventos</span>
           </button>
-          <button onClick={() => setActiveTab('noticias')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'noticias' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
+          <button onClick={() => navigateToTab('noticias')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'noticias' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Newspaper className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Noticias</span>
           </button>
-          <button onClick={() => setActiveTab('afiliacion')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
+          <button onClick={() => navigateToTab('afiliacion')} className={`flex flex-col items-center p-1 tall:p-2 focus:outline-none transition cursor-pointer select-none ${activeTab === 'afiliacion' ? 'text-brand-yellow scale-110' : 'text-white'}`}>
             <Users className="h-5 w-5 tall:h-6 tall:w-6 mb-0.5 tall:mb-1" />
             <span className="text-[9px] tall:text-[10px] font-bold tracking-tight">Afiliación</span>
           </button>
@@ -588,7 +615,7 @@ export default function App() {
             </div>
             <div className="space-y-2 text-sm font-semibold">
               {[['alarma','🚨 Central Alarma Vecinal'],['proyectos','🧱 Proyectos del Barrio'],['eventos','📆 Eventos programados'],['noticias','📰 Noticias'],['farmacias','💊 Farmacias de Turno'],['negocios','🍔 Negocios Locales'],['mascotas','🐾 Mascotas Perdidas'],['afiliacion','📝 Registro de Afiliados']].map(([id,label]) => (
-                <button key={id} onClick={() => { setActiveTab(id); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">{label}</button>
+                <button key={id} onClick={() => { navigateToTab(id); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">{label}</button>
               ))}
               <button onClick={() => { playTone(500, 50); setIsProfileOpen(true); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">👤 Usuario</button>
             </div>

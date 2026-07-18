@@ -6,9 +6,10 @@ interface ProyectosViewProps {
   projects: Project[];
   highlightId?: string | null;
   onClearHighlight?: () => void;
+  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
 }
 
-export default function ProyectosView({ projects, highlightId, onClearHighlight }: ProyectosViewProps) {
+export default function ProyectosView({ projects, highlightId, onClearHighlight, onRegisterBackHandler }: ProyectosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -36,6 +37,18 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight 
     if (match) setActiveProject(match);
     onClearHighlight();
   }, [highlightId]);
+
+  // Register back handler to close detail view when top-bar back button is pressed
+  useEffect(() => {
+    if (activeProject) {
+      onRegisterBackHandler?.(() => {
+        setActiveProject(null);
+        return true;
+      });
+    } else {
+      onRegisterBackHandler?.(null);
+    }
+  }, [activeProject, onRegisterBackHandler]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);
