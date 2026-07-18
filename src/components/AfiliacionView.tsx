@@ -14,6 +14,8 @@ import {
   FileCheck,
   Trash2,
   Plus,
+  Eye,
+  EyeOff,
   Zap,
   Droplet,
   Flame,
@@ -302,6 +304,9 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [batchModalCount, setBatchModalCount] = useState('');
   const [addedRowsHidden, setAddedRowsHidden] = useState(false);
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [deleteRowData, setDeleteRowData] = useState<any | null>(null);
+  const [editRowData, setEditRowData] = useState<any | null>(null);
   const fullListRef = useRef<any[] | null>(null);
   const INITIAL_ROW_COUNT = 5;
 
@@ -1555,25 +1560,49 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {/* ====================================================== */}
           {activeAfiliadoAction === 4 && (
             <>
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pb-[12.2px] px-[7.2px] flex flex-col animate-fade-in shadow-xl">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pb-[12.2px] px-0 flex flex-col animate-fade-in shadow-xl">
               <div className="overflow-auto max-h-[calc(100dvh-320px)] border border-white/5 rounded-xl bg-black/20 custom-scrollbar">
                 <table className="w-full text-left text-xs min-w-[520px]">
                   <thead>
                     <tr className="bg-[#070707] text-gray-400 font-mono text-[9px] uppercase border-b border-white/5 sticky top-0 z-10">
-                      <th className="p-3 w-12 text-center">Nro</th>
-                      <th className="p-3">Nombres y Apellidos</th>
-                      <th className="p-3">Fecha de Ingreso</th>
-                      <th className="p-3">Hora de Ingreso</th>
-                      <th className="p-3 text-center w-16">Acción</th>
+                      <th className="px-1 py-2 w-8 text-center">Nro</th>
+                      <th className="px-1 py-2 text-center w-12">Acción</th>
+                      <th className="px-1 py-2">Nombres y Apellidos</th>
+                      <th className="px-1 py-2">Fecha de Ingreso</th>
+                      <th className="px-1 py-2">Hora de Ingreso</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 text-gray-300">
                     {manualAttendanceList.map((row, idx) => (
                       <tr key={row.id} className="hover:bg-white/[0.01] transition-colors">
-                        <td className="p-3 text-center font-mono text-gray-500 text-[11px]">
+                        <td className="px-1 py-2 text-center font-mono text-gray-500 text-[11px]">
                           {row.num}
                         </td>
-                        <td className="p-2">
+                        <td className="px-1 py-2 text-center">
+                          <div className="flex items-center justify-center gap-0.5">
+                            <button
+                              onClick={() => {
+                                playTone(300, 80);
+                                setDeleteRowData(row);
+                              }}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                              title="Eliminar fila"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                playTone(400, 80);
+                                setEditRowData({ ...row });
+                              }}
+                              className="p-1.5 rounded-lg transition-colors cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                              title="Editar datos"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-0" colSpan={editingRowId === row.id ? 2 : undefined}>
                           <input
                             type="text"
                             placeholder="Escriba nombres y apellidos del vecino..."
@@ -1595,10 +1624,13 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                                 return item;
                               }));
                             }}
-                            className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
+                            onFocus={() => setEditingRowId(row.id)}
+                            onBlur={() => setEditingRowId(null)}
+                            className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
                           />
                         </td>
-                        <td className="p-3 font-mono text-gray-400 text-xs">
+                        {!(editingRowId === row.id) && (
+                        <td className="px-1 py-2 font-mono text-gray-400 text-xs">
                           {row.nombre ? (
                             <span className="bg-white/5 px-2.5 py-1 rounded border border-white/5 text-gray-300 font-semibold">
                               {row.fecha}
@@ -1607,30 +1639,15 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             <span className="text-gray-600 italic">Automática</span>
                           )}
                         </td>
-                        <td className="p-3 font-mono text-xs">
+                        )}
+                        <td className="px-1 py-2 font-mono text-gray-400 text-xs">
                           {row.nombre ? (
-                            <span className="bg-[#FFD700]/5 px-2.5 py-1 rounded border border-[#FFD700]/10 text-[#FFD700] font-semibold">
+                            <span className="bg-white/5 px-2.5 py-1 rounded border border-white/5 text-gray-300 font-semibold">
                               {row.hora}
                             </span>
                           ) : (
                             <span className="text-gray-600 italic">Automática</span>
                           )}
-                        </td>
-                        <td className="p-2 text-center">
-                          <button
-                            onClick={() => {
-                              playTone(300, 80);
-                              if (manualAttendanceList.length <= 1) {
-                                setManualAttendanceList([{ id: String(Date.now()), num: 1, nombre: '', fecha: '', hora: '' }]);
-                              } else {
-                                setManualAttendanceList(prev => prev.filter(item => item.id !== row.id));
-                              }
-                            }}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors cursor-pointer"
-                            title="Eliminar fila"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1739,6 +1756,108 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                         className="flex-1 bg-[#FFD700] hover:bg-[#ffe16d] text-black font-bold rounded-xl py-2.5 text-xs transition-all active:scale-95 cursor-pointer"
                       >
                         Crear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {deleteRowData && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                  <div className="bg-[#121212] border border-red-500/20 rounded-2xl p-6 w-[340px] shadow-2xl animate-fade-in flex flex-col gap-4">
+                    <h3 className="text-white text-sm font-bold text-center">¿Eliminar esta fila?</h3>
+                    <div className="bg-black/40 rounded-xl p-3 flex flex-col gap-2 text-xs">
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-24 shrink-0">Nro</span>
+                        <span className="text-white font-semibold">{deleteRowData.num}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-24 shrink-0">Nombres y Apellidos</span>
+                        <span className="text-white">{deleteRowData.nombre || <span className="text-gray-600 italic">Vacío</span>}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-24 shrink-0">Fecha de Ingreso</span>
+                        <span className="text-white">{deleteRowData.fecha || <span className="text-gray-600 italic">Automática</span>}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-24 shrink-0">Hora de Ingreso</span>
+                        <span className="text-white">{deleteRowData.hora || <span className="text-gray-600 italic">Automática</span>}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          playTone(400, 80);
+                          setDeleteRowData(null);
+                        }}
+                        className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => {
+                          playTone(300, 80);
+                          if (manualAttendanceList.length <= 1) {
+                            setManualAttendanceList([{ id: String(Date.now()), num: 1, nombre: '', fecha: '', hora: '' }]);
+                          } else {
+                            setManualAttendanceList(prev => prev.filter(item => item.id !== deleteRowData.id));
+                          }
+                          setDeleteRowData(null);
+                        }}
+                        className="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-xl py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {editRowData && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                  <div className="bg-[#121212] border border-blue-500/20 rounded-2xl p-6 w-[400px] shadow-2xl animate-fade-in flex flex-col gap-4">
+                    <h3 className="text-white text-sm font-bold text-center">Editar datos</h3>
+                    <div className="bg-black/40 rounded-xl p-3 flex flex-col gap-3 text-xs">
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-20 shrink-0">Nro</span>
+                        <span className="text-white font-semibold">{editRowData.num}</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-gray-500 font-mono">Nombres y Apellidos</span>
+                        <input
+                          type="text"
+                          value={editRowData.nombre}
+                          onChange={(e) => setEditRowData(prev => ({ ...prev, nombre: e.target.value }))}
+                          className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-gray-700 font-sans"
+                        />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-20 shrink-0">Fecha</span>
+                        <span className="text-white font-mono text-xs bg-black/60 px-3 py-2 rounded-lg flex-1">{editRowData.fecha || <span className="text-gray-600 italic">Automática</span>}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-500 font-mono w-20 shrink-0">Hora</span>
+                        <span className="text-white font-mono text-xs bg-black/60 px-3 py-2 rounded-lg flex-1">{editRowData.hora || <span className="text-gray-600 italic">Automática</span>}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          playTone(400, 80);
+                          setEditRowData(null);
+                        }}
+                        className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => {
+                          playTone(700, 80);
+                          setManualAttendanceList(prev => prev.map(item => item.id === editRowData.id ? { ...editRowData } : item));
+                          setEditRowData(null);
+                        }}
+                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                      >
+                        Guardar
                       </button>
                     </div>
                   </div>
