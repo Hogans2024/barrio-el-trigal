@@ -1649,7 +1649,8 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               setHideInstruction(true);
                               setEditingRowId(row.id);
                               setIsKeyboardOpen(true);
-                              setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+                              const container = e.currentTarget.closest('.overflow-auto');
+                              if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
                             }}
                             onBlur={() => { setEditingRowId(null); setIsKeyboardOpen(false); }}
                             className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
