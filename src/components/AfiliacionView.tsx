@@ -1584,7 +1584,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {/* ====================================================== */}
           {activeAfiliadoAction === 4 && (
             <>
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pb-[12.2px] px-0 flex flex-col animate-fade-in shadow-xl">
+            <div className="bg-white/[0.02] border border-white/10 rounded-t-2xl sm:rounded-t-[24px] pb-0 px-0 flex flex-col animate-fade-in shadow-xl">
               <div className={`overflow-auto border border-white/5 rounded-xl bg-black/20 custom-scrollbar ${
                 isKeyboardOpen
                   ? 'max-h-[calc(100vh-180px)] min-h-[120px]'
