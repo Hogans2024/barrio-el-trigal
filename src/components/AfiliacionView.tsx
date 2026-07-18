@@ -1609,15 +1609,36 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                         <td className="px-0">
                           <input
                             type="text"
-                            readOnly
                             placeholder="Escriba nombres y apellidos del vecino..."
                             value={row.nombre}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setManualAttendanceList(prev => prev.map(item => {
+                                if (item.id === row.id) {
+                                  const now = new Date();
+                                  const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                                  const dateStr = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                  return { ...item, nombre: val, fecha: item.fecha || dateStr, hora: item.hora || timeStr };
+                                }
+                                return item;
+                              }));
+                            }}
                             onFocus={() => {
                               setHideInstruction(true);
-                              setModalEditRowId(row.id);
                               setIsKeyboardOpen(true);
                             }}
-                            className="w-full bg-black/30 border border-white/5 hover:border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium cursor-pointer"
+                            onBlur={() => { setIsKeyboardOpen(false); }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const nextRow = manualAttendanceList[idx + 1];
+                                if (nextRow) {
+                                  setModalEditRowId(nextRow.id);
+                                  setIsKeyboardOpen(true);
+                                }
+                              }
+                            }}
+                            className="w-full bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
                           />
                         </td>
                         <td className="pr-1 py-2 text-center">
@@ -1890,14 +1911,10 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                 if (!modalRow) return null;
                 const modalIdx = manualAttendanceList.indexOf(modalRow);
                 return (
-                  <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/60 backdrop-blur-sm" onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}>
-                    <div className="bg-[#121212] border border-[#FFD700]/20 rounded-2xl p-5 w-[320px] shadow-2xl animate-fade-in flex flex-col gap-4" onClick={e => e.stopPropagation()}>
-                      <div className="flex items-center gap-2 text-xs text-gray-400 font-mono">
-                        <span className="text-gray-500">Nro</span>
-                        <span className="text-white font-semibold">{modalRow.num}</span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-gray-500 font-mono text-xs">Nombres y Apellidos</span>
+                  <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/60 backdrop-blur-sm" onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}>
+                    <div className="bg-black/20 border border-white/5 rounded-xl w-[340px] shadow-2xl animate-fade-in overflow-hidden" onClick={e => e.stopPropagation()}>
+                      <div className="bg-[#070707] px-3 py-2.5 flex items-center gap-3 border-b border-white/5">
+                        <span className="text-gray-500 font-mono text-[11px] text-center w-8 shrink-0">{modalRow.num}</span>
                         <input
                           type="text"
                           value={modalRow.nombre}
@@ -1925,14 +1942,14 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               }
                             }
                           }}
-                          className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#FFD700] placeholder-gray-700 font-sans"
+                          className="flex-1 bg-black/30 border border-white/5 hover:border-white/10 focus:border-[#FFD700] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none transition-all placeholder-gray-700 font-sans font-medium"
                           autoFocus
                         />
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 px-3 py-2.5 bg-[#070707]">
                         <button
                           onClick={() => { setModalEditRowId(null); setIsKeyboardOpen(false); }}
-                          className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
+                          className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg py-2 text-xs font-bold transition-all cursor-pointer"
                         >
                           Cerrar
                         </button>
@@ -1946,7 +1963,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               setIsKeyboardOpen(false);
                             }
                           }}
-                          className="flex-1 bg-[#FFD700] hover:bg-yellow-500 text-black rounded-xl py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                          className="flex-1 bg-[#FFD700] hover:bg-yellow-500 text-black rounded-lg py-2 text-xs font-bold transition-all active:scale-95 cursor-pointer"
                         >
                           {modalIdx + 1 < manualAttendanceList.length ? 'Siguiente \u2192' : 'Listo'}
                         </button>
