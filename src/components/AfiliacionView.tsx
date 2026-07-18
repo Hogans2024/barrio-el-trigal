@@ -309,6 +309,11 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [editRowData, setEditRowData] = useState<any | null>(null);
   const [navHeight, setNavHeight] = useState(0);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [hideInstruction, setHideInstruction] = useState(false);
+
+  useEffect(() => {
+    if (activeAfiliadoAction === 4) setHideInstruction(false);
+  }, [activeAfiliadoAction]);
   const fullListRef = useRef<any[] | null>(null);
   const INITIAL_ROW_COUNT = 5;
 
@@ -616,12 +621,12 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                     {activeAfiliadoAction === 8 && '⑧ Requisitos Gas Domiciliario (EMTAGAS Tarija)'}
                   </span>
                 </div>
-                <p className="text-gray-400 text-[11.5px] leading-relaxed max-w-4xl">
+                <p className={`text-gray-400 text-[11.5px] leading-relaxed max-w-4xl ${activeAfiliadoAction === 4 && hideInstruction ? 'hidden' : ''}`}>
                   {activeAfiliadoAction === 1 && 'Este botón permite registrar de forma oficial a un nuevo vecino de la urbanización El Trigal. Requiere autenticación con Google y envía los datos directamente a la base de datos central (hoja "Datos_Afiliacion").'}
 
                   {activeAfiliadoAction === 3 && 'Este botón permite consultar la vigencia de la afiliación de un vecino introduciendo su número de teléfono celular de 8 dígitos. Muestra de forma interactiva si el vecino está plenamente habilitado en la central de alarmas.'}
 
-                  {activeAfiliadoAction === 4 && 'Ingrese nombres y apellidos de los vecinos de forma manual en las celdas de abajo. El sistema registrará la fecha y la hora exacta de ingreso en el mismo instante en que comience a escribir.'}
+                  {activeAfiliadoAction === 4 && !hideInstruction && 'Ingrese nombres y apellidos de los vecinos de forma manual en las celdas de abajo. El sistema registrará la fecha y la hora exacta de ingreso en el mismo instante en que comience a escribir.'}
                   {activeAfiliadoAction === 5 && 'Consulte aquí los requisitos generales y documentación requerida para afiliarse formalmente a la junta de vecinos de El Trigal.'}
                   {activeAfiliadoAction === 6 && 'Guía de requisitos y trámites necesarios para la instalación del servicio de energía eléctrica ante Servicios Eléctricos de Tarija (SETAR).'}
                   {activeAfiliadoAction === 7 && 'Información de documentación indispensable para tramitar la conexión de agua potable ante la cooperativa COSAALT.'}
@@ -1625,6 +1630,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             value={row.nombre}
                             onChange={(e) => {
                               const val = e.target.value;
+                              if (val) setHideInstruction(true);
                               setManualAttendanceList(prev => prev.map(item => {
                                 if (item.id === row.id) {
                                   const now = new Date();
