@@ -1588,7 +1588,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                     <tr className="bg-[#070707] text-gray-400 font-mono text-[9px] uppercase border-b border-white/5 sticky top-0 z-10">
                       <th className="px-1 py-2 w-8 text-center">Nro</th>
                       <th className="px-1 py-2">Nombres y Apellidos</th>
-                      <th className="px-1 py-2 text-center w-12">Acción</th>
+                      <th className="px-0.5 py-2 text-center">Acción</th>
                       <th className="px-1 py-2">Fecha de Ingreso</th>
                       <th className="px-1 py-2">Hora de Ingreso</th>
                     </tr>
@@ -1633,27 +1633,27 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                           />
                         </td>
                         {!(editingRowId === row.id) && (
-                        <td className="px-1 py-2 text-center">
-                          <div className="flex items-center justify-center gap-0.5">
-                            <button
-                              onClick={() => {
-                                playTone(300, 80);
-                                setDeleteRowData(row);
-                              }}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors cursor-pointer"
-                              title="Eliminar fila"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                        <td className="pr-1 py-2 text-center">
+                          <div className="flex items-center justify-center gap-0">
                             <button
                               onClick={() => {
                                 playTone(400, 80);
                                 setEditRowData({ ...row });
                               }}
-                              className="p-1.5 rounded-lg transition-colors cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                              className="p-1 rounded-lg transition-colors cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                               title="Editar datos"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                playTone(300, 80);
+                                setDeleteRowData(row);
+                              }}
+                              className="p-1 rounded-lg transition-colors cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              title="Eliminar fila"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </td>
