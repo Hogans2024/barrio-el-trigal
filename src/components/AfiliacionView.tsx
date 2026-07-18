@@ -314,6 +314,13 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   useEffect(() => {
     if (activeAfiliadoAction === 4) setHideInstruction(false);
   }, [activeAfiliadoAction]);
+
+  useEffect(() => {
+    const nav = document.getElementById('bottom-nav');
+    if (!nav) return;
+    nav.style.display = isKeyboardOpen ? 'none' : '';
+    return () => { if (nav) nav.style.display = ''; };
+  }, [isKeyboardOpen]);
   const fullListRef = useRef<any[] | null>(null);
   const INITIAL_ROW_COUNT = 5;
 
@@ -1639,6 +1646,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               onClick={() => {
                                 playTone(400, 80);
                                 setEditRowData({ ...row });
+                                setIsKeyboardOpen(true);
                               }}
                               className="p-1 rounded-lg transition-colors cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                               title="Editar datos"
@@ -1649,6 +1657,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               onClick={() => {
                                 playTone(300, 80);
                                 setDeleteRowData(row);
+                                setIsKeyboardOpen(true);
                               }}
                               className="p-1 rounded-lg transition-colors cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-500/10"
                               title="Eliminar fila"
@@ -1815,6 +1824,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                         onClick={() => {
                           playTone(400, 80);
                           setDeleteRowData(null);
+                          setIsKeyboardOpen(false);
                         }}
                         className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
                       >
@@ -1829,6 +1839,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             setManualAttendanceList(prev => prev.filter(item => item.id !== deleteRowData.id));
                           }
                           setDeleteRowData(null);
+                          setIsKeyboardOpen(false);
                         }}
                         className="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-xl py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer"
                       >
@@ -1854,6 +1865,8 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                           type="text"
                           value={editRowData.nombre}
                           onChange={(e) => setEditRowData(prev => ({ ...prev, nombre: e.target.value }))}
+                          onFocus={() => setIsKeyboardOpen(true)}
+                          onBlur={() => setIsKeyboardOpen(false)}
                           className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-gray-700 font-sans"
                         />
                       </div>
@@ -1871,6 +1884,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                         onClick={() => {
                           playTone(400, 80);
                           setEditRowData(null);
+                          setIsKeyboardOpen(false);
                         }}
                         className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-2.5 text-xs font-bold transition-all cursor-pointer"
                       >
@@ -1881,6 +1895,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                           playTone(700, 80);
                           setManualAttendanceList(prev => prev.map(item => item.id === editRowData.id ? { ...editRowData } : item));
                           setEditRowData(null);
+                          setIsKeyboardOpen(false);
                         }}
                         className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer"
                       >
