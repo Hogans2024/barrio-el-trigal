@@ -1658,7 +1658,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
             </div>
 
               {/* Fixed bottom bar */}
-              <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[77px] tall:pb-[93px] md:pb-[7.2px]">
+              <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl border-t border-[#FFD700]/20 px-4 pt-[7.2px] pb-[calc(77px+env(safe-area-inset-bottom))] tall:pb-[calc(93px+env(safe-area-inset-bottom))] md:pb-[7.2px]">
                 <div className="max-w-5xl mx-auto flex items-center justify-center gap-2">
                   <button
                     onClick={() => {
