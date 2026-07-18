@@ -1630,7 +1630,6 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                             value={row.nombre}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (val) setHideInstruction(true);
                               setManualAttendanceList(prev => prev.map(item => {
                                 if (item.id === row.id) {
                                   const now = new Date();
@@ -1647,6 +1646,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                               }));
                             }}
                             onFocus={(e) => {
+                              setHideInstruction(true);
                               setEditingRowId(row.id);
                               setIsKeyboardOpen(true);
                               setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
