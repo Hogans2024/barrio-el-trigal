@@ -1573,7 +1573,11 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {activeAfiliadoAction === 4 && (
             <>
             <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pb-[12.2px] px-0 flex flex-col animate-fade-in shadow-xl">
-              <div className="overflow-auto max-h-[calc(100dvh-320px)] border border-white/5 rounded-xl bg-black/20 custom-scrollbar">
+              <div className={`overflow-auto border border-white/5 rounded-xl bg-black/20 custom-scrollbar ${
+                isKeyboardOpen
+                  ? 'max-h-[calc(100vh-180px)] min-h-[120px]'
+                  : 'max-h-[calc(100vh-320px)]'
+              }`}>
                 <table className="w-full text-left text-xs min-w-[520px]">
                   <thead>
                     <tr className="bg-[#070707] text-gray-400 font-mono text-[9px] uppercase border-b border-white/5 sticky top-0 z-10">
