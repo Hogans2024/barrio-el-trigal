@@ -604,11 +604,14 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
 
                   {activeAfiliadoAction === 3 && 'Este botón permite consultar la vigencia de la afiliación de un vecino introduciendo su número de teléfono celular de 8 dígitos. Muestra de forma interactiva si el vecino está plenamente habilitado en la central de alarmas.'}
 
+                  {activeAfiliadoAction === 4 && 'Ingrese nombres y apellidos de los vecinos de forma manual en las celdas de abajo. El sistema registrará la fecha y la hora exacta de ingreso en el mismo instante en que comience a escribir.'}
                   {activeAfiliadoAction === 5 && 'Consulte aquí los requisitos generales y documentación requerida para afiliarse formalmente a la junta de vecinos de El Trigal.'}
                   {activeAfiliadoAction === 6 && 'Guía de requisitos y trámites necesarios para la instalación del servicio de energía eléctrica ante Servicios Eléctricos de Tarija (SETAR).'}
                   {activeAfiliadoAction === 7 && 'Información de documentación indispensable para tramitar la conexión de agua potable ante la cooperativa COSAALT.'}
                   {activeAfiliadoAction === 8 && 'Requisitos y pasos obligatorios para iniciar el trámite de gas natural domiciliario ante la Empresa Tarijeña del Gas (EMTAGAS).'}
                 </p>
+
+
               </div>
             </div>
           )}
@@ -1552,15 +1555,11 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {/* ====================================================== */}
           {activeAfiliadoAction === 4 && (
             <>
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[12.2px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
-              <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                Ingrese nombres y apellidos de los vecinos de forma manual en las celdas de abajo. El sistema registrará la fecha y la hora exacta de ingreso en el mismo instante en que comience a escribir.
-              </p>
-
-              <div className="overflow-x-auto border border-white/5 rounded-xl bg-black/20 custom-scrollbar">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pb-[12.2px] px-[7.2px] flex flex-col animate-fade-in shadow-xl">
+              <div className="overflow-auto max-h-[calc(100dvh-320px)] border border-white/5 rounded-xl bg-black/20 custom-scrollbar">
                 <table className="w-full text-left text-xs min-w-[520px]">
                   <thead>
-                    <tr className="bg-white/[0.03] text-gray-400 font-mono text-[9px] uppercase border-b border-white/5">
+                    <tr className="bg-[#070707] text-gray-400 font-mono text-[9px] uppercase border-b border-white/5 sticky top-0 z-10">
                       <th className="p-3 w-12 text-center">Nro</th>
                       <th className="p-3">Nombres y Apellidos</th>
                       <th className="p-3">Fecha de Ingreso</th>
