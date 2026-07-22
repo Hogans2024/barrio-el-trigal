@@ -453,7 +453,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               }`}
             >
               {step === 'enter_activation_phone' ? (
-                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
+                showMissingPinAlert ? (
+                  <span className="text-[10px] sm:text-xs animate-pulse">⚠️ ¡Primero digite su número de celular!</span>
+                ) : (
+                  <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
+                )
               ) : (
                 <>
                   <Check className="w-4 h-4" />
@@ -461,11 +465,6 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </>
               )}
             </button>
-            {step === 'enter_activation_phone' && showMissingPinAlert && (
-              <p className="text-center text-[#FFD700] text-[10px] sm:text-xs mt-1.5 animate-pulse max-w-[280px] mx-auto">
-                ¡Primero digite su número de celular en el teclado digital antes de presionar este botón!
-              </p>
-            )}
 
             {/* Pasos 1,2,3 — pegado al teclado y solo visible en modo de activación */}
             {step === 'enter_activation_phone' && (
