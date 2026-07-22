@@ -364,7 +364,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   <div className="hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5 mb-2">
                     <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                   </div>
-                  <div className="w-full flex items-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
+                  <div className="w-full flex items-center justify-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
                     <span className="whitespace-nowrap uppercase">INGRESE SU NUMERO DE CELULAR - ACTIVAR ALARMA</span>
                   </div>
                 </div>
