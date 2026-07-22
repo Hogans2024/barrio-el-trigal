@@ -380,7 +380,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               {/* Display de dígitos en una sola fila de 12 */}
               <div className="flex justify-center gap-1 sm:gap-1.5 mb-3 overflow-x-auto">
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => (
-                  <span key={i} className={`font-mono font-bold text-base sm:text-lg transition-all ${
+                  <span key={i} className={`font-mono font-bold text-[22px] sm:text-2xl transition-all ${
                     enteredPin[i]
                       ? pinError
                         ? 'text-red-400'
