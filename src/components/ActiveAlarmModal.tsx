@@ -462,7 +462,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
                   <span>Ingrese su celular de 8 dígitos en el teclado táctico.</span>
                 </div>
-                <div className="flex items-center space-x-3 text-xs text-gray-300">
+                <div className="flex items-start space-x-3 text-xs text-gray-300">
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 hidden sm:flex">2</div>
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 sm:hidden">1</div>
                   <div className="flex flex-col xs:flex-row xs:items-center">
@@ -470,7 +470,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     <strong className="text-[#FFD700] xs:ml-1">"ACTIVAR ALARMA"</strong><span>.</span>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 text-xs text-gray-300">
+                <div className="flex items-start space-x-3 text-xs text-gray-300">
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 hidden sm:flex">3</div>
                   <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0 sm:hidden">2</div>
                   <span>La sirena de alta potencia del barrio El Trigal sonará al instante.</span>
