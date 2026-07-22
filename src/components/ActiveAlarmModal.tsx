@@ -177,7 +177,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       )}
 
       {/* Contenedor: en mobile hoja completa con scroll; en sm: panel fijo 1000×620 */}
-      <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] mt-2 sm:mt-0">
+      <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] mt-1 sm:mt-0">
 
         {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL */}
         <div className="sticky top-0 z-50 w-full flex items-center justify-between px-5 py-2.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
@@ -358,14 +358,14 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               Sin overflow en mobile: fluye con el scroll único del modal. */}
           <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-1 pb-3 flex flex-col justify-between bg-black/20 relative sm:overflow-y-auto">
 
-            <div className="text-center mb-1 sm:mb-2">
+            <div className="mb-1 sm:mb-2">
               {step === 'enter_activation_phone' ? (
                 <div>
                   <div className="hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5 mb-2">
                     <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                   </div>
-                  <div className="flex items-center justify-center text-gray-400 text-[11px] sm:text-xs leading-normal">
-                    <span>Ingrese su numero de celular para activar la alarma</span>
+                  <div className="w-full flex items-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
+                    <span className="w-full whitespace-nowrap">Ingrese su numero de celular para activar la alarma</span>
                   </div>
                 </div>
               ) : (
