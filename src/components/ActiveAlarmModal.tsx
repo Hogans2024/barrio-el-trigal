@@ -169,7 +169,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans pt-14 pb-14 md:pt-4 md:pb-4 px-4">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans pt-14 pb-14 md:pt-4 md:pb-4">
 
       {/* Flashing Warning Visuals (only if alarm is flashing) */}
       {step === 'flashing' && (
@@ -365,7 +365,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                   </div>
                   <div className="w-full flex items-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
-                    <span className="w-full whitespace-nowrap">Ingrese su numero de celular para activar la alarma</span>
+                    <span className="whitespace-nowrap uppercase">INGRESE SU NUMERO DE CELULAR - ACTIVAR ALARMA</span>
                   </div>
                 </div>
               ) : (
