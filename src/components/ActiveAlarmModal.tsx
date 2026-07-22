@@ -446,7 +446,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               }`}
             >
               {step === 'enter_activation_phone' ? (
-                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span className="animate-pulse font-bold">{enteredPin.length || '00'}</span> DIGITOS</span>
+                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
               ) : (
                 <>
                   <Check className="w-4 h-4" />

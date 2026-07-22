@@ -108,4 +108,15 @@
   animation: text-alert-pulse 1.8s ease-in-out infinite;
 }
 
+@keyframes counter-pop {
+  0% { transform: scale(1.4); opacity: 0.5; }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-counter-pop {
+  display: inline-block;
+  animation: counter-pop 0.35s ease-out;
+}
+
 
