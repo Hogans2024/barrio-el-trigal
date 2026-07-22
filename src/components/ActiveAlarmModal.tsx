@@ -400,11 +400,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
               </div>
               {/* Display dinámico: muestra los dígitos reales + cursor pulsante al final */}
-              <div className="flex justify-center items-center gap-1 sm:gap-1.5 mb-2.5 min-h-[2.75rem] flex-wrap">
+              <div className="flex justify-start items-center gap-0.5 sm:gap-1.5 mb-2.5 min-h-[2.75rem] overflow-x-auto flex-nowrap">
                 {enteredPin.split('').map((digit, idx) => (
                   <div
                     key={idx}
-                    className={`w-7 h-9 tall:w-8 tall:h-10 sm:w-8 sm:h-10 rounded-lg border-2 flex items-center justify-center text-sm tall:text-base sm:text-sm font-bold font-mono transition-all ${
+                    className={`w-6 h-9 tall:w-8 tall:h-10 sm:w-8 sm:h-10 rounded-lg border-2 flex items-center justify-center text-xs tall:text-base sm:text-sm font-bold font-mono transition-all shrink-0 ${
                       pinError
                         ? 'border-red-500/50 bg-red-500/10 text-red-400'
                         : 'border-[#FFD700]/60 bg-[#FFD700]/20 text-white shadow-[0_0_10px_rgba(255,215,0,0.25)]'
@@ -415,11 +415,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 ))}
                 {/* Cursor pulsante cuando hay espacio */}
                 {enteredPin.length < 15 && (
-                  <div className="w-2 h-9 tall:h-10 sm:h-10 rounded bg-[#FFD700]/40 animate-pulse" />
+                  <div className="w-2 h-9 tall:h-10 sm:h-10 rounded bg-[#FFD700]/40 animate-pulse shrink-0" />
                 )}
                 {/* Placeholder cuando está vacío */}
                 {enteredPin.length === 0 && (
-                  <span className="text-gray-600 text-xs font-mono italic self-center">ingrese su número aquí</span>
+                  <span className="text-gray-600 text-xs font-mono italic self-center whitespace-nowrap">ingrese su número aquí</span>
                 )}
               </div>
               {pinError && (
