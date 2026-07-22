@@ -377,38 +377,21 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
             <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-              {/* Display de dígitos en dos filas de 6 */}
-              <div className="flex flex-col items-center gap-1 mb-3">
-                <div className="flex justify-center gap-2 sm:gap-3">
-                  {[0, 1, 2, 3, 4, 5].map(i => (
-                    <span key={i} className={`font-mono font-bold text-lg sm:text-xl transition-all ${
-                      enteredPin[i]
-                        ? pinError
-                          ? 'text-red-400'
-                          : 'text-white'
-                        : enteredPin.length === i
-                          ? 'text-[#FFD700]'
-                          : 'text-gray-600'
-                    }`}>
-                      {enteredPin[i] || '_'}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex justify-center gap-2 sm:gap-3">
-                  {[6, 7, 8, 9, 10, 11].map(i => (
-                    <span key={i} className={`font-mono font-bold text-lg sm:text-xl transition-all ${
-                      enteredPin[i]
-                        ? pinError
-                          ? 'text-red-400'
-                          : 'text-white'
-                        : enteredPin.length === i
-                          ? 'text-[#FFD700]'
-                          : 'text-gray-600'
-                    }`}>
-                      {enteredPin[i] || '_'}
-                    </span>
-                  ))}
-                </div>
+              {/* Display de dígitos en una sola fila de 12 */}
+              <div className="flex justify-center gap-1 sm:gap-1.5 mb-3 overflow-x-auto">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => (
+                  <span key={i} className={`font-mono font-bold text-base sm:text-lg transition-all ${
+                    enteredPin[i]
+                      ? pinError
+                        ? 'text-red-400'
+                        : 'text-white'
+                      : enteredPin.length === i
+                        ? 'text-[#FFD700]'
+                        : 'text-gray-600'
+                  }`}>
+                    {enteredPin[i] || '_'}
+                  </span>
+                ))}
               </div>
               {pinError && (
                 <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
