@@ -31,6 +31,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   const [isMuted, setIsMuted] = useState(false);
   const [enteredPin, setEnteredPin] = useState('');
   const [pinError, setPinError] = useState(false);
+  const [showMissingPinAlert, setShowMissingPinAlert] = useState(false);
   const [step, setStep] = useState<'enter_activation_phone' | 'flashing'>('enter_activation_phone');
   const [activatedByPhone, setActivatedByPhone] = useState('12345678');
   const [showUnregisteredModal, setShowUnregisteredModal] = useState(false);
@@ -128,6 +129,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
     if (enteredPin.length < 15) {
       setEnteredPin((prev) => prev + num);
       setPinError(false);
+      setShowMissingPinAlert(false);
     }
   };
 
@@ -433,20 +435,31 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             {/* Main Action Button */}
             <button
-              onClick={handleVerifyPhone}
-              disabled={enteredPin.length < 1}
+              onClick={() => {
+                if (enteredPin.length < 1) {
+                  setShowMissingPinAlert(true);
+                  return;
+                }
+                handleVerifyPhone();
+              }}
               className={`w-[94%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 1
                     ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30'
-                    : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
+                    : showMissingPinAlert
+                      ? 'bg-[#FFD700]/15 border border-[#FFD700]/40 text-[#FFD700] ring-2 ring-[#FFD700]/20'
+                      : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
                   : enteredPin.length >= 1
                     ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30'
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
               }`}
             >
               {step === 'enter_activation_phone' ? (
-                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
+                showMissingPinAlert ? (
+                  <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ DIGITE SU CELULAR</span>
+                ) : (
+                  <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
+                )
               ) : (
                 <>
                   <Check className="w-4 h-4" />
