@@ -378,7 +378,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
             <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
               {/* Display de dígitos: alineado a la izquierda del teclado, cursor parpadeante */}
-              <div className="flex justify-start items-center mb-3 min-h-[2rem] max-w-[176px] mx-auto w-full px-1">
+              <div className="flex justify-start items-center mb-3 min-h-[2rem] max-w-[220px] mx-auto w-full px-1">
                 <span className={`font-mono font-bold text-[22px] sm:text-2xl tracking-[0.2em] ${pinError ? 'text-red-400' : 'text-white'}`}>
                   {enteredPin}
                 </span>
@@ -393,7 +393,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
 
               {/* Rejilla numérica premium — botones compactos */}
-              <div className="grid grid-cols-3 gap-[0.9rem] sm:gap-2 max-w-[176px] mx-auto">
+              <div className="grid grid-cols-3 gap-[0.9rem] sm:gap-2 max-w-[220px] mx-auto">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
                   <button
                     key={num}
