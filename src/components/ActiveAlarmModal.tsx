@@ -180,7 +180,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] -mt-2 sm:mt-0">
 
         {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL */}
-        <div className="sticky top-0 z-50 w-full flex items-center justify-between px-5 py-2.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div className="sticky top-0 z-50 w-full flex items-center justify-between px-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
           <div className="flex items-center space-x-3">
             <div className={`p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
@@ -377,21 +377,14 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
             <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-              {/* Display de dígitos en una sola fila de 12 */}
-              <div className="flex justify-center gap-1 sm:gap-1.5 mb-3 overflow-x-auto">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => (
-                  <span key={i} className={`font-mono font-bold text-[22px] sm:text-2xl transition-all ${
-                    enteredPin[i]
-                      ? pinError
-                        ? 'text-red-400'
-                        : 'text-white'
-                      : enteredPin.length === i
-                        ? 'text-[#FFD700]'
-                        : 'text-gray-600'
-                  }`}>
-                    {enteredPin[i] || '_'}
-                  </span>
-                ))}
+              {/* Display de dígitos: alineado a la izquierda del teclado, cursor parpadeante */}
+              <div className="flex justify-start items-center mb-3 min-h-[2rem] max-w-[220px] mx-auto w-full px-1">
+                <span className={`font-mono font-bold text-[22px] sm:text-2xl tracking-[0.2em] ${pinError ? 'text-red-400' : 'text-white'}`}>
+                  {enteredPin}
+                </span>
+                {enteredPin.length < 12 && (
+                  <span className="font-mono font-bold text-[22px] sm:text-2xl text-[#FFD700] animate-pulse ml-0.5">|</span>
+                )}
               </div>
               {pinError && (
                 <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
@@ -453,7 +446,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               }`}
             >
               {step === 'enter_activation_phone' ? (
-                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA {enteredPin.length || '00'} DTOS</span>
+                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span className="animate-pulse font-bold">{enteredPin.length || '00'}</span> DIGITOS</span>
               ) : (
                 <>
                   <Check className="w-4 h-4" />
