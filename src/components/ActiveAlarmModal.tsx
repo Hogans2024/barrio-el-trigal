@@ -359,68 +359,56 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           <div className="order-1 sm:order-none w-full sm:w-[420px] px-4 sm:px-8 pt-1 pb-3 flex flex-col justify-between bg-black/20 relative sm:overflow-y-auto">
 
             <div className="text-center mb-1 sm:mb-2">
-              <div className={`flex items-center justify-center space-x-2 transition-all duration-300 ${
-                step === 'enter_activation_phone'
-                  ? 'text-gray-400'
-                  : 'text-red-200 bg-red-500/10 border border-red-500/30 p-2 sm:p-3 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse'
-              }`}>
-                {step === 'enter_activation_phone' && (
-                  <div className="w-5 h-5 rounded bg-[#FFD700]/10 flex items-center justify-center text-[#FFD700] font-mono text-[10px] font-bold shrink-0">1</div>
-                )}
-                <p className="text-[11px] sm:text-xs leading-normal">
-                  {step === 'enter_activation_phone'
-                    ? 'Ingrese su numero de celular para activar la alarma'
-                    : 'Vecino, si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior.'
-                  }
-                </p>
-              </div>
-              {step === 'enter_activation_phone' && (
-                <div className="mt-2 hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5">
-                  <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
+              {step === 'enter_activation_phone' ? (
+                <div>
+                  <div className="hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5 mb-2">
+                    <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
+                  </div>
+                  <div className="flex items-center justify-center text-gray-400 text-[11px] sm:text-xs leading-normal">
+                    <span>Ingrese su numero de celular para activar la alarma</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center space-x-2 text-red-200 bg-red-500/10 border border-red-500/30 p-2 sm:p-3 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse">
+                  Vecino, si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior.
                 </div>
               )}
             </div>
 
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
             <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-              {/* Etiqueta + display de dígitos y contador */}
-              <div className="flex items-center justify-center mb-2">
-                <div className="flex items-center gap-1.5 text-[#FFD700]">
-                  <Smartphone className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Su número de celular</span>
+              {/* Display de dígitos en dos filas de 6 */}
+              <div className="flex flex-col items-center gap-1 mb-3">
+                <div className="flex justify-center gap-2 sm:gap-3">
+                  {[0, 1, 2, 3, 4, 5].map(i => (
+                    <span key={i} className={`font-mono font-bold text-lg sm:text-xl transition-all ${
+                      enteredPin[i]
+                        ? pinError
+                          ? 'text-red-400'
+                          : 'text-white'
+                        : enteredPin.length === i
+                          ? 'text-[#FFD700]'
+                          : 'text-gray-600'
+                    }`}>
+                      {enteredPin[i] || '_'}
+                    </span>
+                  ))}
                 </div>
-                
-                {/* Contador de dígitos */}
-                <div className="ml-2 flex items-center">
-                  <span className={`inline-block text-[10px] font-mono bg-white/5 border rounded-full px-2.5 py-0.5 transition-colors ${
-                    enteredPin.length >= 1 ? 'text-[#FFD700] border-[#FFD700]/30' : 'text-gray-400 border-white/10'
-                  }`}>
-                    {enteredPin.length} {enteredPin.length === 1 ? 'dígito' : 'dígitos'}
-                  </span>
+                <div className="flex justify-center gap-2 sm:gap-3">
+                  {[6, 7, 8, 9, 10, 11].map(i => (
+                    <span key={i} className={`font-mono font-bold text-lg sm:text-xl transition-all ${
+                      enteredPin[i]
+                        ? pinError
+                          ? 'text-red-400'
+                          : 'text-white'
+                        : enteredPin.length === i
+                          ? 'text-[#FFD700]'
+                          : 'text-gray-600'
+                    }`}>
+                      {enteredPin[i] || '_'}
+                    </span>
+                  ))}
                 </div>
-              </div>
-              {/* Display dinámico: muestra los dígitos reales + cursor pulsante al final */}
-              <div className="flex justify-start items-center gap-0.5 sm:gap-1.5 mb-2.5 min-h-[2.75rem] overflow-x-auto flex-nowrap">
-                {enteredPin.split('').map((digit, idx) => (
-                  <div
-                    key={idx}
-                    className={`w-6 h-9 tall:w-8 tall:h-10 sm:w-8 sm:h-10 rounded-lg border-2 flex items-center justify-center text-xs tall:text-base sm:text-sm font-bold font-mono transition-all shrink-0 ${
-                      pinError
-                        ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                        : 'border-[#FFD700]/60 bg-[#FFD700]/20 text-white shadow-[0_0_10px_rgba(255,215,0,0.25)]'
-                    }`}
-                  >
-                    {digit}
-                  </div>
-                ))}
-                {/* Cursor pulsante cuando hay espacio */}
-                {enteredPin.length < 15 && (
-                  <div className="w-2 h-9 tall:h-10 sm:h-10 rounded bg-[#FFD700]/40 animate-pulse shrink-0" />
-                )}
-                {/* Placeholder cuando está vacío */}
-                {enteredPin.length === 0 && (
-                  <span className="text-gray-600 text-xs font-mono italic self-center whitespace-nowrap">ingrese su número aquí</span>
-                )}
               </div>
               {pinError && (
                 <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
@@ -429,7 +417,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
 
               {/* Rejilla numérica premium — botones compactos */}
-              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[220px] mx-auto">
+              <div className="grid grid-cols-3 gap-[0.9rem] sm:gap-2 max-w-[220px] mx-auto">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
                   <button
                     key={num}
@@ -471,21 +459,18 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             <button
               onClick={handleVerifyPhone}
               disabled={enteredPin.length < 1}
-              className={`w-full py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
+              className={`max-w-[280px] mx-auto w-full mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 1
-                    ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30 transform scale-[1.02]'
+                    ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30'
                     : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
                   : enteredPin.length >= 1
-                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30 transform scale-[1.02]'
+                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30'
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
               }`}
             >
               {step === 'enter_activation_phone' ? (
-                <>
-                  <ShieldAlert className="w-4 h-4" />
-                  <span>CONFIRMAR Y ACTIVAR ALARMA 🚨</span>
-                </>
+                <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA {enteredPin.length || '00'} DTOS</span>
               ) : (
                 <>
                   <Check className="w-4 h-4" />
