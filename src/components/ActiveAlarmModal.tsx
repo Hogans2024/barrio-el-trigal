@@ -435,7 +435,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             <button
               onClick={handleVerifyPhone}
               disabled={enteredPin.length < 1}
-              className={`w-4/5 mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
+              className={`max-w-[280px] mx-auto w-full mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 1
                     ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30'
