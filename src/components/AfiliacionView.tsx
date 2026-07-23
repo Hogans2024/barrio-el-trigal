@@ -285,7 +285,23 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const [searchCI, setSearchCI] = useState('');
   const [searchPhone, setSearchPhone] = useState('');
   const [searchPerformed, setSearchPerformed] = useState(false);
-  const [searchFoundResult, setSearchFoundResult] = useState<any | null>(null);
+  const [searchResults, setSearchResults] = useState<Vecino[]>([]);
+
+  const handleBuscarVecino = () => {
+    const nombreCompleto = `${searchFirstName.trim()} ${searchLastName.trim()}`.toLowerCase();
+    const ci = searchCI.trim();
+    const celular = searchPhone.trim();
+    const results = vecinos.filter((v) => {
+      const matchNombre = v.nombre.toLowerCase().includes(nombreCompleto) || nombreCompleto.includes(v.nombre.toLowerCase());
+      const matchCI = v.ci === ci;
+      if (celular) {
+        return matchNombre && matchCI && v.celular === celular;
+      }
+      return matchNombre && matchCI;
+    });
+    setSearchResults(results);
+    setSearchPerformed(true);
+  };
 
   // Status check phone state (botón 3)
   const [statusCheckPhone, setStatusCheckPhone] = useState('');
@@ -1276,32 +1292,81 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
           {/* ====================================================== */}
           {activeAfiliadoAction === 2 && (
             <div className="space-y-[12.2px]">
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-[60px] px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] pt-[12.2px] pb-4 px-[7.2px] flex flex-col gap-[7.2px] animate-fade-in shadow-xl">
                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">NOMBRE</label>
                 <input
                   type="text"
                   placeholder="Ej. Daniel"
+                  value={searchFirstName}
+                  onChange={(e) => setSearchFirstName(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-sans"
                 />
                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">APELLIDO</label>
                 <input
                   type="text"
                   placeholder="Ej. Mendez"
+                  value={searchLastName}
+                  onChange={(e) => setSearchLastName(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-sans"
                 />
                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">DOCUMENTO DE IDENTIDAD C.I.</label>
                 <input
                   type="text"
                   placeholder="Ej. 12345678"
+                  value={searchCI}
+                  onChange={(e) => setSearchCI(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-mono"
                 />
                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono leading-none">CELULAR (OPCIONAL)</label>
                 <input
                   type="text"
                   placeholder="Ej. 12345678"
+                  value={searchPhone}
+                  onChange={(e) => setSearchPhone(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-all placeholder-gray-600 font-mono"
                 />
+                <button
+                  onClick={handleBuscarVecino}
+                  className="self-center bg-[#FFD700] hover:bg-yellow-400 text-gray-950 font-extrabold text-sm px-8 py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-[#FFD700]/20"
+                >
+                  Buscar Vecino
+                </button>
               </div>
+              {searchPerformed && (
+                <div className="bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-[24px] p-4 animate-fade-in shadow-xl">
+                  {searchResults.length === 0 ? (
+                    <div className="text-center py-6">
+                      <Search className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-400 font-semibold">No se encontraron vecinos</p>
+                      <p className="text-xs text-gray-500 mt-1">Verifique los datos ingresados e intente de nuevo.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-xs text-emerald-400 font-semibold">{searchResults.length} vecino(s) encontrado(s):</p>
+                      {searchResults.map((v, i) => (
+                        <div key={i} className="bg-black/30 border border-white/5 rounded-xl p-3 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-white font-bold text-sm">{v.nombre}</span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${v.estado === 'Activo' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>{v.estado}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <FileText className="w-3 h-3" />
+                            <span>C.I.: {v.ci}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Smartphone className="w-3 h-3" />
+                            <span>Celular: {v.celular}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <MapPin className="w-3 h-3" />
+                            <span>{v.calle}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               <p className="text-gray-400 text-[11.5px] leading-relaxed max-w-4xl">
                 Este botón exige ingresar de forma obligatoria el Nombre, Apellido y la Cédula de Identidad (C.I.) del vecino, con la opción de ingresar el Celular, para realizar una consulta segura en el padrón. [DATOS DE EJEMPLO PARA PROBAR EL SISTEMA: Nombre: Daniel, Apellido: Mendez, C.I.: 12345678, Celular (opcional): 12345678]
               </p>
