@@ -410,7 +410,7 @@ export default function App() {
             {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
             {activeTab === 'alarma' && (
             <div ref={searchRef} className={`md:hidden relative ${isSearchFocused ? 'flex-1 -mr-5' : 'flex-1 max-w-[200px]'}`}>
-              <div className={`flex items-center w-full bg-black/60 border border-gray-800 ${isSearchFocused ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl'} px-2 py-1.5`}>
+              <div className={`flex items-center w-full bg-black/60 border border-gray-800 ${isSearchFocused ? 'rounded-l-xl rounded-r-none border-r-0 relative z-50' : 'rounded-xl'} px-2 py-1.5`}>
                 <Search className="h-4 w-4 text-gray-400 shrink-0" />
                 <input
                   type="text"
