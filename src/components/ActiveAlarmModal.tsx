@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone } from 'lucide-react';
+import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone, ArrowLeft } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
 
@@ -216,9 +216,10 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 message: 'Modal cerrado manualmente'
               });
             }}
-            className="absolute top-1 left-1 p-2 bg-blue-500/10 hover:bg-blue-500/25 backdrop-blur-sm rounded-xl transition-all duration-300 active:scale-90 shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] border border-blue-500/20 hover:border-blue-500/40 group"
+            className="absolute top-1 left-1 flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 sm:px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans"
           >
-            <X className="w-6 h-6 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all duration-300" />
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Volver Atrás</span>
           </button>
         </div>
 
