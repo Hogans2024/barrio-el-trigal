@@ -457,6 +457,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               {step === 'enter_activation_phone' ? (
                 showMissingPinAlert ? (
                   <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                ) : enteredPin.length >= 8 ? (
+                  <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA</span>
                 ) : (
                   <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
                 )
