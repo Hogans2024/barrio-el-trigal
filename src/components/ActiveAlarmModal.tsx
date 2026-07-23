@@ -444,7 +444,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 }
                 handleVerifyPhone();
               }}
-              className={`w-[94%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 cursor-pointer relative ${
+              className={`w-[90%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 cursor-pointer relative ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 8
                     ? 'bg-black/40 hover:bg-black/70 text-[#FFD700] font-extrabold border-4 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)]'
