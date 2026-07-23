@@ -31,7 +31,6 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   const [isMuted, setIsMuted] = useState(false);
   const [enteredPin, setEnteredPin] = useState('');
   const [pinError, setPinError] = useState(false);
-  const [showMissingPinAlert, setShowMissingPinAlert] = useState(false);
   const [step, setStep] = useState<'enter_activation_phone' | 'flashing'>('enter_activation_phone');
   const [activatedByPhone, setActivatedByPhone] = useState('12345678');
   const [showUnregisteredModal, setShowUnregisteredModal] = useState(false);
@@ -129,7 +128,6 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
     if (enteredPin.length < 15) {
       setEnteredPin((prev) => prev + num);
       setPinError(false);
-      setShowMissingPinAlert(false);
     }
   };
 
@@ -435,13 +433,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             {/* Main Action Button */}
             <button
-              onClick={() => {
-                if (enteredPin.length < 1) {
-                  setShowMissingPinAlert(true);
-                  return;
-                }
-                handleVerifyPhone();
-              }}
+              onClick={enteredPin.length < 1 ? undefined : handleVerifyPhone}
               className={`w-[94%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 1
@@ -453,7 +445,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               }`}
             >
               {step === 'enter_activation_phone' ? (
-                showMissingPinAlert ? (
+                enteredPin.length < 1 ? (
                   <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                 ) : (
                   <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
