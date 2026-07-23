@@ -446,9 +446,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 1
                     ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30'
-                    : showMissingPinAlert
-                      ? 'bg-[#FFD700]/15 border border-[#FFD700]/40 text-[#FFD700] ring-2 ring-[#FFD700]/20'
-                      : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
+                    : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
                   : enteredPin.length >= 1
                     ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30'
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
@@ -456,7 +454,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             >
               {step === 'enter_activation_phone' ? (
                 showMissingPinAlert ? (
-                  <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ DIGITE SU CELULAR</span>
+                  <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ PRIMERO DIGITE SU CELULAR</span>
                 ) : (
                   <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA <span key={enteredPin.length} className="animate-counter-pop">{enteredPin.length || '00'}</span> DIGITOS</span>
                 )
