@@ -218,7 +218,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             }}
             className="absolute right-5 top-1/2 -translate-y-1/2 p-2 hover:bg-white/5 rounded-xl transition-all duration-200 active:scale-90"
           >
-            <X className="w-5 h-5 text-gray-400" />
+            <X className="w-5 h-5 text-red-400 hover:text-red-300" />
           </button>
         </div>
 
