@@ -109,14 +109,14 @@
 }
 
 @keyframes counter-pop {
-  0% { transform: scale(1.4); opacity: 0.5; }
-  50% { transform: scale(0.95); }
+  0% { transform: scale(2.0); opacity: 0.3; }
+  50% { transform: scale(0.85); }
   100% { transform: scale(1); opacity: 1; }
 }
 
 .animate-counter-pop {
   display: inline-block;
-  animation: counter-pop 0.35s ease-out;
+  animation: counter-pop 0.45s ease-out;
 }
 
 @keyframes typing-reveal {
