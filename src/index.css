@@ -119,24 +119,17 @@
   animation: counter-pop 0.35s ease-out;
 }
 
-@keyframes premium-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
-    filter: blur(6px);
-  }
-  60% {
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+@keyframes beam-reveal {
+  from { -webkit-mask-position: 200% 0; mask-position: 200% 0; }
+  to { -webkit-mask-position: 0% 0; mask-position: 0% 0; }
 }
 
-.animate-premium-reveal {
-  animation: premium-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+.animate-beam-reveal {
+  -webkit-mask: linear-gradient(90deg, transparent 0%, transparent 12%, black 35%, black 100%);
+  -webkit-mask-size: 300% 100%;
+  mask: linear-gradient(90deg, transparent 0%, transparent 12%, black 35%, black 100%);
+  mask-size: 300% 100%;
+  animation: beam-reveal 1.8s cubic-bezier(0.25, 0.1, 0.25, 1) 0.5s both;
 }
 
 
