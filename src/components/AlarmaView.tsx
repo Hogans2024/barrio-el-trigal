@@ -116,8 +116,10 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
         }}
         >
           {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
-        <div className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center space-x-2">
-          <Shield className="w-4 h-4 text-[#FFD700]" />
+        <div className="md:hidden absolute top-1.5 left-3 z-20 flex items-center space-x-2">
+          <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
+            <Shield className="w-3.5 h-3.5 text-[#FFD700]" />
+          </div>
           <h2 className="text-xs font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
         </div>
 
