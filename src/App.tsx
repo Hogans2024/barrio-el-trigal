@@ -433,7 +433,9 @@ export default function App() {
               </div>
 
               {(searchResults.length > 0 || (globalSearchQuery.length > 0 && isSearchFocused)) && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c101d] border border-white/10 rounded-2xl shadow-xl z-50 animate-fade-in max-h-[70vh] overflow-y-auto">
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsSearchFocused(false)} />
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c101d] border border-white/10 rounded-2xl shadow-xl z-50 animate-fade-in max-h-[70vh] overflow-y-auto">
                   {searchResults.length === 0 ? (
                     <div className="px-4 py-8 text-center text-xs text-gray-500">
                       No se encontraron resultados para <span className="text-gray-400 font-semibold">"{globalSearchQuery}"</span>
@@ -483,6 +485,7 @@ export default function App() {
                     })()
                   )}
                 </div>
+              </>
               )}
             </div>
             )}
