@@ -458,9 +458,6 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
               }`}
             >
-              {step === 'enter_activation_phone' && enteredPin.length >= 8 && (
-                <span className="absolute inset-0 rounded-xl border-2 border-[#FFD700]/30 animate-ping pointer-events-none" />
-              )}
               {step === 'enter_activation_phone' ? (
                 showMissingPinAlert ? (
                   <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
