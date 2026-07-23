@@ -119,18 +119,24 @@
   animation: counter-pop 0.35s ease-out;
 }
 
-@keyframes typing-reveal {
-  from { max-width: 0 }
-  to { max-width: 22em }
+@keyframes premium-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(6px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
-.animate-typing {
-  overflow: hidden;
-  white-space: nowrap;
-  display: inline-block;
-  max-width: 0;
-  animation: typing-reveal 2.5s steps(40, end) 0.5s forwards;
-  border-right: 2px solid #FFD700;
+.animate-premium-reveal {
+  animation: premium-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
 }
 
 
