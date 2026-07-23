@@ -120,15 +120,16 @@
 }
 
 @keyframes typing-reveal {
-  from { clip-path: inset(0 100% 0 0) }
-  to { clip-path: inset(0 0% 0 0) }
+  from { max-width: 0 }
+  to { max-width: 22em }
 }
 
 .animate-typing {
   overflow: hidden;
   white-space: nowrap;
   display: inline-block;
-  animation: typing-reveal 2s steps(30, end) forwards;
+  max-width: 0;
+  animation: typing-reveal 2.5s steps(40, end) 0.5s forwards;
   border-right: 2px solid #FFD700;
 }
 
