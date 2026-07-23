@@ -120,7 +120,7 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
           <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
             <Shield className="w-3.5 h-3.5 text-[#FFD700]" />
           </div>
-          <h2 className="text-xs font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
+          <h2 className="text-base font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
         </div>
 
         <img
@@ -128,15 +128,15 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
           className="absolute inset-0 w-full h-full object-cover opacity-50"
           src={CAROUSEL_SLIDES[carouselIndex].imageUrl}
         />
-        {/* Dark overlay vignette gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent flex flex-col justify-center px-4 tall:px-6 sm:px-10 md:mt-0">
-          <h2 className="text-sm tall:text-lg sm:text-2xl font-light text-white leading-tight">
+        {/* Dark overlay vignette gradient below left arrow */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col justify-end pl-7 pr-4 tall:pl-9 tall:pr-6 sm:pl-13 sm:pr-10 pb-2 tall:pb-3 sm:pb-4">
+          <h2 className="text-base font-light text-white leading-tight">
             {CAROUSEL_SLIDES[carouselIndex].title}
           </h2>
-          <h3 className="text-sm tall:text-lg sm:text-2xl font-bold text-[#FFD700] mb-0.5 sm:mb-1 font-sans uppercase tracking-tight">
+          <h3 className="text-base font-bold text-[#FFD700] mb-0.5 sm:mb-1 font-sans uppercase tracking-tight">
             {CAROUSEL_SLIDES[carouselIndex].subtitle}
           </h3>
-          <p className="hidden sm:block text-gray-300 max-w-xl text-[11px] leading-relaxed font-sans">
+          <p className="hidden sm:block text-gray-300 max-w-xl text-base leading-relaxed font-sans">
             {CAROUSEL_SLIDES[carouselIndex].description}
           </p>
         </div>
