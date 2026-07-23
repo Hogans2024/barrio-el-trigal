@@ -116,7 +116,7 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
         }}
         >
           {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
-        <div className="md:hidden absolute top-1.5 left-3 z-20 flex items-center space-x-2">
+        <div className="md:hidden absolute top-1.5 left-8 z-20 flex items-center space-x-1">
           <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
             <Shield className="w-3.5 h-3.5 text-[#FFD700]" />
           </div>
@@ -133,7 +133,7 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
           <h2 className="text-base font-light text-white leading-tight">
             {CAROUSEL_SLIDES[carouselIndex].title}
           </h2>
-          <h3 className="text-base font-bold text-[#FFD700] mb-0.5 sm:mb-1 font-sans uppercase tracking-tight">
+          <h3 className="text-sm font-bold text-[#FFD700] mb-0.5 sm:mb-1 font-sans uppercase tracking-tight">
             {CAROUSEL_SLIDES[carouselIndex].subtitle}
           </h3>
           <p className="hidden sm:block text-gray-300 max-w-xl text-base leading-relaxed font-sans">

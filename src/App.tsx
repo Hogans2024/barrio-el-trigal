@@ -636,26 +636,62 @@ export default function App() {
         onClose={() => setIsProfileOpen(false)}
       />
 
-      {/* 4. HAMBURGER MENU DRAWER (MOBILE ONLY) */}
+      {/* 4. HAMBURGER MENU DRAWER (MOBILE ONLY) — clon exacto del sidebar desktop */}
       {menuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-start">
-          <div className="bg-[#121212] border-r border-gray-800 w-full max-w-xs p-6 overflow-y-auto space-y-6 animate-in slide-in-from-left duration-200">
-            <div className="flex justify-between items-center pb-3 border-b border-gray-900">
-              <h3 className="text-brand-yellow font-extrabold text-sm tracking-widest uppercase">BARRIO EL TRIGAL</h3>
-              <button onClick={() => setMenuOpen(false)} className="bg-black/50 hover:bg-black/80 text-gray-400 hover:text-white rounded-full p-2 border border-gray-800 transition focus:outline-none cursor-pointer">
-                <X className="h-5 w-5" />
-              </button>
+        <div className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-start" onClick={() => setMenuOpen(false)}>
+          <div className="flex flex-col w-72 bg-black/40 border-r border-gray-900/80 p-6 z-40 relative backdrop-blur-xl shrink-0 overflow-y-auto animate-in slide-in-from-left duration-200" onClick={(e) => e.stopPropagation()}>
+            <div className="flex-1 space-y-8">
+              <div className="flex items-center space-x-3">
+                <img 
+                  src={`${import.meta.env.BASE_URL}logo_01.svg`} 
+                  alt="Logo Barrio El Trigal" 
+                  className="w-16 h-16 object-contain drop-shadow-md"
+                />
+                <div>
+                  <span className="text-gray-500 text-[10px] uppercase font-mono block tracking-widest">BARRIO</span>
+                  <h2 className="text-white text-xl font-extrabold tracking-tight">El Trigal</h2>
+                </div>
+              </div>
+              <nav className="space-y-2 text-sm font-semibold">
+                {[
+                  { id: 'alarma', icon: Siren, label: 'Central Alarma Vecinal' },
+                  { id: 'proyectos', icon: LayoutGrid, label: 'Proyectos del Barrio' },
+                  { id: 'eventos', icon: Calendar, label: 'Eventos Programados' },
+                  { id: 'farmacias', icon: PlusSquare, label: 'Farmacias de Turno' },
+                  { id: 'negocios', icon: Store, label: 'Negocios Locales' },
+                  { id: 'mascotas', icon: Heart, label: 'Mascotas Perdidas' },
+                  { id: 'noticias', icon: Newspaper, label: 'Noticias' },
+                  { id: 'afiliacion', icon: Users, label: 'Registro Afiliados' }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => { navigateToTab(item.id); setMenuOpen(false); }}
+                    className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition cursor-pointer ${
+                      activeTab === item.id
+                        ? 'bg-brand-yellow text-gray-950 font-bold shadow-md'
+                        : 'text-gray-400 hover:bg-[#1a1a1a] hover:text-white'
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+                <button
+                  onClick={() => { playTone(500, 50); setIsProfileOpen(true); setMenuOpen(false); }}
+                  className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition cursor-pointer ${
+                    false
+                      ? 'bg-brand-yellow text-gray-950 font-bold shadow-md'
+                      : 'text-gray-400 hover:bg-[#1a1a1a] hover:text-white'
+                  }`}
+                >
+                  <User className="h-5 w-5 shrink-0" />
+                  <span>Perfil / Usuario</span>
+                </button>
+              </nav>
             </div>
-            <div className="space-y-2 text-sm font-semibold">
-              {[['alarma','🚨 Central Alarma Vecinal'],['proyectos','🧱 Proyectos del Barrio'],['eventos','📆 Eventos programados'],['noticias','📰 Noticias'],['farmacias','💊 Farmacias de Turno'],['negocios','🍔 Negocios Locales'],['mascotas','🐾 Mascotas Perdidas'],['afiliacion','📝 Registro de Afiliados']].map(([id,label]) => (
-                <button key={id} onClick={() => { navigateToTab(id); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">{label}</button>
-              ))}
-              <button onClick={() => { playTone(500, 50); setIsProfileOpen(true); setMenuOpen(false); }} className="w-full text-left py-3.5 px-4 hover:bg-[#1a1a1a] rounded-xl text-gray-300 hover:text-white transition cursor-pointer">👤 Usuario</button>
-            </div>
-            <div className="bg-black/40 border border-gray-900 rounded-2xl p-5 space-y-2 text-xs text-gray-500 font-mono mt-8">
-              <span className="text-white font-bold block">Contacto Directiva</span>
-              <p>Presidente: Don Omar Castro</p>
-              <p>📍 Sede: Av. Las Begonias N° 230</p>
+            <div className="bg-black/40 border border-gray-900 rounded-2xl p-4 text-[11px] text-gray-500 font-mono tracking-wide leading-relaxed mt-6">
+              <span className="text-white font-semibold block">Tarija Unida • 2026</span>
+              <p className="mt-1">Control de vecindad certificado bajo padrón nacional.</p>
             </div>
           </div>
         </div>
