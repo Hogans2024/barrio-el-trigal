@@ -367,7 +367,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                   </div>
                   <div className="w-full flex items-center justify-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
-                    <span className={`whitespace-nowrap uppercase ${enteredPin.length >= 8 ? 'invisible' : enteredPin.length < 1 && !showMissingPinAlert ? 'text-[#FFD700] animate-pulse' : 'text-white'}`}>⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                    {enteredPin.length >= 8 ? (
+                  <span className="animate-typing text-[#FFD700] uppercase font-extrabold text-xs sm:text-sm">AHORA PRESIONE ACTIVAR ALARMA</span>
+                ) : enteredPin.length < 1 && !showMissingPinAlert ? (
+                  <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                ) : (
+                  <span className="whitespace-nowrap uppercase text-white">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                )}
                   </div>
                 </div>
               ) : (

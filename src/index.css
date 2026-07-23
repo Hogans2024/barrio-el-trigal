@@ -119,4 +119,17 @@
   animation: counter-pop 0.35s ease-out;
 }
 
+@keyframes typing-reveal {
+  from { clip-path: inset(0 100% 0 0) }
+  to { clip-path: inset(0 0% 0 0) }
+}
+
+.animate-typing {
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  animation: typing-reveal 2s steps(30, end) forwards;
+  border-right: 2px solid #FFD700;
+}
+
 
