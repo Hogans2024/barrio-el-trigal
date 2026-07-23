@@ -246,7 +246,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     if (!sentinel) return;
     const observer = new IntersectionObserver(
       ([entry]) => setShowFloatingBtns(!entry.isIntersecting),
-      { threshold: 0 }
+      { threshold: [0, 0.5, 1], rootMargin: '-2px 0px 0px 0px' }
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
@@ -411,7 +411,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
 
   return (
     <div className="flex flex-col space-y-5 relative">
-      <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" />
+      <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-1 pointer-events-none" />
       {/* Header title */}
       <div className="-mt-[16px] flex items-start justify-between">
         <div>
