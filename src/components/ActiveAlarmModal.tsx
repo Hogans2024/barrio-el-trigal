@@ -442,7 +442,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             {/* Main Action Button */}
             <button
               onClick={() => {
-                if (enteredPin.length < 1) {
+                if (enteredPin.length < 8) {
                   setShowMissingPinAlert(true);
                   return;
                 }
@@ -450,10 +450,10 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               }}
               className={`w-[94%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 shadow-lg cursor-pointer ${
                 step === 'enter_activation_phone'
-                  ? enteredPin.length >= 1
+                  ? enteredPin.length >= 8
                     ? 'bg-[#FFD700] hover:bg-[#ffe16d] text-black shadow-[0_0_25px_rgba(255,215,0,0.5)] font-extrabold ring-4 ring-[#FFD700]/30'
                     : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
-                  : enteredPin.length >= 1
+                  : enteredPin.length >= 8
                     ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30'
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
               }`}
