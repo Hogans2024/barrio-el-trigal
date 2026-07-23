@@ -216,9 +216,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 message: 'Modal cerrado manualmente'
               });
             }}
-            className="absolute top-1 left-1 p-1.5 hover:bg-white/5 rounded-xl transition-all duration-200 active:scale-90"
+            className="absolute top-1 left-1 p-2 hover:bg-white/10 rounded-xl transition-all duration-200 active:scale-90 shadow-[0_0_15px_rgba(255,0,0,0.2)] hover:shadow-[0_0_25px_rgba(255,0,0,0.35)]"
           >
-            <X className="w-5 h-5 text-red-400 hover:text-red-300" />
+            <X className="w-6 h-6 text-red-400 hover:text-red-300" />
           </button>
         </div>
 
