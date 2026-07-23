@@ -117,9 +117,7 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
         >
           {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
         <div className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center space-x-2">
-          <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
-            <Shield className="w-3.5 h-3.5 text-[#FFD700]" />
-          </div>
+          <Shield className="w-4 h-4 text-[#FFD700]" />
           <h2 className="text-xs font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
         </div>
 
@@ -129,7 +127,7 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
           src={CAROUSEL_SLIDES[carouselIndex].imageUrl}
         />
         {/* Dark overlay vignette gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent flex flex-col justify-center px-4 tall:px-6 sm:px-10 mt-6 md:mt-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent flex flex-col justify-center px-4 tall:px-6 sm:px-10 md:mt-0">
           <h2 className="text-sm tall:text-lg sm:text-2xl font-light text-white leading-tight">
             {CAROUSEL_SLIDES[carouselIndex].title}
           </h2>
