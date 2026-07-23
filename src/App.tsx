@@ -377,7 +377,7 @@ export default function App() {
             {activeTab !== 'alarma' && !(activeTab === 'afiliacion' && isAfiliadoActionActive) ? (
               <button
                 onClick={goBackTab}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-b from-[#1a1a1d] to-[#0C0C0E] border border-[#2a3547] hover:border-[#686D75] cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 shadow-lg shadow-black/40"
+                className="flex items-center gap-1.5 px-3 py-1.5 -ml-1.5 rounded-full bg-gradient-to-b from-[#1a1a1d] to-[#0C0C0E] border border-[#2a3547] hover:border-[#686D75] cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 shadow-lg shadow-black/40"
                 title="Volver"
               >
                 <ChevronLeft className="w-[18px] h-[18px] text-[#D1D5DB]" />
