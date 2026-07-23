@@ -206,20 +206,23 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              playTone(400, 100);
-              onClose({
-                id: `log-${Date.now()}`,
-                timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-                type: 'cancel' as const,
-                message: 'Modal cerrado manualmente'
-              });
-            }}
-            className="absolute top-1 left-1 p-2 hover:bg-white/10 rounded-xl transition-all duration-200 active:scale-90 shadow-[0_0_15px_rgba(255,0,0,0.2)] hover:shadow-[0_0_25px_rgba(255,0,0,0.35)]"
-          >
-            <X className="w-6 h-6 text-red-400 hover:text-red-300" />
-          </button>
+          <div className="absolute top-1 left-1 flex flex-col items-center">
+            <button
+              onClick={() => {
+                playTone(400, 100);
+                onClose({
+                  id: `log-${Date.now()}`,
+                  timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                  type: 'cancel' as const,
+                  message: 'Modal cerrado manualmente'
+                });
+              }}
+              className="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 active:scale-90 shadow-[0_0_15px_rgba(255,0,0,0.2)] hover:shadow-[0_0_25px_rgba(255,0,0,0.35)]"
+            >
+              <X className="w-6 h-6 text-red-400 hover:text-red-300" />
+            </button>
+            <span className="text-[7px] text-red-400/70 leading-none -mt-0.5">Cerrar</span>
+          </div>
         </div>
 
         {/* CUERPO DEL MODAL (PANELES SPLIT) */}
