@@ -221,7 +221,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             >
               <X className="w-6 h-6 text-red-400 hover:text-red-300" />
             </button>
-            <span className="text-[7px] text-red-400/70 leading-none -mt-0.5">Cerrar</span>
+            <span className="text-[7px] text-white leading-none -mt-0.5">Cerrar</span>
           </div>
         </div>
 
