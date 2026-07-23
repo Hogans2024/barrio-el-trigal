@@ -182,7 +182,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] -mt-2 sm:mt-0">
 
         {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL */}
-        <div className="sticky top-0 z-50 w-full flex items-center justify-between px-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div className="sticky top-0 z-50 w-full flex items-center justify-center px-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
           <div className="flex items-center space-x-3">
             <div className={`p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
@@ -191,7 +191,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             }`}>
               <ShieldAlert className={`w-5 h-5 ${step === 'flashing' ? 'animate-pulse text-red-400' : 'text-[#FFD700]'}`} />
             </div>
-            <div className="flex flex-col text-left">
+            <div className="flex flex-col">
               <div className="flex items-center space-x-2">
                 <h3 className={`text-sm sm:text-base font-extrabold tracking-wide uppercase font-sans transition-all duration-300 ${
                   step === 'enter_activation_phone' ? 'text-white' : 'text-red-400 animate-pulse'
@@ -212,17 +212,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               onClose({
                 id: `log-${Date.now()}`,
                 timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-                type: type,
-                user: 'Vecino',
-                status: 'resolved',
-                resolvedBy: 'Cancelado',
-                resolutionTime: '00:00',
+                type: 'cancel' as const,
+                message: 'Modal cerrado manualmente'
               });
             }}
-            className="w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors active:scale-90"
-            aria-label="Cerrar"
+            className="absolute right-5 top-1/2 -translate-y-1/2 p-2 hover:bg-white/5 rounded-xl transition-all duration-200 active:scale-90"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
