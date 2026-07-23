@@ -51,6 +51,16 @@ export default function App() {
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearSearch = useCallback(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+      searchTimeoutRef.current = null;
+    }
+    setIsSearchFocused(false);
+    setGlobalSearchQuery('');
+  }, []);
 
   const [highlightCardId, setHighlightCardId] = useState<string | null>(null);
   const [isAfiliadoActionActive, setIsAfiliadoActionActive] = useState(false);
@@ -62,6 +72,9 @@ export default function App() {
   }, []);
 
   const navigateToTab = (tab: string) => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    setIsSearchFocused(false);
+    setGlobalSearchQuery('');
     setNavHistory(prev => prev[prev.length - 1] !== tab ? [...prev, tab] : prev);
     setActiveTab(tab);
   };
@@ -71,6 +84,9 @@ export default function App() {
     if (navHistory.length > 1) {
       const newHistory = [...navHistory];
       newHistory.pop();
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      setIsSearchFocused(false);
+      setGlobalSearchQuery('');
       setActiveTab(newHistory[newHistory.length - 1]);
       setNavHistory(newHistory);
     }
@@ -99,17 +115,19 @@ export default function App() {
     return map[s] ?? s;
   };
 
+  const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
   const searchResults = useMemo<SearchResult[]>(() => {
-    const q = globalSearchQuery.toLowerCase().trim();
+    const q = normalize(globalSearchQuery);
     if (!q || q.length < 1) return [];
 
     const results: SearchResult[] = [];
     const addIfMatch = (section: string, id: string, title: string, desc: string, fields: string[]) => {
-      const lowerTitle = title.toLowerCase();
-      const lowerDesc = desc.toLowerCase();
+      const lowerTitle = normalize(title);
+      const lowerDesc = normalize(desc);
       const lowerQuery = q;
       for (const f of fields) {
-        const lf = f.toLowerCase();
+        const lf = normalize(f);
         if (lowerTitle.includes(lf) || lowerDesc.includes(lf)) {
           const relevance = calcRelevance(lowerTitle, lowerDesc, lowerQuery, lf);
           results.push({
@@ -197,11 +215,22 @@ export default function App() {
     return results.slice(0, 20);
   }, [globalSearchQuery, farmacias, mascotas, eventos, negocios, proyectos, noticias]);
 
-  // Click outside to collapse search bar
+  // Click outside: hide results immediately, clear text after 60s
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsSearchFocused(false);
+        if (!searchTimeoutRef.current) {
+          searchTimeoutRef.current = setTimeout(() => {
+            setGlobalSearchQuery('');
+            searchTimeoutRef.current = null;
+          }, 20000);
+        }
+      } else {
+        if (searchTimeoutRef.current) {
+          clearTimeout(searchTimeoutRef.current);
+          searchTimeoutRef.current = null;
+        }
       }
     }
     if (isSearchFocused) {
@@ -271,6 +300,9 @@ export default function App() {
   useEffect(() => {
     const handler = (e: Event) => {
       const customEvent = e as CustomEvent;
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      setIsSearchFocused(false);
+      setGlobalSearchQuery('');
       setActiveTab(customEvent.detail);
       setNavHistory(prev => prev[prev.length - 1] !== customEvent.detail ? [...prev, customEvent.detail] : prev);
     };
@@ -410,7 +442,7 @@ export default function App() {
             {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
             {activeTab === 'alarma' && (
             <div ref={searchRef} className={`md:hidden relative ${isSearchFocused ? 'flex-1 -mr-5' : 'flex-1 max-w-[200px]'}`}>
-              <div className={`flex items-center w-full bg-black/60 border border-gray-800 ${isSearchFocused ? 'rounded-l-xl rounded-r-none border-r-0 relative z-50' : 'rounded-xl'} px-2 py-1.5`}>
+              <div className={`flex items-center w-full bg-black/60 border border-gray-800 ${isSearchFocused ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl'} px-2 py-1.5`}>
                 <Search className="h-4 w-4 text-gray-400 shrink-0" />
                 <input
                   type="text"
@@ -424,7 +456,7 @@ export default function App() {
                   <span className="text-[11px] font-sans text-white/30 ml-1 shrink-0">Buscar</span>
                 ) : (
                   <button 
-                    onClick={() => { setGlobalSearchQuery(''); setIsSearchFocused(false); }}
+                    onClick={() => { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); setGlobalSearchQuery(''); setIsSearchFocused(false); }}
                     className="ml-2 px-3 py-1 text-[10px] font-bold text-gray-400 border border-gray-400 rounded-lg hover:bg-white/5 transition-colors uppercase shrink-0"
                   >
                     BUSCAR
@@ -432,9 +464,7 @@ export default function App() {
                 )}
               </div>
 
-              {(searchResults.length > 0 || (globalSearchQuery.length > 0 && isSearchFocused)) && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsSearchFocused(false)} />
+              {isSearchFocused && (searchResults.length > 0 || globalSearchQuery.length > 0) && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c101d] border border-white/10 rounded-2xl shadow-xl z-50 animate-fade-in max-h-[70vh] overflow-y-auto">
                   {searchResults.length === 0 ? (
                     <div className="px-4 py-8 text-center text-xs text-gray-500">
@@ -465,6 +495,7 @@ export default function App() {
                                   <button
                                     key={`${r.section}-${r.id}`}
                                     onClick={() => {
+                                      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
                                       setGlobalSearchQuery('');
                                       setIsSearchFocused(false);
                                       setHighlightCardId(`${r.section}::${r.id}`);
@@ -485,7 +516,6 @@ export default function App() {
                     })()
                   )}
                 </div>
-              </>
               )}
             </div>
             )}
