@@ -364,7 +364,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   </div>
                   <div className="w-full flex items-center justify-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
                     {enteredPin.length >= 8 ? (
-                  <span className="animate-typing text-white uppercase font-extrabold text-xs sm:text-sm">AHORA PRESIONE ACTIVAR ALARMA</span>
+                  <span className="animate-typing text-white uppercase">AHORA PRESIONE ACTIVAR ALARMA</span>
                 ) : enteredPin.length < 1 && !showMissingPinAlert ? (
                   <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                 ) : (
