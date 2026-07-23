@@ -30,6 +30,75 @@ export function useSheetData(): SheetData {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // ═══════════════════════════════════════════════════════════════════════════════════════════════
+    //  🚫 BLOQUEO TEMPORAL — Conexión al CMS (Google Sheets + Apps Script) DESHABILITADA
+    //  ═══════════════════════════════════════════════════════════════════════════════════════════════
+    //
+    //  ⚠️  ATENCIÓN — LEE ESTO ANTES DE MODIFICAR:
+    //
+    //  _____________________________________________________________________________________________
+    //  |                                                                                           |
+    //  |  🎯 PROPÓSITO DE ESTE BLOQUEO:                                                            |
+    //  |  ──────────────────────────────                                                           |
+    //  |  Deshabilitamos temporalmente la obtención de datos desde Google Sheets vía Apps Script   |
+    //  |  (archivo `public/data.json` servido por GitHub Pages) porque las URLs de las imágenes    |
+    //  |  almacenadas en Google Sheets están CAÍDAS (HTTP 404) y al sobrescribir los datos         |
+    //  |  locales, las tarjetas de Proyectos, Eventos y Noticias se quedan sin imagen.             |
+    //  |                                                                                           |
+    //  |  Al forzar el uso de datos locales (FALLBACK), podemos controlar las URLs de las imágenes |
+    //  |  directamente desde `src/data.ts` y mantenerlas actualizadas sin depender del CMS.        |
+    //  |___________________________________________________________________________________________|
+    //
+    //  _____________________________________________________________________________________________
+    //  |                                                                                           |
+    //  |  🛠️  CÓMO RESTAURAR LA CONEXIÓN AL CMS (CUANDO ESTÉ LISTO):                              |
+    //  |  ───────────────────────────────────────────────────────────                              |
+    //  |  1. Elimina o comenta la línea que llama a `setFallbackAndFinish()` más abajo.            |
+    //  |  2. Descomenta el BLOQUE A (el fetch + parse + setData).                                  |
+    //  |  3. Verifica que el archivo `public/data.json` esté siendo servido correctamente         |
+    //  |     y que contenga TODOS los campos requeridos por los types (TransportInfo, etc.).       |
+    //  |  4. Asegúrate de que las URLs en Google Sheets sean válidas (HTTP 200).                   |
+    //  |___________________________________________________________________________________________|
+    //
+    //  _____________________________________________________________________________________________
+    //  |                                                                                           |
+    //  |  📋 ESTRUCTURA DEL CÓDIGO:                                                                |
+    //  |  ─────────────────────────                                                                |
+    //  |  Hay DOS bloques mutuamente excluyentes. SOLO UNO debe estar activo a la vez:             |
+    //  |                                                                                           |
+    //  |  - BLOQUE A (ACTIVO): Forza datos locales (FALLBACK) en TODAS las secciones.              |
+    //  |  - BLOQUE B (COMENTADO): Fetch al CMS + merge con FALLBACK.                               |
+    //  |                                                                                           |
+    //  |  Cuando quieras reconectar el CMS, activa B y desactiva A.                                 |
+    //  |___________________________________________________________________________________________|
+    //
+    //  _____________________________________________________________________________________________
+    //  |                                                                                           |
+    //  |  🔗 FLUJO COMPLETO (cuando esté conectado):                                               |
+    //  |  ─────────────────────────────────────────────                                            |
+    //  |  Google Sheets (hojas con datos)                                                           |
+    //  |      → Google Apps Script (code.gs en la nube)                                            |
+    //  |          → Exporta a `data.json`                                                           |
+    //  |              → Publica en GitHub Pages (pendiente de configurar)                           |
+    //  |                  → El frontend hace fetch(`${BASE_URL}data.json?v=${Date.now()}`)          |
+    //  |                      → useSheetData hook parsea y distribuye a cada vista                  |
+    //  |                          → Cada vista renderiza `item.imageUrl`                            |
+    //  |                                                                                           |
+    //  |  Las secciones Alarma y Afiliación usan datos separados (`src/data.alarma.ts`)            |
+    //  |  y NO dependen de este flujo CMS.                                                         |
+    //  |___________________________________________________________________________________________|
+    //
+    // ═══════════════════════════════════════════════════════════════════════════════════════════════
+
+    // ─── BLOQUE A: Datos locales (FALLBACK) — ACTIVO ───
+    // Cuando quieras reconectar al CMS, desactiva este bloque y activa el BLOQUE B.
+    setData(FALLBACK);
+    setLoading(false);
+    return; // ← Salimos del efecto, NO ejecutamos el fetch
+
+    // ─── BLOQUE B: Fetch al CMS — COMENTADO (desactivado temporalmente) ───
+    // Descomenta todo este bloque cuando el CMS esté listo (ver instrucciones arriba).
+    /*
     const url = `${import.meta.env.BASE_URL}data.json?v=${Date.now()}`;
     fetch(url)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
@@ -95,6 +164,7 @@ export function useSheetData(): SheetData {
         setData(FALLBACK);
       })
       .finally(() => setLoading(false));
+    */
   }, []);
 
   return { ...data, loading, error };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -55,6 +55,7 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [logs, setLogs] = useState<AlarmLog[]>(ALARM_LOGS);
+  const touchStartX = useRef(0);
 
   // Tipos de alarma seleccionables (panic / suspicious / test / medical)
   const ALARM_TYPES: { id: 'panic' | 'suspicious' | 'test' | 'medical'; label: string; icon: React.ReactNode; color: string }[] = [
@@ -100,8 +101,21 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
 
       {/* ============ 1. CARRUSEL HERO ============ */}
-      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-24 tall:h-32 sm:h-52 shrink-0 select-none bg-[#080a0f]">
-        {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
+      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-24 tall:h-32 sm:h-52 shrink-0 select-none bg-[#080a0f]"
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchMove={(e) => { e.preventDefault(); }}
+        onTouchEnd={(e) => {
+          const diff = touchStartX.current - e.changedTouches[0].clientX;
+          if (Math.abs(diff) > 60) {
+            if (diff > 0) {
+              handleNextSlide();
+            } else {
+              handlePrevSlide();
+            }
+          }
+        }}
+        >
+          {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
         <div className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center space-x-2">
           <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
             <Shield className="w-3.5 h-3.5 text-[#FFD700]" />

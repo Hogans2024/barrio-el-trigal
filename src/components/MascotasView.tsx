@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
+import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle, Zap, Images, FileText, UserCircle2, IdCard, Dog, Cat, Bird, Rabbit, Shield } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
+import { FOUND_PETS_DATA } from '../data';
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
   value: string;
@@ -158,24 +159,44 @@ interface MascotasViewProps {
   onShowNotification: (title: string, message: string) => void;
   highlightId?: string | null;
   onClearHighlight?: () => void;
+  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
 }
 
 const DEFAULT_IMAGES: Record<string, string> = {
   Perro: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
   Gato: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop&q=80',
   Aves: 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=600&auto=format&fit=crop&q=80',
+  Conejo: 'https://images.unsplash.com/photo-1535241749838-299277b6305f?w=600&auto=format&fit=crop&q=80',
+  Tortuga: 'https://images.unsplash.com/photo-1570458436416-b8fcccfe883f?w=600&auto=format&fit=crop&q=80',
   Otras: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600&auto=format&fit=crop&q=80',
 };
 
-export default function MascotasView({ mascotas, onShowNotification, highlightId, onClearHighlight }: MascotasViewProps) {
+export default function MascotasView({ mascotas, onShowNotification, highlightId, onClearHighlight, onRegisterBackHandler }: MascotasViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePet, setActivePet] = useState<LostPet | null>(null);
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
   const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
+  const [showFound, setShowFound] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
+
+  useEffect(() => {
+    if (contactPet) {
+      onRegisterBackHandler?.(() => { setContactPet(null); return true; });
+    } else if (schedulePet) {
+      onRegisterBackHandler?.(() => { setSchedulePet(null); return true; });
+    } else if (activePet) {
+      onRegisterBackHandler?.(() => { setActivePet(null); return true; });
+    } else if (showFound) {
+      onRegisterBackHandler?.(() => { setShowFound(false); const stored = localStorage.getItem('barrio_mascotas_extra'); if (stored) { try { const extra: LostPet[] = JSON.parse(stored); setPets([...extra, ...mascotas]); } catch(e) { setPets(mascotas); } } else { setPets(mascotas); } return true; });
+    } else {
+      onRegisterBackHandler?.(null);
+    }
+  }, [activePet, contactPet, schedulePet, showFound, onRegisterBackHandler, mascotas]);
   const autoPlayRef = useRef(true);
+  const touchStartX = useRef(0);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -186,6 +207,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
 
   const [pets, setPets] = useState<LostPet[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [formMode, setFormMode] = useState<'lost' | 'found'>('lost');
+  const [showFormPicker, setShowFormPicker] = useState(false);
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState<string>('Perro');
   const [newDesc, setNewDesc] = useState('');
@@ -292,14 +315,16 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     localStorage.setItem('barrio_mascotas_extra', JSON.stringify(extraItems));
   };
 
-  const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Otras'];
+  const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Conejos', 'Tortugas', 'Otros animales'];
 
   const categoryIcons: Record<string, React.ReactNode> = {
-    Todos: <LayoutGrid className="w-4 h-4" />,
-    Perros: <HelpCircle className="w-4 h-4" />,
-    Gatos: <HelpCircle className="w-4 h-4" />,
-    Aves: <HelpCircle className="w-4 h-4" />,
-    Otras: <HelpCircle className="w-4 h-4" />,
+    Todos: <LayoutGrid className="w-4 h-4 text-[#FFD700]" />,
+    Perros: <Dog className="w-4 h-4 text-amber-400" />,
+    Gatos: <Cat className="w-4 h-4 text-orange-400" />,
+    Aves: <Bird className="w-4 h-4 text-sky-400" />,
+    Conejos: <Rabbit className="w-4 h-4 text-rose-400" />,
+    Tortugas: <Shield className="w-4 h-4 text-emerald-400" />,
+    'Otros animales': <HelpCircle className="w-4 h-4 text-purple-400" />,
   };
 
   const viewOptions = [
@@ -322,8 +347,12 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       matchesCategory = pet.type === 'Gato';
     } else if (selectedCategory === 'Aves') {
       matchesCategory = pet.type === 'Aves';
-    } else if (selectedCategory === 'Otras') {
-      matchesCategory = pet.type !== 'Perro' && pet.type !== 'Gato' && pet.type !== 'Aves';
+    } else if (selectedCategory === 'Conejos') {
+      matchesCategory = pet.type === 'Conejo';
+    } else if (selectedCategory === 'Tortugas') {
+      matchesCategory = pet.type === 'Tortuga';
+    } else if (selectedCategory === 'Otros animales') {
+      matchesCategory = pet.type !== 'Perro' && pet.type !== 'Gato' && pet.type !== 'Aves' && pet.type !== 'Conejo' && pet.type !== 'Tortuga';
     }
     return matchesSearch && matchesCategory;
   });
@@ -360,8 +389,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     savePets(updated);
     setShowForm(false);
     onShowNotification(
-      '🐾 Alerta de Mascota Publicada',
-      `La alerta de búsqueda para "${newName}" ha sido publicada exitosamente.`
+      formMode === 'lost' ? '🐾 Alerta de Mascota Publicada' : '🐾 Mascota Encontrada Publicada',
+      formMode === 'lost'
+        ? `La alerta de búsqueda para "${newName}" ha sido publicada exitosamente.`
+        : `El aviso de mascota encontrada "${newName}" ha sido publicado exitosamente.`
     );
 
     setNewName('');
@@ -382,11 +413,20 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     <div className="flex flex-col space-y-5 relative">
       <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" />
       {/* Header title */}
-      <div className="-mt-[16px]">
-        <h2 className="text-gray-400 text-sm font-bold tracking-tight">Mascotas Perdidas:</h2>
-        <p className="text-gray-400 text-xs mt-0">
-          Ayuda a encontrar mascotas perdidas.
-        </p>
+      <div className="-mt-[16px] flex items-start justify-between">
+        <div>
+          <h2 className="text-gray-400 text-sm font-bold tracking-tight">{showFound ? 'Mascotas Encontradas:' : 'Mascotas Perdidas:'}</h2>
+          <p className="text-gray-400 text-xs mt-0">
+            Ayuda a encontrar mascotas perdidas.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowFormPicker(true)}
+          className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
+        >
+          <PlusCircle className="h-3.5 w-3.5" />
+          <span>Añadir Mascota</span>
+        </button>
         <style>{`
           @keyframes beam-sweep {
             0% { transform: translate(0, 0); opacity: 0.65; }
@@ -404,6 +444,13 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
           .shimmer-beam.buttons {
             background: linear-gradient(135deg, transparent 15%, rgba(255,215,0,0.08) 35%, rgba(255,215,0,0.18) 50%, rgba(255,215,0,0.08) 65%, transparent 85%);
             animation: beam-sweep 2.5s ease-out 2;
+          }
+          @keyframes icon-slide {
+            0% { transform: translateX(-8px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+          }
+          .cat-icon-animate {
+            animation: icon-slide 0.4s ease-out forwards;
           }
         `}</style>
       </div>
@@ -453,7 +500,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar mascotas..."]');
                     el?.focus();
                   }}
-                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
+                  className="relative inline-flex items-center space-x-1.5 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-sky-500/10 text-sky-400 border-sky-500/40 hover:bg-sky-500/20"
                 >
                   <Search className="w-3.5 h-3.5" />
                   <span>Buscar</span>
@@ -469,8 +516,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                   placeholder="Buscar mascotas..."
-                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/20 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
                 />
               </div>
             </div>
@@ -480,6 +529,35 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
           <div className="relative">
             <div className="relative transition-all duration-300 ease-out">
               <div className="flex gap-2 -mt-[7px]">
+                {!searchFocused && (
+                <>
+                <button
+                  onClick={() => {
+                    setShowFound(false);
+                    const stored = localStorage.getItem('barrio_mascotas_extra');
+                    let base: LostPet[] = [];
+                    if (stored) {
+                      try { const extra: LostPet[] = JSON.parse(stored); base = [...extra, ...mascotas]; } catch(e) { base = mascotas; }
+                    } else { base = mascotas; }
+                    setPets(base);
+                  }}
+                  className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer shrink-0 bg-red-500/10 text-red-400 border-red-500/40"
+                >
+                  <PawPrint className="h-3.5 w-3.5" />
+                  <span>Perdidas</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowFound(true);
+                    setPets(FOUND_PETS_DATA);
+                  }}
+                  className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer shrink-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+                >
+                  <Heart className="h-3.5 w-3.5" />
+                  <span>Encontradas</span>
+                </button>
+                </>
+                )}
                 <div className="relative flex-1">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <Search className="h-4 w-4 text-gray-300" />
@@ -488,17 +566,12 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onFocus={() => setSearchFocused(true)}
+                    onBlur={() => setSearchFocused(false)}
                     placeholder="Buscar mascotas..."
-                    className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/10 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/20 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
                   />
                 </div>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
-                >
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  <span>Añadir Mascota</span>
-                </button>
               </div>
             </div>
             <div ref={barRef} className="mt-3 flex items-center justify-center flex-nowrap" style={{ gap: 'clamp(4px, calc((100vw - 320px) / 12), 19px)' }}>
@@ -594,7 +667,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               </button>
             </div>
             <div className="p-3 space-y-1">
-              {categories.map((cat) => {
+              {categories.map((cat, idx) => {
                 const isActive = selectedCategory === cat;
                 const displayName = cat === 'Todos' ? 'Todas las mascotas' : cat;
                 return (
@@ -610,6 +683,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                         : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border-transparent'
                     }`}
                   >
+                    <span className="cat-icon-animate" style={{ animationDelay: `${idx * 60}ms` }}>
+                      {categoryIcons[cat]}
+                    </span>
                     <span>{displayName}</span>
                     {isActive && <CheckCircle className="w-3.5 h-3.5 ml-auto text-current" />}
                   </button>
@@ -630,7 +706,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 key={pet.id}
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
-                <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
+                <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer" onClick={() => setActivePet(pet)}>
                   <img src={pet.imageUrl} alt={pet.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
@@ -703,7 +779,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-white text-base font-bold tracking-tight">Se busca a "{pet.name}"</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight">{showFound ? 'Encontrado' : 'Se busca a'} "{pet.name}"</h3>
                     <p className="text-gray-400 text-xs mt-1 leading-relaxed">{pet.description}</p>
                   </div>
                   <div className="pt-2 flex items-center justify-between">
@@ -725,7 +801,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 key={pet.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
-                <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
+                <div className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setActivePet(pet)}>
                   <img src={pet.imageUrl} alt={pet.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
@@ -756,7 +832,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               key={pet.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
+              <div className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setActivePet(pet)}>
                 <img
                   src={pet.imageUrl}
                   alt={pet.name}
@@ -839,6 +915,20 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     className="relative h-44 bg-gray-950 overflow-hidden"
                     onMouseEnter={() => { setAutoPlay(false); autoPlayRef.current = false; }}
                     onMouseLeave={() => { setAutoPlay(true); autoPlayRef.current = true; }}
+                    onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                    onTouchMove={(e) => { e.preventDefault(); }}
+                    onTouchEnd={(e) => {
+                      const diff = touchStartX.current - e.changedTouches[0].clientX;
+                      if (Math.abs(diff) > 60) {
+                        if (diff > 0) {
+                          setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1);
+                          setAutoPlay(false);
+                        } else {
+                          setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1);
+                          setAutoPlay(false);
+                        }
+                      }
+                    }}
                   >
                     <img
                       src={slides[slideIdx]}
@@ -888,7 +978,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             })()}
 
             <div className="p-5 space-y-3 pb-16 sm:pb-5">
-              <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
+              <h4 className="text-white text-xl font-bold tracking-tight">{showFound ? 'Encontrado' : 'Se busca a'} "{activePet.name}"</h4>
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
@@ -1077,24 +1167,38 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
         </div>
       )}
 
-      {/* Found footer + Publish button */}
-      <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-5 flex flex-col items-center text-center space-y-3">
-        <div className="bg-[#22c55e]/10 text-[#22c55e] p-2.5 rounded-full">
-          <Heart className="h-5 w-5" />
+      {/* Add Pet Picker Modal */}
+      {showFormPicker && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-xs animate-in fade-in zoom-in duration-150">
+            <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
+              <h4 className="font-extrabold text-sm tracking-tight flex items-center gap-1.5">
+                <PawPrint className="h-4 w-4" />
+                <span>Añadir Mascota</span>
+              </h4>
+              <button type="button" onClick={() => setShowFormPicker(false)} className="hover:opacity-75 text-gray-400">
+                <X className="h-4 w-4 stroke-[2.5]" />
+              </button>
+            </div>
+            <div className="p-5 space-y-3">
+              <button
+                onClick={() => { setFormMode('lost'); setShowFormPicker(false); setShowForm(true); }}
+                className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 border border-red-500/40 hover:bg-red-500/20 px-4 py-3 rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                <PawPrint className="h-4 w-4" />
+                <span>Añadir Mascota Extraviada</span>
+              </button>
+              <button
+                onClick={() => { setFormMode('found'); setShowFormPicker(false); setShowForm(true); }}
+                className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/20 px-4 py-3 rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                <Heart className="h-4 w-4" />
+                <span>Añadir Mascota Encontrada</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <h4 className="text-white text-xs font-bold uppercase tracking-wider">¿Encontraste un animal perdido?</h4>
-          <p className="text-gray-400 text-xs leading-relaxed mt-1">
-            Comunícate con el contacto o publica un aviso comunitario para guiarlo de vuelta.
-          </p>
-        </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-[#FFD700]/10 text-[#FFD700] px-5 py-2.5 rounded-xl text-xs font-extrabold hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer"
-        >
-          Publicar Aviso
-        </button>
-      </div>
+      )}
 
       {/* Add Pet Form Modal */}
       {showForm && (
@@ -1106,7 +1210,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
               <h4 className="font-extrabold text-sm tracking-tight flex items-center gap-1.5">
                 <PawPrint className="h-4 w-4" />
-                <span>Añadir Mascota Extraviada</span>
+                <span>{formMode === 'lost' ? 'Añadir Mascota Extraviada' : 'Añadir Mascota Encontrada'}</span>
               </h4>
               <button type="button" onClick={() => setShowForm(false)} className="hover:opacity-75 text-gray-400">
                 <X className="h-4 w-4 stroke-[2.5]" />
@@ -1137,7 +1241,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     <option value="Perro">Perro</option>
                     <option value="Gato">Gato</option>
                     <option value="Aves">Aves</option>
-                    <option value="Otras">Otras</option>
+                    <option value="Conejo">Conejo</option>
+                    <option value="Tortuga">Tortuga</option>
+                    <option value="Otras">Otros animales</option>
                   </select>
                 </div>
               </div>
@@ -1159,13 +1265,13 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               <div className="border-t border-white/5" />
 
               <div className="space-y-1">
-                <label className="text-emerald-400 text-[10px] uppercase font-bold">Última vez visto <span className="text-red-400">*</span> <span className="text-[8px] text-gray-500 font-normal lowercase">obligatorio/llenar</span></label>
+                <label className="text-emerald-400 text-[10px] uppercase font-bold">{formMode === 'lost' ? 'Última vez visto' : 'Lugar encontrado'} <span className="text-red-400">*</span> <span className="text-[8px] text-gray-500 font-normal lowercase">obligatorio/llenar</span></label>
                 <textarea
                   required
                   rows={3}
                   value={newSeen}
                   onChange={(e) => setNewSeen(e.target.value)}
-                  placeholder="Ej: Cerca de la Plaza, detrás del kiosco de Don José, cuando me di vuelta ya no lo vi más..."
+                  placeholder={formMode === 'lost' ? 'Ej: Cerca de la Plaza, detrás del kiosco de Don José, cuando me di vuelta ya no lo vi más...' : 'Ej: En la Plaza del Barrio, estaba solo y sin collar, lo tengo resguardado...'}
                   className="w-full bg-[#080a0f] text-white p-3 rounded-lg border border-white/10 text-xs focus:outline-none focus:border-[#FFD700] focus:ring-0 resize-none"
                 />
               </div>

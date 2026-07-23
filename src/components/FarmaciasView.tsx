@@ -386,7 +386,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                 key={pharmacy.id}
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
-                <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
+                <div onClick={() => setActivePharmacy(pharmacy)} className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer">
                   <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
@@ -474,7 +474,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                 key={pharmacy.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
-                <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
+                <div onClick={() => setActivePharmacy(pharmacy)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
                   <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
@@ -505,7 +505,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
               key={pharmacy.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
+              <div onClick={() => setActivePharmacy(pharmacy)} className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer">
                 <img
                   src={pharmacy.imageUrl}
                   alt={pharmacy.name}

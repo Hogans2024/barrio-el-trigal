@@ -77,6 +77,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
   const currentSlides = AFILIADOS_SLIDES;
 
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const touchStartX = useRef(0);
 
   // Neighbors list initialized from localStorage or DEFAULT_VECINOS (botones 2,3,4)
   const [vecinos, setVecinos] = useState<Vecino[]>(() => {
@@ -436,7 +437,20 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
 
       {/* ============ 1. CARRUSEL HERO ============ */}
       {activeAfiliadoAction !== null ? null : (
-        <section className="relative rounded-t-none rounded-b-[16px] sm:rounded-b-[20px] overflow-hidden border-b border-x border-white/10 h-32 tall:h-44 sm:h-64 shrink-0 select-none bg-[#080a0f]">
+        <section
+          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+          onTouchMove={(e) => { e.preventDefault(); }}
+          onTouchEnd={(e) => {
+            const diff = touchStartX.current - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 60) {
+              if (diff > 0) {
+                handleNextSlide();
+              } else {
+                handlePrevSlide();
+              }
+            }
+          }}
+          className="relative rounded-t-none rounded-b-[16px] sm:rounded-b-[20px] overflow-hidden border-b border-x border-white/10 h-32 tall:h-44 sm:h-64 shrink-0 select-none bg-[#080a0f]">
           <img
             alt="Barrio El Trigal"
             className="absolute inset-0 w-full h-full object-cover opacity-50"
@@ -541,7 +555,7 @@ export default function AfiliacionView({ onShowNotification, onAfiliadoActionCha
                   id: 7,
                   title: 'Requisitos Agua potable',
                   subtitle: 'Trámite COSAALT',
-                  imageUrl: 'https://images.unsplash.com/photo-1548839140-29a88648f135?auto=format&fit=crop&q=80&w=400',
+                  imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400',
                 },
                 {
                   id: 8,

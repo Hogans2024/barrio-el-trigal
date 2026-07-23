@@ -225,7 +225,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
       Comida: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
       Ropa: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&auto=format&fit=crop&q=80',
       Plantas: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80',
-      'Papa de comer': 'https://images.unsplash.com/photo-1573244514399-7448d3ab85ae?w=600&auto=format&fit=crop&q=80',
+      'Papa de comer': 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&auto=format&fit=crop&q=80',
     };
 
     const daysList = weekDays.filter(d => selectedDays[d]);
@@ -584,7 +584,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
                 key={biz.id}
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
-                <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0">
+                <div onClick={() => setActiveBiz(biz)} className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
@@ -655,7 +655,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
                 key={biz.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
-                <div className="relative h-44 w-full bg-slate-900">
+                <div onClick={() => setActiveBiz(biz)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
                 </div>
                 <div className="p-4 space-y-3">
@@ -687,7 +687,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
                 key={biz.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
-                <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
+                <div onClick={() => setActiveBiz(biz)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
                   <img src={biz.imageUrl} alt={biz.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
@@ -731,7 +731,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
               key={biz.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              <div className="relative h-36 w-full bg-slate-900 overflow-hidden">
+              <div onClick={() => setActiveBiz(biz)} className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer">
                 <img
                   src={biz.imageUrl}
                   alt={biz.name}

@@ -586,7 +586,7 @@ export default function App() {
             {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'negocios' && <NegociosView negocios={negocios} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
-            {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
+            {activeTab === 'mascotas' && <MascotasView mascotas={mascotas} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} onRegisterBackHandler={registerBackHandler} />}
             {activeTab === 'noticias' && <NoticiasView noticias={noticias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'afiliacion' && <AfiliacionView onShowNotification={addToast} onAfiliadoActionChange={setIsAfiliadoActionActive} />}
               </>
