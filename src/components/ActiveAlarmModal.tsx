@@ -375,7 +375,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
               ) : (
                 <div className="flex items-center justify-center space-x-2 text-red-200 bg-red-500/10 border border-red-500/30 p-2 sm:p-3 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse">
-                  Para desactivar: ingrese su celular de 8 dígitos y presione DESACTIVAR.
+                  La alarma se desactivará automáticamente. Si desea desactivarla antes, ingrese su celular y presione DESACTIVAR.
                 </div>
               )}
             </div>
