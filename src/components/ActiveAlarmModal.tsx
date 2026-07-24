@@ -375,7 +375,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
               ) : (
                 <div className="flex items-center justify-center space-x-2 text-red-200 bg-red-500/10 border border-red-500/30 p-2 sm:p-3 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse">
-                  Vecino, si desea desactivar la alarma vecinal, coloque de nuevo los dígitos de su celular y presione el botón rojo inferior.
+                  Para desactivar: ingrese su celular de 8 dígitos y presione DESACTIVAR.
                 </div>
               )}
             </div>
