@@ -803,7 +803,11 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
-
+                <div className="absolute top-3 right-3">
+                  <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-emerald-500/40">
+                    {pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}
+                  </span>
+                </div>
               </div>
 
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
