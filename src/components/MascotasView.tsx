@@ -352,7 +352,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       matchesCategory = pet.type !== 'Perro' && pet.type !== 'Gato' && pet.type !== 'Aves' && pet.type !== 'Conejo' && pet.type !== 'Tortuga';
     }
     return matchesSearch && matchesCategory;
-  }).sort(() => Math.random() - 0.5);
+  });
 
   const getPhoneNumbers = (pet: LostPet): string[] => {
     if (pet.phones && pet.phones.length > 0) return pet.phones;
