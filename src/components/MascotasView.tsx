@@ -810,9 +810,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   <PawPrint className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
+                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center justify-between w-full">
                     <span className="truncate min-w-0"><span className="text-white">{idx + 1}. Nombre:</span> {pet.name}</span>
-                    <span className={'text-center flex-1 ' + (pet.status === 'adoption' ? 'text-blue-400' : pet.status === 'found' ? 'text-emerald-400' : 'text-yellow-400')}>{pet.type}</span>
                     <span className="text-emerald-400 shrink-0 ml-2">{pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}</span>
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
@@ -832,6 +831,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   <Phone className="h-3 w-3" />
                   <span>Contactar</span>
                 </button>
+
+                <span className="bg-yellow-500/20 text-yellow-400 text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg border border-yellow-500/40 whitespace-nowrap">
+                  {pet.type}
+                </span>
 
                 <span
                   onClick={(e) => {
