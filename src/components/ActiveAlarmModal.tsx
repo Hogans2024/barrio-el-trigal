@@ -215,7 +215,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 message: 'Modal cerrado manualmente'
               });
             }}
-            className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 pl-1 pr-2.5 sm:pl-2 sm:pr-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0 mr-4"
+            className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 pl-1 pr-2.5 sm:pl-2 sm:pr-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0 mr-4 ml-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span className="whitespace-nowrap">Volver Atrás</span>
