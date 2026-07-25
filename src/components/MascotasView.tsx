@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle, Zap, Images, FileText, UserCircle2, IdCard, Dog, Cat, Bird, Rabbit, Shield } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
-import { FOUND_PETS_DATA } from '../data';
+
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
   value: string;
@@ -178,7 +178,6 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
   const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
-  const [showFound, setShowFound] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
 
@@ -189,12 +188,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       onRegisterBackHandler?.(() => { setSchedulePet(null); return true; });
     } else if (activePet) {
       onRegisterBackHandler?.(() => { setActivePet(null); return true; });
-    } else if (showFound) {
-      onRegisterBackHandler?.(() => { setShowFound(false); const stored = localStorage.getItem('barrio_mascotas_extra'); if (stored) { try { const extra: LostPet[] = JSON.parse(stored); setPets([...extra, ...mascotas]); } catch(e) { setPets(mascotas); } } else { setPets(mascotas); } return true; });
     } else {
       onRegisterBackHandler?.(null);
     }
-  }, [activePet, contactPet, schedulePet, showFound, onRegisterBackHandler, mascotas]);
+  }, [activePet, contactPet, schedulePet, onRegisterBackHandler, mascotas]);
   const autoPlayRef = useRef(true);
   const touchStartX = useRef(0);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -415,7 +412,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       {/* Header title */}
       <div className="-mt-[16px] flex items-start justify-between">
         <div>
-          <h2 className="text-gray-400 text-sm font-bold tracking-tight">{showFound ? 'Mascotas Encontradas:' : 'Mascotas Perdidas:'}</h2>
+          <h2 className="text-gray-400 text-sm font-bold tracking-tight">Mascotas Perdidas:</h2>
           <p className="text-gray-400 text-xs mt-0">
             Ayuda a encontrar mascotas perdidas.
           </p>
@@ -528,37 +525,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
           /* ── Normal layout: search bar + category bar ── */
           <div className="relative">
             <div className="relative transition-all duration-300 ease-out">
-              <div className="flex gap-2 -mt-[7px]">
-                {!searchFocused && (
-                <>
-                <button
-                  onClick={() => {
-                    setShowFound(false);
-                    const stored = localStorage.getItem('barrio_mascotas_extra');
-                    let base: LostPet[] = [];
-                    if (stored) {
-                      try { const extra: LostPet[] = JSON.parse(stored); base = [...extra, ...mascotas]; } catch(e) { base = mascotas; }
-                    } else { base = mascotas; }
-                    setPets(base);
-                  }}
-                  className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer shrink-0 bg-red-500/10 text-red-400 border-red-500/40"
-                >
-                  <PawPrint className="h-3.5 w-3.5" />
-                  <span>Perdidas</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setShowFound(true);
-                    setPets(FOUND_PETS_DATA);
-                  }}
-                  className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer shrink-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
-                >
-                  <Heart className="h-3.5 w-3.5" />
-                  <span>Encontradas</span>
-                </button>
-                </>
-                )}
-                <div className="relative flex-1">
+              <div className="flex justify-center -mt-[7px]">
+                <div className="relative w-full max-w-md">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <Search className="h-4 w-4 text-gray-300" />
                   </span>
@@ -779,7 +747,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-white text-base font-bold tracking-tight">{showFound ? 'Encontrado' : 'Se busca a'} "{pet.name}"</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight">Se busca a "{pet.name}"</h3>
                     <p className="text-gray-400 text-xs mt-1 leading-relaxed">{pet.description}</p>
                   </div>
                   <div className="pt-2 flex items-center justify-between">
@@ -978,7 +946,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             })()}
 
             <div className="p-5 space-y-3 pb-16 sm:pb-5">
-              <h4 className="text-white text-xl font-bold tracking-tight">{showFound ? 'Encontrado' : 'Se busca a'} "{activePet.name}"</h4>
+              <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
