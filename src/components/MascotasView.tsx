@@ -315,13 +315,13 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Conejo', 'Tortugas', 'Otra mascota'];
 
   const categoryIcons: Record<string, React.ReactNode> = {
-    Todos: <LayoutGrid className="w-4 h-4 text-[#FFD700]" />,
-    Perros: <Dog className="w-4 h-4 text-amber-400" />,
-    Gatos: <Cat className="w-4 h-4 text-orange-400" />,
-    Aves: <Bird className="w-4 h-4 text-sky-400" />,
-    Conejo: <Rabbit className="w-4 h-4 text-rose-400" />,
-    Tortugas: <Shield className="w-4 h-4 text-emerald-400" />,
-    'Otra mascota': <HelpCircle className="w-4 h-4 text-purple-400" />,
+    Todos: <LayoutGrid className="w-4 h-4 text-current" />,
+    Perros: <Dog className="w-4 h-4 text-current" />,
+    Gatos: <Cat className="w-4 h-4 text-current" />,
+    Aves: <Bird className="w-4 h-4 text-current" />,
+    Conejo: <Rabbit className="w-4 h-4 text-current" />,
+    Tortugas: <Shield className="w-4 h-4 text-current" />,
+    'Otra mascota': <HelpCircle className="w-4 h-4 text-current" />,
   };
 
   const viewOptions = [
@@ -810,11 +810,11 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   <PawPrint className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center justify-between w-full">
-                    <span className="truncate min-w-0"><span className="text-white">{idx + 1}. Nombre:</span> {pet.name}</span>
+                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
+                    <span className="truncate min-w-0"><span className="text-white">{idx + 1}. Nombre:</span><span className="text-white ml-2">{pet.name}</span></span>
                     <span className="text-emerald-400 shrink-0 ml-2">{pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}</span>
                   </h3>
-                  <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
+                  <p className="text-gray-400 text-xs line-clamp-3 leading-relaxed">
                     {pet.description}
                   </p>
                 </div>
@@ -826,13 +826,14 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     e.stopPropagation();
                     setContactPet(pet);
                   }}
-                  className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white"
+                  className="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white"
                 >
                   <Phone className="h-3 w-3" />
                   <span>Contactar</span>
                 </button>
 
-                <span className="bg-yellow-500/20 text-yellow-400 text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg border border-yellow-500/40 whitespace-nowrap">
+                <span className="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 whitespace-nowrap bg-white/5 text-gray-300 border border-white/10">
+                  {pet.type === 'Perro' ? <Dog className="h-3 w-3" /> : pet.type === 'Gato' ? <Cat className="h-3 w-3" /> : pet.type === 'Aves' ? <Bird className="h-3 w-3" /> : pet.type === 'Conejo' ? <Rabbit className="h-3 w-3" /> : pet.type === 'Tortuga' ? <Shield className="h-3 w-3" /> : <HelpCircle className="h-3 w-3" />}
                   {pet.type}
                 </span>
 
@@ -841,7 +842,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     e.stopPropagation();
                     setActivePet(pet);
                   }}
-                  className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap"
+                  className="flex-1 bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap flex items-center justify-center"
                 >
                   Ver Detalles
                 </span>
