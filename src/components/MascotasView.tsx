@@ -204,7 +204,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
 
   const [pets, setPets] = useState<LostPet[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [formMode, setFormMode] = useState<'lost' | 'found'>('lost');
+  const [formMode, setFormMode] = useState<'lost' | 'found' | 'adoption'>('lost');
   const [showFormPicker, setShowFormPicker] = useState(false);
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState<string>('Perro');
@@ -386,10 +386,12 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     savePets(updated);
     setShowForm(false);
     onShowNotification(
-      formMode === 'lost' ? '🐾 Alerta de Mascota Publicada' : '🐾 Mascota Encontrada Publicada',
+      formMode === 'lost' ? '🐾 Alerta de Mascota Publicada' : formMode === 'found' ? '🐾 Mascota Encontrada Publicada' : '🐾 Mascota en Adopción Publicada',
       formMode === 'lost'
         ? `La alerta de búsqueda para "${newName}" ha sido publicada exitosamente.`
-        : `El aviso de mascota encontrada "${newName}" ha sido publicado exitosamente.`
+        : formMode === 'found'
+          ? `El aviso de mascota encontrada "${newName}" ha sido publicado exitosamente.`
+          : `El aviso de adopción para "${newName}" ha sido publicado exitosamente.`
     );
 
     setNewName('');
@@ -1163,6 +1165,13 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 <Heart className="h-4 w-4" />
                 <span>Añadir Mascota Encontrada</span>
               </button>
+              <button
+                onClick={() => { setFormMode('adoption'); setShowFormPicker(false); setShowForm(true); }}
+                className="w-full flex items-center justify-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-4 py-3 rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                <Heart className="h-4 w-4" />
+                <span>Añadir Mascota en Adopción</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1178,7 +1187,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             <div className="p-4 bg-[#FFD700]/10 text-[#FFD700] border-b border-[#FFD700]/20 flex justify-between items-center">
               <h4 className="font-extrabold text-sm tracking-tight flex items-center gap-1.5">
                 <PawPrint className="h-4 w-4" />
-                <span>{formMode === 'lost' ? 'Añadir Mascota Extraviada' : 'Añadir Mascota Encontrada'}</span>
+                <span>{formMode === 'lost' ? 'Añadir Mascota Extraviada' : formMode === 'found' ? 'Añadir Mascota Encontrada' : 'Añadir Mascota en Adopción'}</span>
               </h4>
               <button type="button" onClick={() => setShowForm(false)} className="hover:opacity-75 text-gray-400">
                 <X className="h-4 w-4 stroke-[2.5]" />
@@ -1233,13 +1242,13 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               <div className="border-t border-white/5" />
 
               <div className="space-y-1">
-                <label className="text-emerald-400 text-[10px] uppercase font-bold">{formMode === 'lost' ? 'Última vez visto' : 'Lugar encontrado'} <span className="text-red-400">*</span> <span className="text-[8px] text-gray-500 font-normal lowercase">obligatorio/llenar</span></label>
+                <label className="text-emerald-400 text-[10px] uppercase font-bold">{formMode === 'lost' ? 'Última vez visto' : formMode === 'found' ? 'Lugar encontrado' : 'Dirección actual'} <span className="text-red-400">*</span> <span className="text-[8px] text-gray-500 font-normal lowercase">obligatorio/llenar</span></label>
                 <textarea
                   required
                   rows={3}
                   value={newSeen}
                   onChange={(e) => setNewSeen(e.target.value)}
-                  placeholder={formMode === 'lost' ? 'Ej: Cerca de la Plaza, detrás del kiosco de Don José, cuando me di vuelta ya no lo vi más...' : 'Ej: En la Plaza del Barrio, estaba solo y sin collar, lo tengo resguardado...'}
+                  placeholder={formMode === 'lost' ? 'Ej: Cerca de la Plaza, detrás del kiosco de Don José, cuando me di vuelta ya no lo vi más...' : formMode === 'found' ? 'Ej: En la Plaza del Barrio, estaba solo y sin collar, lo tengo resguardado...' : 'Ej: Domicilio en la Calle 123, Zona El Trigal, contáctame para coordinar la entrega...'}
                   className="w-full bg-[#080a0f] text-white p-3 rounded-lg border border-white/10 text-xs focus:outline-none focus:border-[#FFD700] focus:ring-0 resize-none"
                 />
               </div>
