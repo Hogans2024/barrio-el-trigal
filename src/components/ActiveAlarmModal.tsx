@@ -286,28 +286,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               </div>
             ) : (
               <>
-                <div>
-                  <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                    <span className="flex h-3 w-3 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F87171] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-[#F87171]"></span>
-                    </span>
-                    <span className="text-[#F87171] font-mono text-xs uppercase tracking-widest font-semibold">Alarma Vecinal Activa</span>
-                  </div>
-
-                  <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white mb-2 leading-tight">
-                    {type === 'panic' && '🚨 Botón de Pánico Activado'}
-                    {type === 'suspicious' && '🔍 Actividad Sospechosa Reportada'}
-                    {type === 'medical' && '⚕️ Alerta de Emergencia Médica'}
-                    {type === 'test' && '⚙️ Modo de Prueba de Alarma'}
-                  </h2>
-                  <p className="text-gray-400 text-xs sm:max-w-md">
-                    La señal disuasiva de alta potencia ha sido propagada. Las familias vecinas y las patrullas policiales de Tarija están en alerta.
-                  </p>
-                </div>
-
                 {/* Siren Visualization */}
-                <div className="my-4 sm:my-6 flex items-center space-x-4 sm:space-x-6 bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
+                <div className="flex items-center space-x-4 sm:space-x-6 bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
                   <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all shrink-0 ${seconds % 2 === 0 ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]' : 'bg-[#F87171] text-white shadow-[0_0_20px_rgba(248,113,113,0.5)]'}`}>
                     <ShieldAlert className="w-7 h-7 sm:w-8 sm:h-8 animate-bounce" />
                   </div>
@@ -328,6 +308,26 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                       ))}
                     </div>
                   </div>
+                </div>
+
+                {/* Alarma Activa info */}
+                <div className="mt-4 sm:mt-6">
+                  <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+                    <span className="flex h-3 w-3 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F87171] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-[#F87171]"></span>
+                    </span>
+                    <span className="text-[#F87171] font-mono text-xs uppercase tracking-widest font-semibold">Alarma Vecinal Activa</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white mb-2 leading-tight">
+                    {type === 'panic' && '🚨 Botón de Pánico Activado'}
+                    {type === 'suspicious' && '🔍 Actividad Sospechosa Reportada'}
+                    {type === 'medical' && '⚕️ Alerta de Emergencia Médica'}
+                    {type === 'test' && '⚙️ Modo de Prueba de Alarma'}
+                  </h2>
+                  <p className="text-gray-400 text-xs sm:max-w-md">
+                    La señal disuasiva de alta potencia ha sido propagada. Las familias vecinas y las patrullas policiales de Tarija están en alerta.
+                  </p>
                 </div>
 
                 {/* Dispatch Logs */}
@@ -474,7 +474,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               </div>
             </div>
 
-            {/* Main Action Button */}
+            {/* Main Action Button - hidden when overlay with green button is active */}
+            {step !== 'flashing' || showKeypadForDeactivation ? (
             <button
               onClick={() => {
                 if (enteredPin.length < 8) {
@@ -508,6 +509,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </>
               )}
             </button>
+            ) : null}
 
             {/* Pasos 1,2,3 — pegado al teclado y solo visible en modo de activación */}
             {step === 'enter_activation_phone' && (
