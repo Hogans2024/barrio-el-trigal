@@ -236,11 +236,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 }`}>
                   {step === 'enter_activation_phone' ? 'Activar Alarma' : 'Desactivar Alarma'}
                 </h3>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">ID TERM: #0912</span>
                 <span className={`inline-block w-1.5 h-1.5 rounded-full ${
                   step === 'enter_activation_phone' ? 'bg-[#FFD700] animate-pulse' : 'bg-red-500 animate-ping'
                 }`} />
               </div>
-              <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-0.5">ID TERM: #0912</span>
             </div>
           </div>
 
