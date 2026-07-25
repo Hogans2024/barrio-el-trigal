@@ -26,6 +26,8 @@ const COORDINATORS = [
  *    Los dos paneles (info + teclado) se apilan uno sobre otro.
  *  - `sm:` (≥ 640px): layout de dos paneles estilo origen (1000×620).
  */
+const AUTO_DEACTIVATE_SECONDS = 90;
+
 export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmModalProps) {
   const [seconds, setSeconds] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
@@ -36,6 +38,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   const [activatedByPhone, setActivatedByPhone] = useState('12345678');
   const [showUnregisteredModal, setShowUnregisteredModal] = useState(false);
   const [attemptedPhone, setAttemptedPhone] = useState('');
+
+  const autoDeactivateCountdown = Math.max(0, AUTO_DEACTIVATE_SECONDS - seconds);
+  const [showKeypadForDeactivation, setShowKeypadForDeactivation] = useState(false);
 
   const [dispatchLogs, setDispatchLogs] = useState<string[]>([]);
 
@@ -48,6 +53,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       setStep('enter_activation_phone');
       setIsMuted(false);
       setShowUnregisteredModal(false);
+      setShowKeypadForDeactivation(false);
       setDispatchLogs([
         'Iniciando secuencia de validación de identidad...',
         'Esperando ingreso de número de celular de 8 dígitos para activación...',
@@ -64,6 +70,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       if (!isMuted) {
         startSiren();
       }
+      setShowKeypadForDeactivation(false);
       setDispatchLogs([
         'Secuencia de alerta comunitaria iniciada.',
         'Siren disuasivo físico de poste activado (simulado).',
@@ -113,6 +120,21 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       setDispatchLogs((prev) => [...prev, '📞 Llamada de verificación del coordinador de seguridad saliendo...']);
     }
   }, [seconds, step]);
+
+  // Auto-deactivate when countdown reaches 0
+  useEffect(() => {
+    if (step !== 'flashing' || autoDeactivateCountdown > 0) return;
+    stopSiren();
+    onClose({
+      id: `log-${Date.now()}`,
+      timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      type: type,
+      user: `Celular Autorizado (${activatedByPhone})`,
+      status: 'resolved',
+      resolvedBy: 'Auto-desactivacion',
+      resolutionTime: formatTime(seconds),
+    });
+  }, [autoDeactivateCountdown, step]);
 
   if (!isOpen) return null;
 
@@ -373,15 +395,31 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 )}
                   </div>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center space-x-2 text-red-200 bg-red-500/10 border border-red-500/30 p-2 sm:p-3 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.1)] font-medium animate-pulse">
-                  La Alarma se desactivara automaticamente. O ingrese su numero de celular y presione Desactivar.
-                </div>
-              )}
+              ) : null}
             </div>
 
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
-            <div className="rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)] w-[90%] mx-auto">
+            <div className="relative rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)] w-[90%] mx-auto">
+              {/* Translucent overlay with manual deactivate button when alarm is active */}
+              {step === 'flashing' && !showKeypadForDeactivation && (
+                <div className="absolute inset-0 z-10 rounded-2xl bg-black/5 backdrop-blur-[6px] flex flex-col items-center pt-7 gap-2">
+                  <span className="-mt-[2px] text-xs sm:text-sm font-semibold text-[#FFD700]/90 text-center uppercase tracking-wider">ESTIMADO VECIN@</span>
+                  <span className="text-xs sm:text-sm text-gray-300 text-center uppercase">La Alarma Vecinal se desactivara en:</span>
+                  <div className="flex items-center justify-center bg-white/[0.06] backdrop-blur-md px-5 py-2 rounded-xl border border-white/10 shadow-[0_0_30px_rgba(255,215,0,0.1),inset_0_1px_0_rgba(255,255,255,0.1)]">
+                    <span className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FFD700] to-[#FF8C00] font-mono tracking-[0.08em] drop-shadow-[0_0_12px_rgba(255,215,0,0.6)]">{String(Math.floor(autoDeactivateCountdown / 60)).padStart(2, '0')}:{String(autoDeactivateCountdown % 60).padStart(2, '0')}</span>
+                    <span className="text-sm sm:text-base font-semibold text-[#FFD700]/80 ml-2 uppercase tracking-wider">{autoDeactivateCountdown >= 60 ? 'minutos' : 'segundos'}</span>
+                  </div>
+                  <button
+                    onClick={() => setShowKeypadForDeactivation(true)}
+                    className="mt-6 bg-[#22c55e] hover:bg-[#16a34a] text-white font-extrabold text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4 rounded-xl shadow-lg shadow-[#22c55e]/30 transition-all active:scale-95 cursor-pointer uppercase"
+                  >
+                    DESACTIVAR ALARMA MANUAL
+                  </button>
+                  <p className="text-xs sm:text-sm text-gray-300 text-center w-[250px] leading-relaxed mt-2">
+                    Presione el boton verde para acceder al teclado e ingresar su celular nuevamente.
+                  </p>
+                </div>
+              )}
               {/* Display de dígitos: alineado a la izquierda del teclado, cursor parpadeante */}
               <div className="flex justify-start items-center mb-3 min-h-[2rem] max-w-[220px] mx-auto w-full px-1">
                 <span className={`font-mono font-bold text-[22px] sm:text-2xl tracking-[0.2em] ${pinError ? 'text-red-400' : 'text-white'}`}>
