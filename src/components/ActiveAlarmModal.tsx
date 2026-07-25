@@ -204,7 +204,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] -mt-2 sm:mt-0">
 
         {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL */}
-        <div className="sticky top-0 z-50 w-full flex items-center justify-between pl-3 pr-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div className="sticky top-0 z-50 w-full grid grid-cols-3 items-center px-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
           <button
             onClick={() => {
               playTone(400, 100);
@@ -215,13 +215,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 message: 'Modal cerrado manualmente'
               });
             }}
-            className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 sm:px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0"
+            className="justify-self-start flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 sm:px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span className="whitespace-nowrap">Volver Atrás</span>
           </button>
 
-          <div className="flex items-center space-x-3 min-w-0">
+          <div className="flex items-center justify-center space-x-3 min-w-0">
             <div className={`p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 text-[#FFD700] border border-[#FFD700]/30 shadow-[#FFD700]/5'
@@ -244,7 +244,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             </div>
           </div>
 
-          <div className="w-10 sm:w-[100px]" />
+          <div />
         </div>
 
         {/* CUERPO DEL MODAL (PANELES SPLIT) */}
