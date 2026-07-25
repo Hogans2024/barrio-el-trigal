@@ -229,7 +229,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             }`}>
               <ShieldAlert className={`w-5 h-5 ${step === 'flashing' ? 'animate-pulse text-red-400' : 'text-[#FFD700]'}`} />
             </div>
-            <div className="flex flex-col ml-[5px]">
+            <div className="flex flex-col ml-[7px]">
               <div className="flex items-center space-x-2">
                 <h3 className={`text-sm sm:text-base font-extrabold tracking-wide uppercase font-sans whitespace-nowrap transition-all duration-300 ${
                   step === 'enter_activation_phone' ? 'text-white' : 'text-red-400 animate-pulse'
