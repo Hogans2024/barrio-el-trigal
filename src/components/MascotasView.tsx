@@ -940,7 +940,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             })()}
 
             <div className="p-5 space-y-3 pb-16 sm:pb-5">
-              <h4 className="text-white text-xl font-bold tracking-tight">Se busca a "{activePet.name}"</h4>
+              <h4 className="text-white text-xl font-bold tracking-tight">{activePet.status === 'found' ? '🐾 Encontrado' : activePet.status === 'adoption' ? '🐾 En Adopción' : '🐾 Se busca'}: "{activePet.name}"</h4>
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
@@ -963,7 +963,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               </div>
 
               <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Última vez visto</h5>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">{activePet.status === 'found' ? 'Lugar encontrado' : activePet.status === 'adoption' ? 'Dirección actual' : 'Última vez visto'}</h5>
                 <p className="text-white text-sm leading-relaxed">{activePet.lastSeen}</p>
               </div>
 
