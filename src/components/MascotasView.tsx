@@ -683,7 +683,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-1.5 mb-1.5">
-                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}</h3>
+                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-yellow-400'}>{pet.type}</span> {pet.name}</h3>
                     </div>
                     <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{pet.description}</p>
                   </div>
@@ -710,7 +710,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-base font-bold tracking-tight truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-yellow-400'}>{pet.type}</span> {pet.name}</h3>
                   </div>
                   <p className="text-gray-400 text-xs leading-normal">{pet.description}</p>
                   <div className="space-y-2 pt-2 border-t border-white/5 text-xs">
@@ -747,7 +747,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-white text-base font-bold tracking-tight">Se busca a "<span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}"</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight">Se busca a "<span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-yellow-400'}>{pet.type}</span> {pet.name}"</h3>
                     <p className="text-gray-400 text-xs mt-1 leading-relaxed">{pet.description}</p>
                   </div>
                   <div className="pt-2 flex items-center justify-between">
@@ -773,7 +773,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-base font-bold tracking-tight truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-yellow-400'}>{pet.type}</span> {pet.name}</h3>
                   </div>
                   <p className="text-gray-400 text-xs leading-relaxed max-h-16 line-clamp-2">{pet.description}</p>
                   <div className="pt-2 border-t border-white/5 mt-2 flex items-center justify-between text-xs">
@@ -812,7 +812,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    <span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}
+                    <span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-yellow-400'}>{pet.type}</span> {pet.name}
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
                     {pet.description}
@@ -1141,7 +1141,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             <div className="p-5 space-y-3">
               <button
                 onClick={() => { setFormMode('lost'); setShowFormPicker(false); setShowForm(true); }}
-                className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 border border-red-500/40 hover:bg-red-500/20 px-4 py-3 rounded-xl text-xs font-bold transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-yellow-500/10 text-yellow-400 border border-yellow-500/40 hover:bg-yellow-500/20 px-4 py-3 rounded-xl text-xs font-bold transition cursor-pointer"
               >
                 <PawPrint className="h-4 w-4" />
                 <span>Añadir Mascota Extraviada</span>
