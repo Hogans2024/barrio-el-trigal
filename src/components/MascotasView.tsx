@@ -803,11 +803,6 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
-                <div className="absolute top-3 right-3">
-                  <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-emerald-500/40">
-                    {pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}
-                  </span>
-                </div>
               </div>
 
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
@@ -816,7 +811,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    <span className={pet.status === 'adoption' ? 'text-blue-400' : pet.status === 'found' ? 'text-emerald-400' : 'text-yellow-400'}><span className="text-white">{idx + 1}.</span> {pet.type}</span> {pet.name}
+                    <span className={pet.status === 'adoption' ? 'text-blue-400' : pet.status === 'found' ? 'text-emerald-400' : 'text-yellow-400'}><span className="text-white">{idx + 1}.</span> {pet.type}</span> {pet.name} <span className="text-emerald-400">{pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}</span>
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
                     {pet.description}
