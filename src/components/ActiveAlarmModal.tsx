@@ -231,7 +231,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             </div>
             <div className="flex flex-col">
               <div className="flex items-center space-x-2">
-                <h3 className={`text-sm sm:text-base font-extrabold tracking-wide uppercase font-sans transition-all duration-300 ${
+                <h3 className={`text-sm sm:text-base font-extrabold tracking-wide uppercase font-sans whitespace-nowrap transition-all duration-300 ${
                   step === 'enter_activation_phone' ? 'text-white' : 'text-red-400 animate-pulse'
                 }`}>
                   {step === 'enter_activation_phone' ? 'Activar Alarma' : 'Desactivar Alarma'}
