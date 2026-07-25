@@ -312,16 +312,16 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     localStorage.setItem('barrio_mascotas_extra', JSON.stringify(extraItems));
   };
 
-  const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Conejos', 'Tortugas', 'Otros animales'];
+  const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Conejo', 'Tortugas', 'Otra mascota'];
 
   const categoryIcons: Record<string, React.ReactNode> = {
     Todos: <LayoutGrid className="w-4 h-4 text-[#FFD700]" />,
     Perros: <Dog className="w-4 h-4 text-amber-400" />,
     Gatos: <Cat className="w-4 h-4 text-orange-400" />,
     Aves: <Bird className="w-4 h-4 text-sky-400" />,
-    Conejos: <Rabbit className="w-4 h-4 text-rose-400" />,
+    Conejo: <Rabbit className="w-4 h-4 text-rose-400" />,
     Tortugas: <Shield className="w-4 h-4 text-emerald-400" />,
-    'Otros animales': <HelpCircle className="w-4 h-4 text-purple-400" />,
+    'Otra mascota': <HelpCircle className="w-4 h-4 text-purple-400" />,
   };
 
   const viewOptions = [
@@ -344,11 +344,11 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       matchesCategory = pet.type === 'Gato';
     } else if (selectedCategory === 'Aves') {
       matchesCategory = pet.type === 'Aves';
-    } else if (selectedCategory === 'Conejos') {
+    } else if (selectedCategory === 'Conejo') {
       matchesCategory = pet.type === 'Conejo';
     } else if (selectedCategory === 'Tortugas') {
       matchesCategory = pet.type === 'Tortuga';
-    } else if (selectedCategory === 'Otros animales') {
+    } else if (selectedCategory === 'Otra mascota') {
       matchesCategory = pet.type !== 'Perro' && pet.type !== 'Gato' && pet.type !== 'Aves' && pet.type !== 'Conejo' && pet.type !== 'Tortuga';
     }
     return matchesSearch && matchesCategory;
@@ -1212,7 +1212,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     <option value="Aves">Aves</option>
                     <option value="Conejo">Conejo</option>
                     <option value="Tortuga">Tortuga</option>
-                    <option value="Otras">Otros animales</option>
+                    <option value="Otras">Otra mascota</option>
                   </select>
                 </div>
               </div>
