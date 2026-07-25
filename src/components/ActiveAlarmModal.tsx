@@ -215,13 +215,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 message: 'Modal cerrado manualmente'
               });
             }}
-            className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 sm:px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans"
+            className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 sm:px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Volver Atrás</span>
+            <span className="whitespace-nowrap">Volver Atrás</span>
           </button>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 min-w-0">
             <div className={`p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 text-[#FFD700] border border-[#FFD700]/30 shadow-[#FFD700]/5'
@@ -244,7 +244,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             </div>
           </div>
 
-          <div className="w-[100px]" />
+          <div className="w-10 sm:w-[100px]" />
         </div>
 
         {/* CUERPO DEL MODAL (PANELES SPLIT) */}
