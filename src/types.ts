@@ -79,6 +79,7 @@ export interface LostPet {
   id: string;
   name: string;
   type: string;
+  status?: 'lost' | 'found' | 'adoption';
   imageUrl: string;
   description: string;
   lastSeen: string;

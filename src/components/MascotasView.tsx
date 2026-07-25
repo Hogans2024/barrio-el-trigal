@@ -369,6 +369,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       id: `custom_pet_${Date.now()}`,
       name: newName,
       type: newType,
+      status: formMode,
       imageUrl: allImages[0] || DEFAULT_IMAGES[newType] || DEFAULT_IMAGES.Otras,
       description: newDesc,
       lastSeen: newSeen,
@@ -682,7 +683,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-1.5 mb-1.5">
-                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition line-clamp-2">{pet.name}</h3>
+                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}</h3>
                     </div>
                     <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">{pet.description}</p>
                   </div>
@@ -709,10 +710,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-base font-bold tracking-tight">{pet.name}</h3>
-                    <span className="bg-[#22c55e]/40 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-[#22c55e]/40 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">
-                      {pet.type}
-                    </span>
+                    <h3 className="text-white text-base font-bold tracking-tight truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}</h3>
                   </div>
                   <p className="text-gray-400 text-xs leading-normal">{pet.description}</p>
                   <div className="space-y-2 pt-2 border-t border-white/5 text-xs">
@@ -749,11 +747,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-white text-base font-bold tracking-tight">Se busca a "{pet.name}"</h3>
+                    <h3 className="text-white text-base font-bold tracking-tight">Se busca a "<span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}"</h3>
                     <p className="text-gray-400 text-xs mt-1 leading-relaxed">{pet.description}</p>
                   </div>
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 text-[10px] font-extrabold px-2.5 py-1 rounded [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">{pet.type}</span>
                     <span className="bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] font-extrabold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 border border-[#FFD700]/40 transition cursor-pointer">
                       <Phone className="h-3.5 w-3.5" />
                       <span>Contactar</span>
@@ -776,10 +773,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-base font-bold tracking-tight">{pet.name}</h3>
-                    <span className="bg-[#22c55e]/40 text-white border border-[#22c55e]/40 font-extrabold text-[10px] px-2.5 py-1 rounded-md tracking-wider uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap">
-                      {pet.type}
-                    </span>
+                    <h3 className="text-white text-base font-bold tracking-tight truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}</h3>
                   </div>
                   <p className="text-gray-400 text-xs leading-relaxed max-h-16 line-clamp-2">{pet.description}</p>
                   <div className="pt-2 border-t border-white/5 mt-2 flex items-center justify-between text-xs">
@@ -809,11 +803,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
-                <div className="absolute top-3 right-3 animate-pulse">
-                  <span className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider border border-[#FFD700]/40">
-                    {pet.type}
-                  </span>
-                </div>
+
               </div>
 
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
@@ -822,7 +812,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    {pet.name}
+                    <span className={pet.status === 'adoption' ? 'text-blue-400' : 'text-red-400'}>{pet.type}</span> {pet.name}
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
                     {pet.description}
@@ -841,9 +831,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   <Phone className="h-3 w-3" />
                   <span>Contactar</span>
                 </button>
-                <span className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-500/40 whitespace-nowrap">
-                  {pet.type}
-                </span>
+
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
