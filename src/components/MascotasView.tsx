@@ -810,8 +810,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   <PawPrint className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    <span className={pet.status === 'adoption' ? 'text-blue-400' : pet.status === 'found' ? 'text-emerald-400' : 'text-yellow-400'}><span className="text-white">{idx + 1}.</span> {pet.type}</span> {pet.name} <span className="text-emerald-400">{pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}</span>
+                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center justify-between w-full">
+                    <span className="truncate"><span className={pet.status === 'adoption' ? 'text-blue-400' : pet.status === 'found' ? 'text-emerald-400' : 'text-yellow-400'}><span className="text-white">{idx + 1}.</span> {pet.type}</span> {pet.name}</span>
+                    <span className="text-emerald-400 shrink-0 ml-2">{pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}</span>
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
                     {pet.description}
