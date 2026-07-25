@@ -549,14 +549,14 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               {shimmer && <div className="shimmer-beam buttons" />}
               <button
                 onClick={() => setShowCategoryModal(true)}
-                className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
+                className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer border bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
                 <span>Categorías</span>
               </button>
               <div
                 onClick={() => setShowCategoryModal(true)}
-                className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+                className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
               >
                 {categoryIcons[selectedCategory]}
                 <span>{selectedCategory === 'Todos' ? 'Todas' : selectedCategory}</span>
@@ -571,7 +571,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               </div>
               <button
                 onClick={() => setShowViewModal(true)}
-                className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
+                className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer border bg-blue-500/10 text-blue-400 border-blue-500/40 hover:bg-blue-500/20"
               >
                 {viewOptions.find(v => v.id === viewMode)?.icon}
                 <span>Vista</span>
@@ -607,7 +607,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       setViewMode(opt.id);
                       setShowViewModal(false);
                     }}
-                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer border ${
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition cursor-pointer border ${
                       isActive
                         ? 'bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40'
                         : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border-transparent'
@@ -648,7 +648,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       setSelectedCategory(cat);
                       setShowCategoryModal(false);
                     }}
-                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer border ${
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition cursor-pointer border ${
                       isActive
                         ? 'bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/40'
                         : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border-transparent'
