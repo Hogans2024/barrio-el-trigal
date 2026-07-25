@@ -222,7 +222,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           </button>
 
           <div className="flex items-center space-x-3 min-w-0">
-            <div className={`-ml-[5px] p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
+            <div className={`ml-[2px] p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 text-[#FFD700] border border-[#FFD700]/30 shadow-[#FFD700]/5'
                 : 'bg-gradient-to-br from-red-500/20 to-red-500/5 text-red-400 border border-red-500/30 shadow-red-500/5'
