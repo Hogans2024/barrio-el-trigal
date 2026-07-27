@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Siren, LayoutGrid, Calendar, Users, Heart, Store, PlusSquare,
-  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, Newspaper, Pill, PawPrint, Building2, Phone, AlertTriangle
+  Bell, Menu, X, Info, Activity, User, ChevronDown, Search, ChevronLeft, Newspaper, Pill, PawPrint, Building2, Phone, AlertTriangle, ArrowLeft
 } from 'lucide-react';
 
 // Sub-views
@@ -66,6 +66,7 @@ export default function App() {
   const [isAfiliadoActionActive, setIsAfiliadoActionActive] = useState(false);
   const [navHistory, setNavHistory] = useState<string[]>(['alarma']);
   const backHandlerRef = useRef<(() => boolean) | null>(null);
+  const [isAlarmaKeypadOpen, setIsAlarmaKeypadOpen] = useState(false);
 
   const registerBackHandler = useCallback((handler: (() => boolean) | null) => {
     backHandlerRef.current = handler;
@@ -383,8 +384,16 @@ export default function App() {
                 <ChevronLeft className="w-[18px] h-[18px] text-[#D1D5DB]" />
                 <span className="text-[11px] text-[#D1D5DB] font-semibold font-sans">Volver Atrás</span>
               </button>
+            ) : activeTab === 'alarma' && isAlarmaKeypadOpen ? (
+              <button
+                onClick={goBackTab}
+                className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 pl-1 pr-2.5 sm:pl-2 sm:pr-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0 ml-[9px]"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">Volver Atrás</span>
+              </button>
             ) : (
-              activeTab === 'alarma' && (
+              activeTab === 'alarma' && !isAlarmaKeypadOpen && (
                 <>
                   <div className="flex items-center space-x-2.5 md:hidden">
                       <span>
@@ -411,9 +420,9 @@ export default function App() {
             )}
           </div>
 
-          {/* Center: Logo (mobile) / Title (desktop) — only for non-Alarma */}
-          {activeTab !== 'alarma' && (
-            <div className="flex-1 flex justify-center items-center -ml-[125px]">
+          {/* Center: Logo (mobile) / Title (desktop) — for non-Alarma or when alarma keypad is open */}
+          {(activeTab !== 'alarma' || isAlarmaKeypadOpen) && (
+            <div className={`flex-1 flex justify-center items-center ${activeTab !== 'alarma' ? '-ml-[125px]' : ''}`}>
                 <div className="flex items-center space-x-2.5 md:hidden">
                   <span className="img-float">
                     <img 
@@ -438,9 +447,9 @@ export default function App() {
           )}
 
           {/* Right controls */}
-          <div className={`flex items-center justify-end ${activeTab === 'alarma' ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? 'ml-3 space-x-1.5' : 'space-x-1.5'}`}>
+          <div className={`flex items-center justify-end ${activeTab === 'alarma' && !isAlarmaKeypadOpen ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? 'ml-3 space-x-1.5' : 'space-x-1.5'}`}>
             {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
-            {activeTab === 'alarma' && (
+            {activeTab === 'alarma' && !isAlarmaKeypadOpen && (
             <div ref={searchRef} className={`md:hidden relative ${isSearchFocused ? 'flex-1 -mr-5' : 'flex-1 max-w-[200px]'}`}>
               <div className={`flex items-center w-full bg-black/60 border border-gray-800 ${isSearchFocused ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl'} px-2 py-1.5`}>
                 <Search className="h-4 w-4 text-gray-400 shrink-0" />
@@ -581,7 +590,7 @@ export default function App() {
               </div>
             ) : (
               <>
-            {activeTab === 'alarma' && <AlarmaView onNavigate={navigateToTab} onShowNotification={addToast} />}
+            {activeTab === 'alarma' && <AlarmaView onNavigate={navigateToTab} onShowNotification={addToast} onKeypadOpenChange={setIsAlarmaKeypadOpen} onRegisterBackHandler={registerBackHandler} />}
             {activeTab === 'proyectos' && <ProyectosView projects={proyectos} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} onRegisterBackHandler={registerBackHandler} />}
             {activeTab === 'eventos' && <EventosView eventos={eventos} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}
             {activeTab === 'farmacias' && <FarmaciasView farmacias={farmacias} onShowNotification={addToast} highlightId={highlightCardId} onClearHighlight={() => setHighlightCardId(null)} />}

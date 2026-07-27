@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone, ArrowLeft } from 'lucide-react';
+import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
 
@@ -203,26 +203,10 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       {/* Contenedor: en mobile hoja completa con scroll; en sm: panel fijo 1000×620 */}
       <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] -mt-2 sm:mt-0">
 
-        {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL */}
-        <div className="sticky top-0 z-50 w-full flex items-center justify-between pl-[28.8px] pr-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
-          <button
-            onClick={() => {
-              playTone(400, 100);
-              onClose({
-                id: `log-${Date.now()}`,
-                timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-                type: 'cancel' as const,
-                message: 'Modal cerrado manualmente'
-              });
-            }}
-            className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 pl-1 pr-2.5 sm:pl-2 sm:pr-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0 mr-4"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">Volver Atrás</span>
-          </button>
-
-          <div className="flex items-center space-x-3 min-w-0">
-            <div className={`ml-[1px] p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
+        {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL — sin botón Volver Atrás (movido a App.tsx header) */}
+        <div className="sticky top-0 z-50 w-full flex items-center justify-start sm:justify-center px-4 sm:px-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+          <div className="flex items-center space-x-3 min-w-0 w-full max-w-[220px] mx-auto sm:max-w-none sm:mx-auto px-1 sm:px-0">
+            <div className={`ml-[-8px] sm:ml-0 p-2.5 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
               step === 'enter_activation_phone'
                 ? 'bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 text-[#FFD700] border border-[#FFD700]/30 shadow-[#FFD700]/5'
                 : 'bg-gradient-to-br from-red-500/20 to-red-500/5 text-red-400 border border-red-500/30 shadow-red-500/5'
@@ -245,8 +229,6 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               </div>
             </div>
           </div>
-
-          <div className="w-10 sm:w-[100px]" />
         </div>
 
         {/* CUERPO DEL MODAL (PANELES SPLIT) */}

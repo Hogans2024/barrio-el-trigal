@@ -30,6 +30,10 @@ interface AlarmaViewProps {
   onNavigate: (tab: string) => void;
   /** Muestra un toast flotante global (equivalente a onToast del proyecto origen). */
   onShowNotification: (title: string, message: string) => void;
+  /** Notifica a App.tsx cuando se abre/cierra el teclado digital de ActiveAlarmModal. */
+  onKeypadOpenChange?: (isOpen: boolean) => void;
+  /** Registra un manejador para que App.tsx sepa que el modal maneja el botón Volver Atrás. */
+  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
 }
 
 /**
@@ -45,7 +49,7 @@ interface AlarmaViewProps {
  *  - tall: celular grande (≥ 700px de alto)
  *  - sm: tablet/escritorio (≥ 640px de ancho) — fiel al diseño del origen.
  */
-export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaViewProps) {
+export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpenChange, onRegisterBackHandler }: AlarmaViewProps) {
   // Main interactive modals toggles
   const [isAlarmActive, setIsAlarmActive] = useState(false);
   const [activeAlarmType, setActiveAlarmType] = useState<'panic' | 'suspicious' | 'test' | 'medical'>('panic');
@@ -64,6 +68,28 @@ export default function AlarmaView({ onNavigate, onShowNotification }: AlarmaVie
     { id: 'medical', label: 'Médica', icon: <HeartPulse className="w-4 h-4" />, color: 'text-blue-400 border-blue-500/40 bg-blue-500/10' },
     { id: 'test', label: 'Prueba', icon: <Wrench className="w-4 h-4" />, color: 'text-gray-300 border-white/20 bg-white/5' },
   ];
+
+  // Notify App.tsx when ActiveAlarmModal opens/closes
+  useEffect(() => {
+    onKeypadOpenChange?.(isAlarmActive);
+  }, [isAlarmActive, onKeypadOpenChange]);
+
+  // Register back handler when modal is open, so header back button can close it
+  useEffect(() => {
+    if (isAlarmActive) {
+      onRegisterBackHandler?.(() => {
+        handleCloseAlarm({
+          id: `log-${Date.now()}`,
+          timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+          type: 'cancel' as const,
+          message: 'Modal cerrado manualmente'
+        });
+        return true;
+      });
+    } else {
+      onRegisterBackHandler?.(null);
+    }
+  }, [isAlarmActive, onRegisterBackHandler]);
 
   // Carousel timer loop
   useEffect(() => {
