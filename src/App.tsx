@@ -368,7 +368,7 @@ export default function App() {
       </aside>
 
       {/* -------------------- MAIN CONTENT AREA -------------------- */}
-      <div className="flex-1 flex flex-col relative z-10 w-full">
+      <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
         
         {/* APP STATUS HEADER (Mobile & Desktop) */}
         <header 
