@@ -486,7 +486,10 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 showMissingPinAlert ? (
                   <span className="text-[#FFD700] text-xs font-extrabold animate-pulse">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                 ) : (
-                  <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA VECINAL</span>
+                  <>
+                    <span className="text-base sm:text-lg">🚨</span>
+                    <span className="whitespace-nowrap">ACTIVAR ALARMA VECINAL</span>
+                  </>
                 )
               ) : (
                 <>
