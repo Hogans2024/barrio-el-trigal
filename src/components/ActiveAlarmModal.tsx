@@ -472,7 +472,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 }
                 handleVerifyPhone();
               }}
-              className={`w-[90%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center space-x-2 cursor-pointer relative ${
+              className={`w-[90%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative ${
                 step === 'enter_activation_phone'
                   ? enteredPin.length >= 8
                     ? 'bg-black/40 hover:bg-black/70 text-[#FFD700] font-extrabold border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)]'
@@ -484,18 +484,20 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             >
               {step === 'enter_activation_phone' ? (
                 showMissingPinAlert ? (
-                  <span className="text-[#FFD700] text-xs font-extrabold animate-pulse">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                  <div className="flex w-full items-center justify-center">
+                    <span className="text-[#FFD700] text-xs font-extrabold animate-pulse text-center">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                  </div>
                 ) : (
-                  <>
-                    <span className="text-base sm:text-lg">🚨</span>
-                    <span className="whitespace-nowrap">ACTIVAR ALARMA VECINAL</span>
-                  </>
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <span className="text-base sm:text-lg flex-shrink-0">🚨</span>
+                    <span className="whitespace-nowrap tracking-wide text-center">ACTIVAR ALARMA VECINAL</span>
+                  </div>
                 )
               ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>DESACTIVAR ALARMA VECINAL 🔴</span>
-                </>
+                <div className="flex w-full items-center justify-center gap-2">
+                  <Check className="w-4 h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap text-center">DESACTIVAR ALARMA VECINAL 🔴</span>
+                </div>
               )}
             </button>
             ) : null}
