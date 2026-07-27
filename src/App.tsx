@@ -387,7 +387,7 @@ export default function App() {
             ) : activeTab === 'alarma' && isAlarmaKeypadOpen ? (
               <button
                 onClick={goBackTab}
-                className="flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 pl-1 pr-2.5 sm:pl-2 sm:pr-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0 ml-[9px]"
+                className="flex items-center space-x-0.5 xs:space-x-1.5 text-[10px] sm:text-xs font-semibold text-[#FFD700] hover:text-[#ffe16d] bg-white/5 hover:bg-white/10 border border-white/10 pl-0.5 xs:pl-1 pr-0.5 xs:pr-2.5 sm:pl-2 sm:pr-3.5 py-1.5 rounded-xl cursor-pointer transition-colors font-sans shrink-0 ml-[9px]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span className="whitespace-nowrap">Volver Atrás</span>
@@ -395,22 +395,22 @@ export default function App() {
             ) : (
               activeTab === 'alarma' && !isAlarmaKeypadOpen && (
                 <>
-                  <div className="flex items-center space-x-2.5 md:hidden">
+                  <div className="flex items-center space-x-[0.8px] md:hidden">
                       <span>
-                      <img 
-                        src={`${import.meta.env.BASE_URL}logo_01.svg`} 
-                        alt="Logo Barrio El Trigal" 
-                        className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
-                      />
-                    </span>
-                    <div className="relative">
-                      <div className="flex flex-col space-y-[2px]">
-                        <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
-                        <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
-                      </div>
-                    </div>
+                    <img 
+                      src={`${import.meta.env.BASE_URL}logo_01.svg`} 
+                      alt="Logo Barrio El Trigal" 
+                      className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md shrink-0 max-w-none"
+                    />
+                  </span>
+                  <div className={`relative ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'ml-[4px]' : ''}`}>
+                  <div className="flex flex-col space-y-[2px]">
+                        <span className="text-[#FFD700] text-[10px] md:text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
+                        <h2 className="text-white text-[15px] md:text-base font-extrabold tracking-tight leading-none whitespace-nowrap">El Trigal</h2>
                   </div>
-                  <div className="hidden md:flex items-center space-x-2">
+                </div>
+                  </div>
+              <div className="hidden md:flex items-center space-x-2">
                     <Activity className="h-5 w-5 text-brand-green animate-pulse" />
                     <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
                     <span className="text-white font-mono font-bold text-sm uppercase">{currentTabTitle()}</span>
@@ -423,21 +423,21 @@ export default function App() {
           {/* Center: Logo (mobile) / Title (desktop) — for non-Alarma or when alarma keypad is open */}
           {(activeTab !== 'alarma' || isAlarmaKeypadOpen) && (
             <div className={`flex-1 flex justify-center items-center ${activeTab !== 'alarma' ? '-ml-[125px]' : ''}`}>
-                <div className="flex items-center space-x-2.5 md:hidden">
-                  <span className="img-float">
-                    <img 
+                <div className="flex items-center space-x-[0.8px] md:hidden">
+                  <span className={`img-float ${activeTab === 'alarma' && isAlarmaKeypadOpen ? '-ml-[6.2px]' : ''}`}>
+                <img 
                       src={`${import.meta.env.BASE_URL}logo_01.svg`} 
                       alt="Logo Barrio El Trigal" 
-                      className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md"
+                      className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md shrink-0 max-w-none"
                     />
                   </span>
-                  <div className="relative">
+<div className={`relative ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'ml-[1.6px]' : ''}`}>
                   <div className="flex flex-col space-y-[2px]">
-                    <span className="text-[#FFD700] text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
-                    <h2 className="text-white text-base font-extrabold tracking-tight leading-none">El Trigal</h2>
+                        <span className="text-[#FFD700] text-[10px] md:text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
+                        <h2 className="text-white text-[15px] md:text-base font-extrabold tracking-tight leading-none whitespace-nowrap">El Trigal</h2>
                   </div>
                 </div>
-              </div>
+                  </div>
               <div className="hidden md:flex items-center space-x-2">
                 <Activity className="h-5 w-5 text-brand-green animate-pulse" />
                 <span className="text-gray-400 text-sm font-mono">Panel Seccional:</span>
@@ -447,7 +447,7 @@ export default function App() {
           )}
 
           {/* Right controls */}
-          <div className={`flex items-center justify-end ${activeTab === 'alarma' && !isAlarmaKeypadOpen ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? 'ml-3 space-x-1.5' : 'space-x-1.5'}`}>
+          <div className={`flex items-center justify-end ${activeTab === 'alarma' && !isAlarmaKeypadOpen ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? 'ml-[7px] xs:ml-3 space-x-1.5 -translate-x-[8px] xs:translate-x-0' : 'space-x-1.5'}`}>
             {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
             {activeTab === 'alarma' && !isAlarmaKeypadOpen && (
             <div ref={searchRef} className={`md:hidden relative ${isSearchFocused ? 'flex-1 -mr-5' : 'flex-1 max-w-[200px]'}`}>
