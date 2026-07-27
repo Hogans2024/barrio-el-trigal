@@ -127,7 +127,7 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
     <div className="flex flex-col space-y-2.5 tall:space-y-4 sm:space-y-6">
 
       {/* ============ 1. CARRUSEL HERO ============ */}
-      <section className="relative -mt-6 -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-24 tall:h-32 sm:h-52 shrink-0 select-none bg-[#080a0f]"
+      <section className="relative -mx-4 md:mt-0 md:mx-0 rounded-none sm:rounded-b-[20px] overflow-hidden border-b md:border-x border-white/10 h-24 tall:h-32 sm:h-52 shrink-0 select-none bg-[#080a0f]"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchMove={(e) => { e.preventDefault(); }}
         onTouchEnd={(e) => {

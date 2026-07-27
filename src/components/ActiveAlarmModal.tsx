@@ -193,7 +193,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans pt-14 pb-14 md:pt-4 md:pb-4">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-stretch justify-center bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain font-sans pt-[45px] pb-14 md:pt-4 md:pb-4">
 
       {/* Flashing Warning Visuals (only if alarm is flashing) */}
       {step === 'flashing' && (
@@ -201,7 +201,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       )}
 
       {/* Contenedor: en mobile hoja completa con scroll; en sm: panel fijo 1000×620 */}
-      <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px] -mt-2 sm:mt-0">
+      <div className="relative w-full max-h-[100dvh] sm:max-h-[620px] sm:w-[1000px] bg-[#0c101d] rounded-none sm:rounded-[32px] border-y sm:border border-white/10 overflow-y-auto sm:overflow-hidden custom-scrollbar shadow-[0_0_80px_rgba(248,113,113,0.15)] flex flex-col sm:h-[620px]">
 
         {/* HEADER SUPERIOR UNIFICADO Y ULTRA-PROFESIONAL — sin botón Volver Atrás (movido a App.tsx header) */}
         <div className="sticky top-0 z-50 w-full flex items-center justify-start sm:justify-center px-4 sm:px-5 py-1.5 bg-[#0a0d18]/95 backdrop-blur-md border-b border-white/10 shrink-0">
