@@ -19,6 +19,36 @@
   }
 }
 
+/* Teclado de alarma en teléfonos altos: conserva la tarjeta original. */
+@media (max-width: 639px) and (min-height: 700px) {
+  .alarm-keypad-card {
+    box-sizing: border-box;
+    /* Sin height fijo: deja que el contenido defina el tamaño */
+    padding-top: 4px;
+    padding-bottom: 14.4px; /* igual al gap entre filas → espacio uniforme */
+  }
+
+  .alarm-keypad-display {
+    min-height: 26px;
+    margin-bottom: 7.6px;
+  }
+
+  .alarm-keypad-grid {
+    gap: 14.4px;
+  }
+
+  .alarm-keypad-grid > button {
+    height: 48px;
+  }
+}
+
+/* Teclado de alarma en móviles pequeños (sin tall): mismo espaciado inferior */
+@media (max-width: 639px) and (max-height: 699px) {
+  .alarm-keypad-card {
+    padding-bottom: 14.4px; /* igual al gap-[0.9rem] = 14.4px */
+  }
+}
+
 /* ============================================================ */
 /* Utilidades compartidas para la sección Alarma y Afiliados.    */
 /* Provienen del proyecto origen; conviven con las clases del     */

@@ -146,19 +146,20 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const handleKeyPress = (num: string) => {
-    playTone(1500, 35, 'square'); // Tech beep
-    // Sin límite de dígitos: el backend (Apps Script) valida el número real.
+    // Actualiza el estado PRIMERO para respuesta visual inmediata,
+    // luego dispara el audio en el siguiente tick para no bloquear el render.
     if (enteredPin.length < 15) {
       setEnteredPin((prev) => prev + num);
       setPinError(false);
       setShowMissingPinAlert(false);
     }
+    setTimeout(() => playTone(1500, 35, 'square'), 0);
   };
 
   const handleBackspace = () => {
-    playTone(392, 80);
     setEnteredPin((prev) => prev.slice(0, -1));
     setPinError(false);
+    setTimeout(() => playTone(392, 80), 0);
   };
 
   const handleVerifyPhone = () => {
@@ -371,13 +372,13 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                   <div className="hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5 mb-2">
                     <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                   </div>
-                  <div className="w-full flex items-center justify-center text-gray-400 text-[11px] sm:text-xs leading-normal px-0">
+                  <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0">
                     {enteredPin.length >= 8 ? (
-                  <span className="animate-typing text-white uppercase">AHORA PRESIONE ACTIVAR ALARMA</span>
+                  <span className="animate-typing text-white uppercase text-xs font-bold">AHORA PRESIONE ACTIVAR ALARMA</span>
                 ) : enteredPin.length < 1 && !showMissingPinAlert ? (
-                  <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                  <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em] max-[319px]:block max-[319px]:w-full max-[319px]:tracking-[0.02em] max-[319px]:[text-align-last:justify]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                 ) : (
-                  <span className="whitespace-nowrap uppercase text-white">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                  <span className="whitespace-nowrap uppercase text-white text-[11.5px] tracking-[0.05em]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                 )}
                   </div>
                 </div>
@@ -385,7 +386,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             </div>
 
             {/* ====== Teclado premium: display de dígitos + rejilla ====== */}
-            <div className="relative rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 p-3 sm:p-4 shadow-[0_8px_30px_rgba(0,0,0,0.4)] w-[90%] mx-auto">
+            <div className="alarm-keypad-card relative rounded-2xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/10 pt-3 px-3 pb-[0.9rem] sm:pt-4 sm:px-4 sm:pb-2 shadow-[0_8px_30px_rgba(0,0,0,0.4)] w-[90%] mx-auto">
               {/* Translucent overlay with manual deactivate button when alarm is active */}
               {step === 'flashing' && !showKeypadForDeactivation && (
                 <div className="absolute inset-0 z-10 rounded-2xl bg-black/5 backdrop-blur-[6px] flex flex-col items-center pt-7 gap-2">
@@ -407,7 +408,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 </div>
               )}
               {/* Display de dígitos: alineado a la izquierda del teclado, cursor parpadeante */}
-              <div className="flex justify-start items-center mb-3 min-h-[2rem] max-w-[220px] mx-auto w-full px-1">
+              <div className="alarm-keypad-display flex justify-start items-center mb-3 min-h-[2rem] max-w-[220px] mx-auto w-full px-1">
                 <span className={`font-mono font-bold text-[22px] sm:text-2xl tracking-[0.2em] ${pinError ? 'text-red-400' : 'text-white'}`}>
                   {enteredPin}
                 </span>
@@ -422,38 +423,39 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
 
               {/* Rejilla numérica premium — botones compactos */}
-              <div className="grid grid-cols-3 gap-[0.9rem] sm:gap-2 max-w-[220px] mx-auto">
+              {/* touch-action:manipulation elimina el delay de 300ms del navegador en móvil */}
+              <div className="alarm-keypad-grid grid grid-cols-3 gap-[0.9rem] sm:gap-2 max-w-[220px] mx-auto" style={{ touchAction: 'manipulation' }}>
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
                   <button
                     key={num}
-                    onClick={() => handleKeyPress(num)}
-                    className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-[#FFD700]/15 hover:to-[#FFD700]/5 active:from-[#FFD700]/25 active:to-[#FFD700]/10 border border-white/10 hover:border-[#FFD700]/40 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer"
+                    onPointerDown={(e) => { e.preventDefault(); handleKeyPress(num); }}
+                    className="h-10 max-sm:tall:h-12 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-[#FFD700]/15 hover:to-[#FFD700]/5 active:from-[#FFD700]/25 active:to-[#FFD700]/10 border border-white/10 hover:border-[#FFD700]/40 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer select-none"
                   >
                     {num}
                   </button>
                 ))}
                 {/* Botón limpiar a la izquierda */}
                 <button
-                  onClick={() => {
-                    playTone(300, 100);
+                  onPointerDown={(e) => {
+                    e.preventDefault();
                     setEnteredPin('');
+                    setTimeout(() => playTone(300, 100), 0);
                   }}
-                  className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-red-500/20 hover:to-red-500/5 active:from-red-500/30 active:to-red-500/10 border border-white/10 hover:border-red-500/30 text-gray-300 hover:text-red-400 transition-all active:scale-90 text-[10px] tall:text-[11px] sm:text-[11px] font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer"
+                  className="h-10 max-sm:tall:h-12 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-red-500/20 hover:to-red-500/5 active:from-red-500/30 active:to-red-500/10 border border-white/10 hover:border-red-500/30 text-gray-300 hover:text-red-400 transition-all active:scale-90 text-[10px] tall:text-[11px] sm:text-[11px] font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer select-none"
                 >
                   Limpiar
                 </button>
                 {/* Botón 0 en el centro */}
                 <button
-                  key="0"
-                  onClick={() => handleKeyPress('0')}
-                  className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-[#FFD700]/15 hover:to-[#FFD700]/5 active:from-[#FFD700]/25 active:to-[#FFD700]/10 border border-white/10 hover:border-[#FFD700]/40 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer"
+                  onPointerDown={(e) => { e.preventDefault(); handleKeyPress('0'); }}
+                  className="h-10 max-sm:tall:h-12 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-[#FFD700]/15 hover:to-[#FFD700]/5 active:from-[#FFD700]/25 active:to-[#FFD700]/10 border border-white/10 hover:border-[#FFD700]/40 text-white font-bold font-mono text-base tall:text-lg sm:text-sm transition-all active:scale-90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer select-none"
                 >
                   0
                 </button>
                 {/* Botón retroceder a la derecha */}
                 <button
-                  onClick={handleBackspace}
-                  className="h-9 tall:h-11 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-white/[0.16] hover:to-white/[0.06] active:from-white/[0.22] active:to-white/[0.08] border border-white/10 hover:border-white/25 text-gray-300 font-bold transition-all active:scale-90 text-base tall:text-lg sm:text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer"
+                  onPointerDown={(e) => { e.preventDefault(); handleBackspace(); }}
+                  className="h-10 max-sm:tall:h-12 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-white/[0.16] hover:to-white/[0.06] active:from-white/[0.22] active:to-white/[0.08] border border-white/10 hover:border-white/25 text-gray-300 font-bold transition-all active:scale-90 text-base tall:text-lg sm:text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer select-none"
                 >
                   ⌫
                 </button>
@@ -482,7 +484,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             >
               {step === 'enter_activation_phone' ? (
                 showMissingPinAlert ? (
-                  <span className="text-[#FFD700] text-[11px] sm:text-xs font-extrabold animate-pulse">⚠️ PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                  <span className="text-[#FFD700] text-xs font-extrabold animate-pulse">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                 ) : enteredPin.length >= 8 ? (
                   <span className="whitespace-nowrap">🚨 ACTIVAR ALARMA</span>
                 ) : (
