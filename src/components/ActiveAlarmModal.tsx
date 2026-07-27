@@ -488,9 +488,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     <span className="text-[#FFD700] text-xs font-extrabold animate-pulse text-center">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
                   </div>
                 ) : (
-                  <div className="flex w-full items-center justify-center gap-2">
+                  <div className="flex w-full items-center justify-center gap-1.5 sm:gap-2">
                     <span className="text-base sm:text-lg flex-shrink-0">🚨</span>
-                    <span className="whitespace-nowrap tracking-wide text-center">ACTIVAR ALARMA VECINAL</span>
+                    <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center">ACTIVAR ALARMA VECINAL</span>
                   </div>
                 )
               ) : (
