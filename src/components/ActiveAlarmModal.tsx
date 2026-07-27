@@ -490,7 +490,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 ) : (
                   <div className="flex w-full items-center justify-center gap-1.5 sm:gap-2">
                     <span className="text-base sm:text-lg flex-shrink-0">🚨</span>
-                    <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center">ACTIVAR ALARMA VECINAL</span>
+                    <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">ACTIVAR ALARMA VECINAL</span>
                   </div>
                 )
               ) : (
