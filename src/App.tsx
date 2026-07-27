@@ -368,7 +368,7 @@ export default function App() {
       </aside>
 
       {/* -------------------- MAIN CONTENT AREA -------------------- */}
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
+      <div className="flex-1 flex flex-col relative z-10 w-full">
         
         {/* APP STATUS HEADER (Mobile & Desktop) */}
         <header className="relative z-30 bg-[#070707]/85 px-5 py-0 flex items-center shrink-0 backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.08)] will-change-transform">
@@ -431,7 +431,7 @@ export default function App() {
                       className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md shrink-0 max-w-none"
                     />
                   </span>
-<div className={`relative ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'ml-[1.6px]' : ''}`}>
+<div className={`relative ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'ml-[0.3px]' : ''}`}>
                   <div className="flex flex-col space-y-[2px]">
                         <span className="text-[#FFD700] text-[10px] md:text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
                         <h2 className="text-white text-[15px] md:text-base font-extrabold tracking-tight leading-none whitespace-nowrap">El Trigal</h2>
@@ -447,7 +447,7 @@ export default function App() {
           )}
 
           {/* Right controls */}
-          <div className={`flex items-center justify-end ${activeTab === 'alarma' && !isAlarmaKeypadOpen ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? 'ml-[7px] xs:ml-3 space-x-1.5 -translate-x-[8px] xs:translate-x-0' : 'space-x-1.5'}`}>
+          <div className={`flex items-center justify-end ${activeTab === 'alarma' && !isAlarmaKeypadOpen ? 'flex-1' : ''} ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? (isAlarmaKeypadOpen ? 'ml-[7px] xs:ml-3 space-x-[1px] -translate-x-[9.4px] xs:translate-x-0' : 'ml-[7px] xs:ml-3 space-x-1.5') : 'space-x-1.5'}`}>
             {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
             {activeTab === 'alarma' && !isAlarmaKeypadOpen && (
             <div ref={searchRef} className={`md:hidden relative ${isSearchFocused ? 'flex-1 -mr-5' : 'flex-1 max-w-[200px]'}`}>
