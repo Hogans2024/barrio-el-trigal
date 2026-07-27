@@ -370,7 +370,63 @@ export default function App() {
       {/* -------------------- MAIN CONTENT AREA -------------------- */}
       <div className="flex-1 flex flex-col overflow-hidden relative z-10 w-full">
         
-        {/* APP STATUS HEADER (Mobile & Desktop) */}
+        {/* APP STATUS HEADER (Mobile & Desktop)
+          
+          ====================================================================================
+          SOLUCIÓN DE CENTRADO — LOGO + TEXTO "BARRIO El Trigal"
+          ====================================================================================
+          
+          PROBLEMA:
+          Cuando el teclado digital de alarma está abierto (isAlarmaKeypadOpen === true),
+          el logo amarillo (escudo) + texto "BARRIO El Trigal" debe estar centrado entre:
+            - Borde derecho del botón "Volver Atrás" (columna 1)
+            - Borde izquierdo del botón campana 🔔 (columna 3)
+          
+          La columna 3 contiene DOS botones (campana + hamburguesa), lo que la hace
+          asimétrica. El centro visual entre campana y hamburguesa NO coincide con el
+          centro de la columna 3. La campana está más cerca del centro del viewport
+          que el hamburguesa.
+          
+          SOLUCIÓN EN 6 CAPAS:
+          
+          1. CSS GRID (en lugar de Flexbox):
+             gridTemplateColumns: 'auto minmax(0, 1fr) auto'
+             - Col1 auto:  ~96px (botón 87px + ml-[9px])
+             - Col2 1fr:   espacio restante
+             - Col3 auto:  ~76px (campana 34px + gap 1px + hamburguesa 34px + ml-[7px])
+             Con Flexbox las columnas competían por el espacio (flex-1). Con Grid
+             cada columna tiene tamaño fijo y la central se adapta sin competencia.
+             
+          2. paddingRight con clamp() en la columna central:
+             paddingRight: 'clamp(0px, calc((100vw - 300px) * 0.4), 8px)'
+             El padding derecho desplaza el centro visual del contenido hacia la
+             izquierda. A 300vw → 0px, a 306vw → ~2.4px (centrado exacto),
+             a ≥320vw → 8px (máximo). El error máximo es de ~3px, imperceptible.
+             
+          3. position: relative + left-[1px] en el logo:
+             Desplaza visualmente el escudo 1px a la derecha sin alterar el flujo.
+             La forma del escudo tiene más peso visual a la izquierda; este ajuste
+             lo centra visualmente.
+             
+          4. ml-[0.3px] en el contenedor de texto:
+             Ajuste sub-pixel que balancea el gap total entre logo y texto a ~1.1px.
+             Sin esto, el texto parece pegado al logo.
+             
+          5. -translate-x-[9.4px] en la columna derecha (campana + hamburguesa):
+             Desplaza todo el grupo 9.4px a la izquierda para alinear visualmente
+             la campana con el borde derecho de la tarjeta del teclado.
+             Se anula en pantallas ≥480px con xs:translate-x-0.
+             
+          6. space-x-[0.8px] entre logo y texto:
+             Gap mínimo para cohesión visual del grupo.
+          
+          IMPORTANTE: Se descartó un enfoque con getBoundingClientRect() + translateX
+          porque causaba flicker, dependía del timing de render y era frágil.
+          La solución CSS pura es más robusta, predecible y sin flicker.
+          
+          Documentación completa en: alineacion_y_centrado_barra_superior_web_app.md
+          ====================================================================================
+        */}
         <header 
           className="relative z-30 bg-[#070707]/85 px-5 py-0 grid items-center shrink-0 backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.08)] will-change-transform"
           style={{
@@ -427,11 +483,33 @@ export default function App() {
             )}
           </div>
 
-          {/* Center: Logo (mobile) / Title (desktop) */}
+          {/* Center: Logo (mobile) / Title (desktop)
+          
+              CAPA 2 — paddingRight con clamp()
+              ====================================
+              paddingRight: 'clamp(0px, calc((100vw - 300px) * 0.4), 8px)'
+              
+              Desplaza el centro visual del contenido hacia la izquierda para
+              compensar la asimetría de la columna derecha (campana + hamburguesa).
+              
+              - A 300vw → 0px (sin ajuste, error ~0.66px)
+              - A 306vw → ~2.4px (centrado exacto)
+              - A ≥320vw → 8px (clamp máximo, error ~3.3px imperceptible)
+              
+              CAPA 6 — space-x-[0.8px]
+              ==========================
+              Gap mínimo entre logo y texto para cohesión visual del grupo.
+          */}
           <div className="flex justify-center items-center">
             {(activeTab !== 'alarma' || isAlarmaKeypadOpen) && (
               <>
                 <div className="flex items-center space-x-[0.8px] md:hidden" style={{ paddingRight: 'clamp(0px, calc((100vw - 300px) * 0.4), 8px)' }}>
+                  {/* CAPA 3 — relative left-[1px] en el logo
+                      Desplaza visualmente el escudo 1px a la derecha sin alterar
+                      el flujo (position:relative). La forma del escudo dentro del
+                      cuadrado de 45px tiene más peso visual a la izquierda;
+                      este ajuste centra visualmente la figura.
+                  */}
                   <span className={`img-float ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'relative left-[1px]' : ''}`}>
                     <img 
                       src={`${import.meta.env.BASE_URL}logo_01.svg`} 
@@ -439,6 +517,13 @@ export default function App() {
                       className="w-[45px] h-[45px] md:w-12 md:h-12 object-contain drop-shadow-md shrink-0 max-w-none"
                     />
                   </span>
+
+                  {/* CAPA 4 — ml-[0.3px] en el texto
+                      Ajuste sub-pixel que suma 0.3px al gap base (0.8px) dando
+                      ~1.1px total entre logo y texto. Sin esto el texto parece
+                      pegado al logo visualmente porque el logo cuadrado y el
+                      texto alargado tienen centros visuales distintos.
+                  */}
                   <div className={`relative ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'ml-[0.3px]' : ''}`}>
                     <div className="flex flex-col space-y-[2px]">
                       <span className="text-[#FFD700] text-[10px] md:text-[11px] uppercase font-mono block tracking-[0.15em] font-bold leading-none">BARRIO</span>
@@ -455,7 +540,22 @@ export default function App() {
             )}
           </div>
 
-          {/* Right controls */}
+          {/* Right controls (campana + perfil + hamburguesa)
+
+              CAPA 5 — -translate-x-[9.4px]
+              ==============================
+              Desplaza todo el grupo (campana + hamburguesa) 9.4px a la izquierda
+              para alinear visualmente la campana 🔔 con el borde derecho de la
+              tarjeta del teclado digital de alarma.
+              
+              Combinación de ajustes:
+              - ml-[7px]:         Separa la columna 3 de la columna 2
+              - space-x-[1px]:    Gap entre campana y hamburguesa
+              - -translate-x-[9.4px]: Desplaza todo 9.4px a la izquierda
+              - xs:translate-x-0: En ≥480px se anula (hay suficiente espacio)
+              
+              Neto: la columna 3 se desplaza 2.4px a la izquierda (9.4-7=2.4)
+          */}
           <div className={`flex items-center justify-end ${isSearchFocused ? 'ml-0 space-x-0' : activeTab === 'alarma' ? (isAlarmaKeypadOpen ? 'ml-[7px] xs:ml-3 space-x-[1px] -translate-x-[9.4px] xs:translate-x-0' : 'ml-[7px] xs:ml-3 space-x-1.5') : 'space-x-1.5'}`}>
             {/* Search bar (Mobile only) — solo visible en Alarma, busca en todas las secciones */}
             {activeTab === 'alarma' && !isAlarmaKeypadOpen && (
