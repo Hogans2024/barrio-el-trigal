@@ -424,7 +424,7 @@ export default function App() {
           {(activeTab !== 'alarma' || isAlarmaKeypadOpen) && (
             <div className={`flex-1 flex justify-center items-center ${activeTab !== 'alarma' ? '-ml-[125px]' : ''}`}>
                 <div className="flex items-center space-x-[0.8px] md:hidden">
-                  <span className={`img-float ${activeTab === 'alarma' && isAlarmaKeypadOpen ? '-ml-[6.2px]' : ''}`}>
+                  <span className={`img-float ${activeTab === 'alarma' && isAlarmaKeypadOpen ? 'relative left-[1px]' : ''}`}>
                 <img 
                       src={`${import.meta.env.BASE_URL}logo_01.svg`} 
                       alt="Logo Barrio El Trigal" 
