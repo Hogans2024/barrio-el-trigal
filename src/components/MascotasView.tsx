@@ -163,7 +163,7 @@ interface MascotasViewProps {
 }
 
 const DEFAULT_IMAGES: Record<string, string> = {
-  Perro: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
+  Perro: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop&q=40',
   Gato: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop&q=80',
   Aves: 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=600&auto=format&fit=crop&q=80',
   Conejo: 'https://images.unsplash.com/photo-1535241749838-299277b6305f?w=600&auto=format&fit=crop&q=80',
@@ -222,6 +222,11 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const petFileRef = useRef<HTMLInputElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
+  const [likes, setLikes] = useState<Record<string, number>>(() => {
+    try { return JSON.parse(localStorage.getItem('barrio_mascotas_likes') || '{}'); } catch { return {}; }
+  });
+
+  useEffect(() => { localStorage.setItem('barrio_mascotas_likes', JSON.stringify(likes)); }, [likes]);
 
   useEffect(() => {
     if (!highlightId || !onClearHighlight) return;
@@ -807,15 +812,6 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               key={pet.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              <div className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setActivePet(pet)}>
-                <img
-                  src={pet.imageUrl}
-                  alt={pet.name}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                />
-              </div>
-
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
@@ -829,32 +825,58 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
               </div>
 
-              <div className="flex items-center justify-center pb-[11px] px-3 gap-5">
+              <div className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setActivePet(pet)}>
+                <img
+                  src={pet.imageUrl}
+                  alt={pet.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-center pt-[10px] pb-[11px] px-3 gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLikes(prev => ({ ...prev, [pet.id]: (prev[pet.id] || 0) + 1 }));
+                  }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-red-400 hover:border-red-400/40"
+                >
+                  <Heart className={`h-3.5 w-3.5 ${likes[pet.id] ? 'fill-red-400 text-red-400' : ''}`} />
+                  <span>{likes[pet.id] || 0}</span>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setContactPet(pet);
                   }}
-                  className="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white"
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white shrink min-w-0"
                 >
                   <Phone className="h-3 w-3" />
                   <span>Contactar</span>
                 </button>
-
-                <span className="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 whitespace-nowrap bg-white/5 text-gray-300 border border-white/10">
-                  {pet.type === 'Perro' ? <Dog className="h-3 w-3" /> : pet.type === 'Gato' ? <Cat className="h-3 w-3" /> : pet.type === 'Aves' ? <Bird className="h-3 w-3" /> : pet.type === 'Conejo' ? <Rabbit className="h-3 w-3" /> : pet.type === 'Tortuga' ? <Shield className="h-3 w-3" /> : <HelpCircle className="h-3 w-3" />}
-                  {pet.type}
-                </span>
 
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
                     setActivePet(pet);
                   }}
-                  className="flex-1 bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap flex items-center justify-center"
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold transition flex items-center justify-center gap-1 whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 cursor-pointer shrink min-w-0"
                 >
                   Ver Detalles
                 </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" overflow="visible" style={{ transform: 'scale(1.25)', transformOrigin: 'center' }}><path d="M12 5l7 7-7 7v-4c-5 0-8 3-9 6 1.5-4.5 4-9 9-10V5z"/></svg>
+                </button>
               </div>
             </div>
           );
@@ -872,15 +894,20 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
-              const slides = activePet.images && activePet.images.length >= 5
-                ? activePet.images.slice(0, 5)
-                : [
-                    'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
-                  ];
+              const petIdx = pets.findIndex(p => p.id === activePet.id);
+              const SLIDE_MAP = [1,1,2,3,1,1,1,1,2,1,1,3,1,4,3,1,5,1,4,5,1,1,2,1,1,4,1,5,1,1];
+              const slideCount = SLIDE_MAP[Math.max(0, petIdx) % SLIDE_MAP.length] || 1;
+              const sourceImages = activePet.images || [];
+              const fallbacks = [
+                'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
+              ];
+              const slides = sourceImages.length >= slideCount
+                ? sourceImages.slice(0, slideCount)
+                : fallbacks.slice(0, slideCount);
               return (
                 <>
                   <div
@@ -916,8 +943,14 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                           className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
                         >
                           <ChevronLeft className="h-4 w-4" />
-                        </button>
-                        <button
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                </button>
+                <button
                           onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
                         >
@@ -953,33 +986,35 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               <h4 className="text-white text-xl font-bold tracking-tight">{activePet.status === 'found' ? '🐾 Encontrado' : activePet.status === 'adoption' ? '🐾 En Adopción' : '🐾 Se busca'}: "{activePet.name}"</h4>
 
               <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
-                <p className="text-white text-sm font-semibold">{activePet.type}</p>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
+                <p className="text-gray-300 text-xs leading-relaxed">{activePet.description}</p>
               </div>
 
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
-                <p className="text-white text-sm font-semibold">{activePet.name}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nombre</h5>
+                  <p className="text-white text-sm font-semibold">{activePet.name}</p>
+                </div>
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Tipo de Mascota</h5>
+                  <p className="text-white text-sm font-semibold">{activePet.type}</p>
+                </div>
               </div>
 
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Barrio / Zona</h5>
-                <p className="text-white text-sm font-semibold">{activePet.neighborhood}</p>
-              </div>
-
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Fecha</h5>
-                <p className="text-white text-sm font-semibold">{activePet.date}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Barrio / Zona</h5>
+                  <p className="text-white text-sm font-semibold">{activePet.neighborhood}</p>
+                </div>
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Fecha</h5>
+                  <p className="text-white text-sm font-semibold">{activePet.date}</p>
+                </div>
               </div>
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">{activePet.status === 'found' ? 'Lugar encontrado' : activePet.status === 'adoption' ? 'Dirección actual' : 'Última vez visto'}</h5>
                 <p className="text-white text-sm leading-relaxed">{activePet.lastSeen}</p>
-              </div>
-
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
-                <p className="text-gray-300 text-xs leading-relaxed">{activePet.description}</p>
               </div>
 
               <div>
