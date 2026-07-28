@@ -413,20 +413,13 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     <div className="flex flex-col space-y-5 relative">
       <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-1 pointer-events-none" />
       {/* Header title */}
-      <div className="-mt-[16px] flex items-start justify-between">
+      <div className="-mt-[16px]">
         <div>
           <h2 className="text-gray-400 text-sm font-bold tracking-tight">Mascotas Perdidas:</h2>
           <p className="text-gray-400 text-xs mt-0">
             Ayuda a encontrar mascotas perdidas.
           </p>
         </div>
-        <button
-          onClick={() => setShowFormPicker(true)}
-          className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
-        >
-          <PlusCircle className="h-3.5 w-3.5" />
-          <span>Añadir Mascota</span>
-        </button>
         <style>{`
           @keyframes beam-sweep {
             0% { transform: translate(0, 0); opacity: 0.65; }
@@ -508,28 +501,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               </div>
             </div>
             <div className={`pb-1.5 ${isMobile ? 'w-full' : ''}`} style={{ width: isMobile ? undefined : stickyBarWidth > 0 ? stickyBarWidth : undefined }}>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-300" />
-                </span>
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
-                  placeholder="Buscar mascotas..."
-                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/20 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
-                />
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* ── Normal layout: search bar + category bar ── */
-          <div className="relative">
-            <div className="relative transition-all duration-300 ease-out">
-              <div className="flex justify-center -mt-[7px]">
-                <div className="relative w-full max-w-md">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1 min-w-0">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <Search className="h-4 w-4 text-gray-300" />
                   </span>
@@ -540,8 +513,46 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     onFocus={() => setSearchFocused(true)}
                     onBlur={() => setSearchFocused(false)}
                     placeholder="Buscar mascotas..."
-                  className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/20 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                    className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/20 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
                   />
+                </div>
+                <button
+                  onClick={() => setShowFormPicker(true)}
+                  className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span>Añadir Mascota</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* ── Normal layout: search bar + add button + category bar ── */
+          <div className="relative">
+            <div className="relative transition-all duration-300 ease-out">
+              <div className="flex justify-center -mt-[7px]">
+                <div className="flex items-center gap-2 w-full max-w-md">
+                  <div className="relative flex-1 min-w-0">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <Search className="h-4 w-4 text-gray-300" />
+                    </span>
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
+                      placeholder="Buscar mascotas..."
+                      className="w-full bg-[#080a0f] text-white pl-10 pr-4 py-1.5 rounded-xl border border-white/20 text-xs placeholder:text-gray-400 focus:outline-none focus:border-[#FFD700] transition"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowFormPicker(true)}
+                    className="bg-[#FFD700]/10 border border-[#FFD700]/20 hover:border-[#FFD700] text-[#FFD700] font-extrabold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 transition cursor-pointer shrink-0"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    <span>Añadir Mascota</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -806,11 +817,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               </div>
 
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
-                <div className="text-teal-400 bg-teal-500/10 p-2.5 rounded-lg shrink-0">
-                  <PawPrint className="h-5 w-5" />
-                </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
+                    <PawPrint className="h-[18px] w-[18px] text-teal-400 shrink-0 mr-1" />
                     <span className="truncate min-w-0"><span className="text-white">{idx + 1}. Nombre:</span><span className="text-white ml-2">{pet.name}</span></span>
                     <span className="text-emerald-400 shrink-0 ml-2">{pet.status === 'adoption' ? 'Adopción' : pet.status === 'found' ? 'Encontrado' : 'Perdido'}</span>
                   </h3>
