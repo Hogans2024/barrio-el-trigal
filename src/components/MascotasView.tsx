@@ -1157,7 +1157,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
           <div className="relative w-full h-full flex items-center justify-center">
             <button
               onClick={() => { setFullscreenImg(null); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }}
-              className="absolute top-2 right-2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer"
+              className="absolute top-[18px] right-[3px] bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-[99]"
             >
               <X className="h-4 w-4" />
             </button>
@@ -1168,6 +1168,31 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 className="max-w-full max-h-full object-contain"
               />
             </div>
+            {(() => {
+              if (!activePet) return null;
+              const petIdx = pets.findIndex(p => p.id === activePet.id);
+              const slideCount = SLIDE_MAP[Math.max(0, petIdx) % SLIDE_MAP.length] || 1;
+              const sourceImages = activePet.images || [];
+              const slides = sourceImages.length >= slideCount
+                ? sourceImages.slice(0, slideCount)
+                : SLIDE_FALLBACKS.slice(0, slideCount);
+              
+              if (slides.length <= 1) return null;
+              
+              return (
+                <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-[90] pointer-events-auto">
+                  {slides.map((src, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => { setFullscreenImg(src); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }}
+                      className={`w-14 h-14 rounded-lg border-2 overflow-hidden transition ${fullscreenImg === src ? 'border-[#FFD700] opacity-100 shadow-[0_0_10px_rgba(255,215,0,0.5)]' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                    >
+                      <img src={src} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
