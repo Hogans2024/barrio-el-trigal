@@ -2,6 +2,15 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle, Zap, Images, FileText, UserCircle2, IdCard, Dog, Cat, Bird, Rabbit, Shield } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
 
+const SLIDE_MAP = [1,1,2,3,1,1,1,1,2,1,1,3,1,4,3,1,5,1,4,5,1,1,2,1,1,4,1,5,1,1];
+const SLIDE_FALLBACKS = [
+  'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
+];
+
 
 function CustomSelect({ value, onChange, placeholder, options, className }: {
   value: string;
@@ -180,6 +189,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const [slideIdx, setSlideIdx] = useState(0);
   const [searchFocused, setSearchFocused] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
+  const [fullscreenImg, setFullscreenImg] = useState<string | null>(null);
+  const [zoomScale, setZoomScale] = useState(1);
+  const pinchRef = useRef({ dist: 0 });
+  useEffect(() => { setZoomScale(1); }, [fullscreenImg]);
 
   useEffect(() => {
     if (contactPet) {
@@ -193,6 +206,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     }
   }, [activePet, contactPet, schedulePet, onRegisterBackHandler, mascotas]);
   const autoPlayRef = useRef(true);
+  const slideCountRef = useRef(1);
   const touchStartX = useRef(0);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('mascotas');
@@ -227,6 +241,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   });
 
   useEffect(() => { localStorage.setItem('barrio_mascotas_likes', JSON.stringify(likes)); }, [likes]);
+
+  const [portraitPets, setPortraitPets] = useState<Record<string, boolean>>({});
+  const [portraitSlides, setPortraitSlides] = useState<Record<string, Record<number, boolean>>>({});
 
   useEffect(() => {
     if (!highlightId || !onClearHighlight) return;
@@ -291,8 +308,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   useEffect(() => {
     if (!autoPlay) return;
     const id = setInterval(() => setSlideIdx(prev => {
-      const slides = activePet?.images?.length && activePet.images.length >= 5 ? activePet.images.slice(0, 5) : Array(5);
-      return prev >= slides.length - 1 ? 0 : prev + 1;
+      return prev >= slideCountRef.current - 1 ? 0 : prev + 1;
     }), 4000);
     return () => clearInterval(id);
   }, [autoPlay, activePet]);
@@ -825,12 +841,24 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
               </div>
 
-              <div className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setActivePet(pet)}>
+              <div className={`relative ${portraitPets[pet.id] ? 'h-[264px]' : 'h-36'} w-full bg-slate-900 overflow-hidden cursor-pointer`} onClick={() => setActivePet(pet)} style={{ clipPath: 'inset(0)' }}>
+                {portraitPets[pet.id] && (
+                  <>
+                    <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${pet.imageUrl})` }} />
+                    <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                  </>
+                )}
                 <img
                   src={pet.imageUrl}
                   alt={pet.name}
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  className={`relative z-10 w-full h-full transition duration-500 ${portraitPets[pet.id] ? 'object-contain scale-[1.3]' : 'object-cover group-hover:scale-105'}`}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    if (img.naturalWidth / img.naturalHeight < 0.8) {
+                      setPortraitPets(prev => ({ ...prev, [pet.id]: true }));
+                    }
+                  }}
                 />
               </div>
 
@@ -895,23 +923,16 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
               const petIdx = pets.findIndex(p => p.id === activePet.id);
-              const SLIDE_MAP = [1,1,2,3,1,1,1,1,2,1,1,3,1,4,3,1,5,1,4,5,1,1,2,1,1,4,1,5,1,1];
               const slideCount = SLIDE_MAP[Math.max(0, petIdx) % SLIDE_MAP.length] || 1;
               const sourceImages = activePet.images || [];
-              const fallbacks = [
-                'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
-              ];
               const slides = sourceImages.length >= slideCount
                 ? sourceImages.slice(0, slideCount)
-                : fallbacks.slice(0, slideCount);
+                : SLIDE_FALLBACKS.slice(0, slideCount);
+              slideCountRef.current = slides.length;
               return (
                 <>
                   <div
-                    className="relative h-44 bg-gray-950 overflow-hidden"
+                    className="relative h-[264px] bg-gray-950 overflow-hidden"
                     onMouseEnter={() => { setAutoPlay(false); autoPlayRef.current = false; }}
                     onMouseLeave={() => { setAutoPlay(true); autoPlayRef.current = true; }}
                     onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
@@ -929,12 +950,26 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       }
                     }}
                   >
+                    {portraitSlides[activePet.id]?.[slideIdx] && (
+                      <>
+                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${slides[slideIdx]})` }} />
+                        <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                      </>
+                    )}
                     <img
                       src={slides[slideIdx]}
                       alt={activePet.name}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer"
-                      onClick={() => { setAutoPlay(false); autoPlayRef.current = false; }}
+                      className="relative z-10 w-full h-full transition-all duration-300 cursor-pointer object-contain"
+                      onDoubleClick={() => setFullscreenImg(slides[slideIdx])}
+                      onClick={() => setFullscreenImg(slides[slideIdx])}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        const isPortrait = img.naturalWidth / img.naturalHeight < 0.8;
+                        if (isPortrait !== portraitSlides[activePet.id]?.[slideIdx]) {
+                          setPortraitSlides(prev => ({ ...prev, [activePet.id]: { ...prev[activePet.id], [slideIdx]: isPortrait } }));
+                        }
+                      }}
                     />
                     {slides.length > 1 && (
                       <>
@@ -951,12 +986,25 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   <MessageCircle className="h-3.5 w-3.5" />
                 </button>
                 <button
-                          onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
+                  onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>
                       </>
+                    )}
+                    {slides.length > 1 && (
+                      <div className="absolute bottom-0 left-0 right-0 z-20 flex gap-1.5 px-3 py-2 justify-center bg-gradient-to-t from-black/60 to-transparent">
+                        {slides.map((src, j) => (
+                          <button
+                            key={j}
+                            onClick={(e) => { e.stopPropagation(); setSlideIdx(j); setAutoPlay(false); autoPlayRef.current = false; }}
+                            className={`shrink-0 rounded overflow-hidden border-2 transition cursor-pointer ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
+                          >
+                            <img src={src} alt="" className="w-12 h-8 object-cover" />
+                          </button>
+                        ))}
+                      </div>
                     )}
                     <button
                       onClick={() => setActivePet(null)}
@@ -965,24 +1013,11 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                  {slides.length > 1 && (
-                    <div className="flex gap-1.5 px-4 py-2 bg-[#080a0f] justify-center">
-                      {slides.map((src, j) => (
-                        <button
-                          key={j}
-                          onClick={() => { setSlideIdx(j); setAutoPlay(false); autoPlayRef.current = false; }}
-                          className={`shrink-0 rounded overflow-hidden border-2 transition cursor-pointer ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
-                        >
-                          <img src={src} alt="" className="w-12 h-8 object-cover" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </>
               );
             })()}
 
-            <div className="p-5 space-y-3 pb-16 sm:pb-5">
+            <div className="px-5 pt-1 space-y-1.5 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activePet.status === 'found' ? '🐾 Encontrado' : activePet.status === 'adoption' ? '🐾 En Adopción' : '🐾 Se busca'}: "{activePet.name}"</h4>
 
               <div>
@@ -1071,6 +1106,44 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {fullscreenImg && (
+        <div
+          className="fixed inset-0 z-[70] bg-black flex flex-col pt-14 pb-14 overflow-hidden"
+          onTouchStart={(e) => {
+            if (e.touches.length === 2) {
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              pinchRef.current.dist = Math.hypot(dx, dy);
+            }
+          }}
+          onTouchMove={(e) => {
+            if (e.touches.length === 2) {
+              e.preventDefault();
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const newDist = Math.hypot(dx, dy);
+              const ratio = newDist / pinchRef.current.dist;
+              setZoomScale(s => Math.max(1, Math.min(5, s * ratio)));
+              pinchRef.current.dist = newDist;
+            }
+          }}
+        >
+          <button
+            onClick={() => { setFullscreenImg(null); setZoomScale(1); }}
+            className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <img
+            src={fullscreenImg}
+            alt=""
+            className="w-full h-full object-contain cursor-pointer transition-transform duration-100"
+            style={{ transform: `scale(${zoomScale})` }}
+            onClick={() => { setFullscreenImg(null); setZoomScale(1); }}
+          />
         </div>
       )}
 

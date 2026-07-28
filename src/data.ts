@@ -2343,14 +2343,14 @@ export const LOST_PETS_DATA: LostPet[] = [
     id: 'fp1',
     status: 'found',
     name: 'Chispita',
-    type: 'Perro',
-    imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80',
-    description: 'Encontrada deambulando por la Av. Potosí. Es una perrita pequeña color blanco con manchas negras, collar rojo, muy cariñosa. Fue resguardada temporalmente. Tiene patas cortas, orejas paradas y una mancha negra alrededor del ojo izquierdo. Es muy energética y salta de alegría al ver personas.',
+    type: 'Gato',
+    imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=360&h=640&fit=crop&q=80',
+    description: 'Encontrado deambulando por la Av. Potosí. Es un gato pequeño color blanco con manchas negras, collar rojo, muy cariñoso. Fue resguardado temporalmente. Tiene patas cortas, orejas paradas y una mancha negra alrededor del ojo izquierdo. Es muy energético y salta de alegría al ver personas.',
     lastSeen: 'Av. Potosí #450',
     contact: '4 611 2233',
     neighborhood: 'El Molino',
     date: '24 de junio de 2026',
-    images: ['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=60']
+    images: ['https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=360&h=640&fit=crop&q=80','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=640&h=360&fit=crop&q=80','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=60']
   },
   {
     id: 'ap2',
