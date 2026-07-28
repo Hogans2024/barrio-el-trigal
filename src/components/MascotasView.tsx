@@ -191,8 +191,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const [autoPlay, setAutoPlay] = useState(true);
   const [fullscreenImg, setFullscreenImg] = useState<string | null>(null);
   const [zoomScale, setZoomScale] = useState(1);
-  const pinchRef = useRef({ dist: 0 });
-  useEffect(() => { setZoomScale(1); }, [fullscreenImg]);
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const touchState = useRef({ dist: 0, midX: 0, midY: 0, panX: 0, panY: 0, scale: 1 });
+  useEffect(() => { setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }, [fullscreenImg]);
 
   useEffect(() => {
     if (contactPet) {
@@ -1111,12 +1112,18 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
 
       {fullscreenImg && (
         <div
-          className="fixed inset-0 z-[70] bg-black flex flex-col pt-14 pb-14 overflow-hidden"
+          className="fixed left-0 right-0 z-[70] bg-black flex flex-col overflow-hidden"
+          style={{ top: '3.5rem', bottom: '3.5rem' }}
           onTouchStart={(e) => {
             if (e.touches.length === 2) {
               const dx = e.touches[0].clientX - e.touches[1].clientX;
               const dy = e.touches[0].clientY - e.touches[1].clientY;
-              pinchRef.current.dist = Math.hypot(dx, dy);
+              const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+              const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+              touchState.current = { dist: Math.hypot(dx, dy), midX: mx, midY: my, panX: zoomPos.x, panY: zoomPos.y, scale: zoomScale };
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+              touchState.current.midX = e.touches[0].clientX;
+              touchState.current.midY = e.touches[0].clientY;
             }
           }}
           onTouchMove={(e) => {
@@ -1124,26 +1131,44 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               e.preventDefault();
               const dx = e.touches[0].clientX - e.touches[1].clientX;
               const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+              const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
               const newDist = Math.hypot(dx, dy);
-              const ratio = newDist / pinchRef.current.dist;
-              setZoomScale(s => Math.max(1, Math.min(5, s * ratio)));
-              pinchRef.current.dist = newDist;
+              const ratio = newDist / touchState.current.dist;
+              const newScale = Math.max(1, Math.min(5, touchState.current.scale * ratio));
+              const cx = touchState.current.midX;
+              const cy = touchState.current.midY;
+              setZoomPos({ x: touchState.current.panX + (mx - cx), y: touchState.current.panY + (my - cy) });
+              setZoomScale(newScale);
+              touchState.current.dist = newDist;
+              touchState.current.midX = mx;
+              touchState.current.midY = my;
+              touchState.current.scale = newScale;
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+              setZoomPos({ x: zoomPos.x + (e.touches[0].clientX - touchState.current.midX), y: zoomPos.y + (e.touches[0].clientY - touchState.current.midY) });
+              touchState.current.midX = e.touches[0].clientX;
+              touchState.current.midY = e.touches[0].clientY;
             }
           }}
+          onTouchEnd={() => {
+            if (zoomScale <= 1) setZoomPos({ x: 0, y: 0 });
+          }}
         >
-          <button
-            onClick={() => { setFullscreenImg(null); setZoomScale(1); }}
-            className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer"
-          >
-            <X className="h-5 w-5" />
-          </button>
-          <img
-            src={fullscreenImg}
-            alt=""
-            className="w-full h-full object-contain cursor-pointer transition-transform duration-100"
-            style={{ transform: `scale(${zoomScale})` }}
-            onClick={() => { setFullscreenImg(null); setZoomScale(1); }}
-          />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <button
+              onClick={() => { setFullscreenImg(null); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }}
+              className="absolute top-2 right-2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="w-full h-full flex items-center justify-center" style={{ transform: `translate(${zoomPos.x}px, ${zoomPos.y}px) scale(${zoomScale})` }}>
+              <img
+                src={fullscreenImg}
+                alt=""
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+          </div>
         </div>
       )}
 
