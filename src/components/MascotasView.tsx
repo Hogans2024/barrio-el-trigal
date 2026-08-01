@@ -196,7 +196,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   useEffect(() => { setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }, [fullscreenImg]);
 
   useEffect(() => {
-    if (contactPet) {
+    if (fullscreenImg) {
+      onRegisterBackHandler?.(() => { setFullscreenImg(null); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); return true; });
+    } else if (contactPet) {
       onRegisterBackHandler?.(() => { setContactPet(null); return true; });
     } else if (schedulePet) {
       onRegisterBackHandler?.(() => { setSchedulePet(null); return true; });
@@ -205,7 +207,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     } else {
       onRegisterBackHandler?.(null);
     }
-  }, [activePet, contactPet, schedulePet, onRegisterBackHandler, mascotas]);
+  }, [activePet, contactPet, schedulePet, fullscreenImg, onRegisterBackHandler, mascotas]);
   const autoPlayRef = useRef(true);
   const slideCountRef = useRef(1);
   const touchStartX = useRef(0);
@@ -979,15 +981,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                           className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
                         >
                           <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); }}
-                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
                         >
                           <ChevronRight className="h-4 w-4" />
