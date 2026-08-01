@@ -258,6 +258,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
 
   const [portraitPets, setPortraitPets] = useState<Record<string, boolean>>({});
   const [portraitSlides, setPortraitSlides] = useState<Record<string, Record<number, boolean>>>({});
+  const [squarePets, setSquarePets] = useState<Record<string, boolean>>({});
+  const [squareSlides, setSquareSlides] = useState<Record<string, Record<number, boolean>>>({});
 
   useEffect(() => {
     if (!highlightId || !onClearHighlight) return;
@@ -855,7 +857,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 </div>
               </div>
 
-              <div className={`relative ${portraitPets[pet.id] ? 'h-[264px]' : 'h-36'} w-full bg-slate-900 overflow-hidden cursor-pointer`} onClick={() => setActivePet(pet)} style={{ clipPath: 'inset(0)' }}>
+              <div className={`relative ${portraitPets[pet.id] ? 'h-[264px]' : squarePets[pet.id] ? 'aspect-square' : 'h-36'} w-full bg-slate-900 overflow-hidden cursor-pointer`} onClick={() => setActivePet(pet)} style={{ clipPath: 'inset(0)' }}>
                 {portraitPets[pet.id] && (
                   <>
                     <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${pet.imageUrl})` }} />
@@ -869,8 +871,11 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   className={`relative z-10 w-full h-full transition duration-500 ${portraitPets[pet.id] ? 'object-contain scale-[1.3]' : 'object-cover group-hover:scale-105'}`}
                   onLoad={(e) => {
                     const img = e.currentTarget;
-                    if (img.naturalWidth / img.naturalHeight < 0.8) {
+                    const ratio = img.naturalWidth / img.naturalHeight;
+                    if (ratio < 0.8) {
                       setPortraitPets(prev => ({ ...prev, [pet.id]: true }));
+                    } else if (ratio >= 0.8 && ratio <= 1.2) {
+                      setSquarePets(prev => ({ ...prev, [pet.id]: true }));
                     }
                   }}
                 />
@@ -939,7 +944,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               const petIdx = pets.findIndex(p => p.id === activePet.id);
               const slides = buildPetSlides(activePet, petIdx);
               slideCountRef.current = slides.length;
-              const singleHorizontal = slides.length === 1 && !portraitSlides[activePet.id]?.[0];
+              const portrait0 = portraitSlides[activePet.id]?.[0] ?? portraitPets[activePet.id];
+              const square0 = squareSlides[activePet.id]?.[0] ?? squarePets[activePet.id];
+              const singleHorizontal = slides.length === 1 && !portrait0 && !square0;
               return (
                 <>
                   <div
@@ -974,7 +981,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       className={`z-10 cursor-pointer ${
                         singleHorizontal
                           ? 'relative w-full h-full object-cover'
-                          : portraitSlides[activePet.id]?.[slideIdx]
+                          : (slideIdx === 0 ? portrait0 || square0 : (portraitSlides[activePet.id]?.[slideIdx] || squareSlides[activePet.id]?.[slideIdx]))
                             ? 'relative w-full h-full object-contain'
                             : 'absolute inset-x-0 top-1/2 -translate-y-1/2 w-full h-36 object-cover'
                       }`}
@@ -982,9 +989,14 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       onClick={() => setFullscreenImg(slides[slideIdx])}
                       onLoad={(e) => {
                         const img = e.currentTarget;
-                        const isPortrait = img.naturalWidth / img.naturalHeight < 0.8;
+                        const ratio = img.naturalWidth / img.naturalHeight;
+                        const isPortrait = ratio < 0.8;
+                        const isSquare = ratio >= 0.8 && ratio <= 1.2;
                         if (isPortrait !== portraitSlides[activePet.id]?.[slideIdx]) {
                           setPortraitSlides(prev => ({ ...prev, [activePet.id]: { ...prev[activePet.id], [slideIdx]: isPortrait } }));
+                        }
+                        if (isSquare !== squareSlides[activePet.id]?.[slideIdx]) {
+                          setSquareSlides(prev => ({ ...prev, [activePet.id]: { ...prev[activePet.id], [slideIdx]: isSquare } }));
                         }
                       }}
                     />
