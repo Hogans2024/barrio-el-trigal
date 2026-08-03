@@ -11,8 +11,17 @@ const SLIDE_FALLBACKS = [
   'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=600&auto=format&fit=crop&q=80'
 ];
 
-function buildPetSlides(pet: LostPet, petIdx: number): string[] {
-  const slideCount = SLIDE_MAP[Math.max(0, petIdx) % SLIDE_MAP.length] || 1;
+/** Fix #6 — Índice estable basado en el ID de la mascota para SLIDE_MAP.
+ *  Garantiza que el nº de slides no se desplace cuando se añaden mascotas
+ *  custom al inicio del array (custom_pet_<ts> siempre mapea al mismo slot). */
+function stableIdx(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function buildPetSlides(pet: LostPet): string[] {
+  const slideCount = SLIDE_MAP[stableIdx(pet.id) % SLIDE_MAP.length] || 1;
   const others = (pet.images || []).filter(img => img !== pet.imageUrl);
   const slides: string[] = [pet.imageUrl, ...others].slice(0, slideCount);
   if (slides.length < slideCount) {
@@ -725,8 +734,29 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 key={pet.id}
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
-                <div className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer" onClick={() => setActivePet(pet)}>
-                  <img src={pet.imageUrl} alt={pet.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                {/* Fix #1 + #8 + #9 — Vista Proyectos: detección de formato global */}
+                <div className="relative w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer" onClick={() => setActivePet(pet)} style={{ clipPath: 'inset(0)' }}>
+                  {portraitPets[pet.id] && (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${pet.imageUrl})` }} />
+                      <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                    </>
+                  )}
+                  <img
+                    src={pet.imageUrl}
+                    alt={pet.name}
+                    referrerPolicy="no-referrer"
+                    className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      const ratio = img.naturalWidth / img.naturalHeight;
+                      if (ratio < 0.8) {
+                        setPortraitPets(prev => ({ ...prev, [pet.id]: true }));
+                      } else if (ratio >= 0.8 && ratio <= 1.2) {
+                        setSquarePets(prev => ({ ...prev, [pet.id]: true }));
+                      }
+                    }}
+                  />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                   <div>
@@ -752,8 +782,29 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 key={pet.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
-                <div className="relative h-44 w-full bg-slate-900">
-                  <img src={pet.imageUrl} alt={pet.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                {/* Fix #1 + #9 — Vista Farmacias: detección de formato global */}
+                <div className={`relative ${portraitPets[pet.id] ? 'h-[264px]' : 'h-44'} w-full bg-slate-900 overflow-hidden`} style={{ clipPath: 'inset(0)' }}>
+                  {portraitPets[pet.id] && (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${pet.imageUrl})` }} />
+                      <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                    </>
+                  )}
+                  <img
+                    src={pet.imageUrl}
+                    alt={pet.name}
+                    referrerPolicy="no-referrer"
+                    className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      const ratio = img.naturalWidth / img.naturalHeight;
+                      if (ratio < 0.8) {
+                        setPortraitPets(prev => ({ ...prev, [pet.id]: true }));
+                      } else if (ratio >= 0.8 && ratio <= 1.2) {
+                        setSquarePets(prev => ({ ...prev, [pet.id]: true }));
+                      }
+                    }}
+                  />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#080a0f] to-transparent h-16 pointer-events-none" />
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
@@ -790,8 +841,29 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 key={pet.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
-                <div className="relative h-44 w-full bg-slate-900">
-                  <img src={pet.imageUrl} alt={pet.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
+                {/* Fix #1 + #8 + #9 — Vista Eventos: detección de formato global */}
+                <div className={`relative ${portraitPets[pet.id] ? 'h-[264px]' : 'h-44'} w-full bg-slate-900 overflow-hidden`} style={{ clipPath: 'inset(0)' }}>
+                  {portraitPets[pet.id] && (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${pet.imageUrl})` }} />
+                      <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                    </>
+                  )}
+                  <img
+                    src={pet.imageUrl}
+                    alt={pet.name}
+                    referrerPolicy="no-referrer"
+                    className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      const ratio = img.naturalWidth / img.naturalHeight;
+                      if (ratio < 0.8) {
+                        setPortraitPets(prev => ({ ...prev, [pet.id]: true }));
+                      } else if (ratio >= 0.8 && ratio <= 1.2) {
+                        setSquarePets(prev => ({ ...prev, [pet.id]: true }));
+                      }
+                    }}
+                  />
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
@@ -816,8 +888,29 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                 key={pet.id}
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
-                <div className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setActivePet(pet)}>
-                  <img src={pet.imageUrl} alt={pet.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                {/* Fix #1 + #9 — Vista Negocios: detección de formato global */}
+                <div className={`relative ${portraitPets[pet.id] ? 'h-[264px]' : 'h-44'} w-full bg-slate-900 overflow-hidden cursor-pointer`} onClick={() => setActivePet(pet)} style={{ clipPath: 'inset(0)' }}>
+                  {portraitPets[pet.id] && (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${pet.imageUrl})` }} />
+                      <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                    </>
+                  )}
+                  <img
+                    src={pet.imageUrl}
+                    alt={pet.name}
+                    referrerPolicy="no-referrer"
+                    className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      const ratio = img.naturalWidth / img.naturalHeight;
+                      if (ratio < 0.8) {
+                        setPortraitPets(prev => ({ ...prev, [pet.id]: true }));
+                      } else if (ratio >= 0.8 && ratio <= 1.2) {
+                        setSquarePets(prev => ({ ...prev, [pet.id]: true }));
+                      }
+                    }}
+                  />
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
@@ -868,7 +961,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   src={pet.imageUrl}
                   alt={pet.name}
                   referrerPolicy="no-referrer"
-                  className={`relative z-10 w-full h-full transition duration-500 ${portraitPets[pet.id] ? 'object-contain scale-[1.3]' : 'object-cover group-hover:scale-105'}`}
+                  className={`relative z-10 w-full h-full transition duration-500 ${portraitPets[pet.id] ? 'object-contain' : 'object-cover group-hover:scale-105'}`} /* Fix #5 — eliminado scale-[1.3] hardcoded que recortaba la imagen portrait */
                   onLoad={(e) => {
                     const img = e.currentTarget;
                     const ratio = img.naturalWidth / img.naturalHeight;
@@ -941,8 +1034,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
-              const petIdx = pets.findIndex(p => p.id === activePet.id);
-              const slides = buildPetSlides(activePet, petIdx);
+              /* Fix #6 — petIdx eliminado; buildPetSlides usa stableIdx(pet.id) internamente */
+              const slides = buildPetSlides(activePet);
               slideCountRef.current = slides.length;
               const portrait0 = portraitSlides[activePet.id]?.[0] ?? portraitPets[activePet.id];
               const square0 = squareSlides[activePet.id]?.[0] ?? squarePets[activePet.id];
@@ -968,7 +1061,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                       }
                     }}
                   >
-                    {portraitSlides[activePet.id]?.[slideIdx] && (
+                    {/* Fix #4 — blur de fondo activado también para slides cuadradas (1:1) */}
+                    {(portraitSlides[activePet.id]?.[slideIdx] || squareSlides[activePet.id]?.[slideIdx]) && (
                       <>
                         <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${slides[slideIdx]})` }} />
                         <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
@@ -1024,7 +1118,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                             onClick={(e) => { e.stopPropagation(); setSlideIdx(j); setAutoPlay(false); autoPlayRef.current = false; }}
                             className={`shrink-0 rounded overflow-hidden border-2 cursor-pointer ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
                           >
-                            <img src={src} alt="" className="w-12 h-8 object-cover" />
+                            <img src={src} alt="" className="w-10 h-10 object-cover" />
                           </button>
                         ))}
                       </div>
@@ -1192,8 +1286,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             </div>
             {(() => {
               if (!activePet) return null;
-              const petIdx = pets.findIndex(p => p.id === activePet.id);
-              const slides = buildPetSlides(activePet, petIdx);
+              /* Fix #6 — petIdx eliminado; buildPetSlides usa stableIdx(pet.id) internamente */
+              const slides = buildPetSlides(activePet);
               
               if (slides.length <= 1) return null;
               

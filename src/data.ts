@@ -2672,7 +2672,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     status: 'lost',
     name: 'Canela',
     type: 'Gato',
-    imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=600&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=360&h=640&fit=crop&q=80',
     description: 'Se perdió en la noche del 10 de junio. Es una gata naranja con rayas atigradas, muy cariñosa y maulladora. Tiene ojos grandes verde claro, pecho blanco y patas con manchas claras. Maúlla fuerte cuando tiene hambre y no tiene collar.',
     lastSeen: 'Calle Comercio #321',
     contact: '4 698 1122',
