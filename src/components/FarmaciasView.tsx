@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, Home, MessageCircle, Bus, Navigation, ChevronRight, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
 import { Pharmacy, TransportLine, TransportInfo } from '../types';
+import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
+
+// CAPA 2 (futuro, no implementado): compresión/redimensionado de imágenes en el
+// navegador del usuario antes de subirlas, para reducir peso de archivo en origen.
+// CAPA 3 (futuro, no implementado): migración de almacenamiento/entrega de imágenes a
+// Cloudinary (plan gratuito). Subida directa desde el navegador vía "unsigned upload
+// preset" (sin pasar por Apps Script), y URLs servidas con parámetros f_auto (formato
+// automático WebP/AVIF) y q_auto (compresión automática) vía su CDN.
 
 interface FarmaciasViewProps {
   farmacias: Pharmacy[];
@@ -107,7 +115,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
     { id: 'negocios', label: 'Vista Tarjeta', icon: <IdCard className="w-4 h-4" /> },
   ];
 
-  const filteredPharmacies = farmacias.filter((pharmacy) => {
+  const filteredPharmacies = useMemo(() => farmacias.filter((pharmacy) => {
     const matchesSearch = pharmacy.name.toLowerCase().includes(search.toLowerCase()) ||
                           pharmacy.description.toLowerCase().includes(search.toLowerCase());
     let matchesCategory = false;
@@ -117,7 +125,10 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
       matchesCategory = pharmacy.neighborhood.toLowerCase() === selectedCategory.toLowerCase();
     }
     return matchesSearch && matchesCategory;
-  });
+  }), [farmacias, search, selectedCategory]);
+
+  // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
+  const { visibleItems: visiblePharmacies, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredPharmacies);
 
   const handleNavigate = (pharmacyName: string, address: string) => {
     onShowNotification(
@@ -378,7 +389,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
 
       {/* Pharmacy Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {filteredPharmacies.map((pharmacy) => {
+        {visiblePharmacies.map((pharmacy) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
@@ -387,7 +398,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
                 <div onClick={() => setActivePharmacy(pharmacy)} className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer">
-                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                   <div>
@@ -414,7 +425,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
-                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#080a0f] to-transparent h-16 pointer-events-none" />
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
@@ -448,7 +459,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
-                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
+                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
@@ -475,7 +486,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div onClick={() => setActivePharmacy(pharmacy)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
-                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={pharmacy.imageUrl} alt={pharmacy.name} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
@@ -510,6 +521,8 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                   src={pharmacy.imageUrl}
                   alt={pharmacy.name}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
                 <div className="absolute top-3 right-3 animate-pulse">
@@ -560,6 +573,9 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
             </div>
           );
         })}
+
+        {/* Sentinela de carga incremental — SIEMPRE montado para evitar loop mount/unmount del observer */}
+        <div ref={batchSentinelRef} className="w-full h-4" aria-hidden="true" />
 
         {filteredPharmacies.length === 0 && (
           <div className="text-center py-12 text-gray-500 text-sm">

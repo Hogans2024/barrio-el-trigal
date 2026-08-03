@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Heart, PlusCircle, Upload, Home, MessageCircle, Zap, Images, FileText, UserCircle2, IdCard, Dog, Cat, Bird, Rabbit, Shield } from 'lucide-react';
 import { LostPet, DaySchedule } from '../types';
+import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
+
+// CAPA 2 (futuro, no implementado): compresión/redimensionado de imágenes en el
+// navegador del usuario antes de subirlas, para reducir peso de archivo en origen.
+// CAPA 3 (futuro, no implementado): migración de almacenamiento/entrega de imágenes a
+// Cloudinary (plan gratuito). Subida directa desde el navegador vía "unsigned upload
+// preset" (sin pasar por Apps Script), y URLs servidas con parámetros f_auto (formato
+// automático WebP/AVIF) y q_auto (compresión automática) vía su CDN.
 
 const SLIDE_MAP = [1,1,2,3,1,1,1,1,2,1,1,3,1,4,3,1,5,1,4,5,1,1,2,1,1,4,1,5,1,1];
 const SLIDE_FALLBACKS = [
@@ -378,7 +386,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     { id: 'negocios', label: 'Vista Tarjeta', icon: <IdCard className="w-4 h-4" /> },
   ];
 
-  const filteredPets = pets.filter((pet) => {
+  const filteredPets = useMemo(() => pets.filter((pet) => {
     const matchesSearch = pet.name.toLowerCase().includes(search.toLowerCase()) ||
                           pet.description.toLowerCase().includes(search.toLowerCase());
     let matchesCategory = false;
@@ -398,7 +406,10 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       matchesCategory = pet.type !== 'Perro' && pet.type !== 'Gato' && pet.type !== 'Aves' && pet.type !== 'Conejo' && pet.type !== 'Tortuga';
     }
     return matchesSearch && matchesCategory;
-  });
+  }), [pets, search, selectedCategory]);
+
+  // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
+  const { visibleItems: visiblePets, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredPets);
 
   const getPhoneNumbers = (pet: LostPet): string[] => {
     if (pet.phones && pet.phones.length > 0) return pet.phones;
@@ -726,7 +737,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
 
       {/* Pet Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {filteredPets.map((pet, idx) => {
+        {visiblePets.map((pet, idx) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
@@ -746,6 +757,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     src={pet.imageUrl}
                     alt={pet.name}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
                     onLoad={(e) => {
                       const img = e.currentTarget;
@@ -794,6 +807,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     src={pet.imageUrl}
                     alt={pet.name}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
                     onLoad={(e) => {
                       const img = e.currentTarget;
@@ -853,6 +868,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     src={pet.imageUrl}
                     alt={pet.name}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
                     onLoad={(e) => {
                       const img = e.currentTarget;
@@ -900,6 +917,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     src={pet.imageUrl}
                     alt={pet.name}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className={`relative z-10 w-full h-full transition duration-300 group-hover:scale-105 ${portraitPets[pet.id] || squarePets[pet.id] ? 'object-contain' : 'object-cover'}`}
                     onLoad={(e) => {
                       const img = e.currentTarget;
@@ -961,6 +980,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                   src={pet.imageUrl}
                   alt={pet.name}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className={`relative z-10 w-full h-full transition duration-500 ${portraitPets[pet.id] ? 'object-contain' : 'object-cover group-hover:scale-105'}`} /* Fix #5 — eliminado scale-[1.3] hardcoded que recortaba la imagen portrait */
                   onLoad={(e) => {
                     const img = e.currentTarget;
@@ -1021,6 +1042,9 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
             </div>
           );
         })}
+
+        {/* Sentinela de carga incremental — SIEMPRE montado para evitar loop mount/unmount del observer */}
+        <div ref={batchSentinelRef} className="w-full h-4" aria-hidden="true" />
 
         {filteredPets.length === 0 && (
           <div className="text-center py-12 text-gray-500 text-sm">

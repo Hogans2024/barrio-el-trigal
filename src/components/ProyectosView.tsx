@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, MessageSquare, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
 import { Project } from '../types';
+import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
+
+// CAPA 2 (futuro, no implementado): compresión/redimensionado de imágenes en el
+// navegador del usuario antes de subirlas, para reducir peso de archivo en origen.
+// CAPA 3 (futuro, no implementado): migración de almacenamiento/entrega de imágenes a
+// Cloudinary (plan gratuito). Subida directa desde el navegador vía "unsigned upload
+// preset" (sin pasar por Apps Script), y URLs servidas con parámetros f_auto (formato
+// automático WebP/AVIF) y q_auto (compresión automática) vía su CDN.
 
 interface ProyectosViewProps {
   projects: Project[];
@@ -121,7 +129,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
     { id: 'negocios', label: 'Vista Tarjeta', icon: <IdCard className="w-4 h-4" /> },
   ];
 
-  const filteredProjects = projects.filter((project) => {
+  const filteredProjects = useMemo(() => projects.filter((project) => {
     const matchesSearch = project.title.toLowerCase().includes(search.toLowerCase()) ||
                           project.description.toLowerCase().includes(search.toLowerCase());
     
@@ -133,7 +141,10 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
     }
 
     return matchesSearch && matchesCategory;
-  });
+  }), [projects, search, selectedCategory]);
+
+  // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
+  const { visibleItems: visibleProjects, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredProjects);
 
   const handleAddComment = (id: string) => {
     if (!newComment.trim()) return;
@@ -384,7 +395,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
 
       {/* Project Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {filteredProjects.map((proj) => {
+        {visibleProjects.map((proj) => {
           // Vista tipo Eventos (icon + content + centered buttons)
           if (viewMode === 'eventos') {
             return (
@@ -397,6 +408,8 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                     src={proj.imageUrl}
                     alt={proj.title}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
@@ -436,7 +449,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
-                  <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#080a0f] to-transparent h-16 pointer-events-none" />
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
@@ -472,7 +485,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div onClick={() => setActiveProject(proj)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
-                  <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
+                  <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
@@ -501,7 +514,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div onClick={() => setActiveProject(proj)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
-                  <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
@@ -532,7 +545,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
               className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
             >
               <div onClick={() => setActiveProject(proj)} className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer">
-                <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
               </div>
               <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                 <div>
@@ -558,6 +571,9 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
             </div>
           );
         })}
+
+        {/* Sentinela de carga incremental — SIEMPRE montado para evitar loop mount/unmount del observer */}
+        <div ref={batchSentinelRef} className="w-full h-4" aria-hidden="true" />
 
         {filteredProjects.length === 0 && (
           <div className="text-center py-12 text-gray-500 text-sm">

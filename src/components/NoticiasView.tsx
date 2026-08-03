@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
+import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
+
+// CAPA 2 (futuro, no implementado): compresión/redimensionado de imágenes en el
+// navegador del usuario antes de subirlas, para reducir peso de archivo en origen.
+// CAPA 3 (futuro, no implementado): migración de almacenamiento/entrega de imágenes a
+// Cloudinary (plan gratuito). Subida directa desde el navegador vía "unsigned upload
+// preset" (sin pasar por Apps Script), y URLs servidas con parámetros f_auto (formato
+// automático WebP/AVIF) y q_auto (compresión automática) vía su CDN.
 
 interface NoticiasViewProps {
   noticias: NeighborhoodEvent[];
@@ -116,7 +124,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
     { id: 'negocios', label: 'Vista Tarjeta', icon: <IdCard className="w-4 h-4" /> },
   ];
 
-  const filteredNews = noticias.filter((item) => {
+  const filteredNews = useMemo(() => noticias.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase()) ||
                           item.description.toLowerCase().includes(search.toLowerCase());
     
@@ -130,7 +138,10 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
     }
 
     return matchesSearch && matchesCategory;
-  });
+  }), [noticias, search, selectedCategory]);
+
+  // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
+  const { visibleItems: visibleNews, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredNews);
 
   const handleSubscribe = (id: string, name: string) => {
     const nextStatus = !subscribedNews[id];
@@ -389,7 +400,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
 
       {/* News Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {filteredNews.map((item) => {
+        {visibleNews.map((item) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
@@ -398,7 +409,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                 className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
               >
                 <div onClick={() => setActiveNews(item)} className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer">
-                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
                 <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
                   <div>
@@ -425,7 +436,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div className="relative h-44 w-full bg-slate-900">
-                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#080a0f] to-transparent h-16 pointer-events-none" />
                 </div>
                 <div className="p-4 flex flex-col space-y-3">
@@ -459,7 +470,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden flex flex-col group hover:border-[#FFD700]/30 transition"
               >
                 <div onClick={() => setActiveNews(item)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
-                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
@@ -486,7 +497,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                 className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex flex-col group"
               >
                 <div onClick={() => setActiveNews(item)} className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer">
-                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <img src={item.imageUrl} alt={item.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
@@ -521,6 +532,8 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                   src={item.imageUrl}
                   alt={item.title}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
               </div>
@@ -563,6 +576,9 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
             </div>
           );
         })}
+
+        {/* Sentinela de carga incremental — SIEMPRE montado para evitar loop mount/unmount del observer */}
+        <div ref={batchSentinelRef} className="w-full h-4" aria-hidden="true" />
 
         {filteredNews.length === 0 && (
           <div className="text-center py-12 text-gray-500 text-sm">
