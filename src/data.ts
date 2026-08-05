@@ -2306,6 +2306,12 @@ export const BUSINESSES_DATA: LocalBusiness[] = [
   }
 ];
 
+// NOTA TEMPORAL: el campo `facebook` en estos mocks usa un link de prueba
+// (grupo real "MASCOTAS PERDIDAS TARIJA") solo para verificar visualmente
+// el botón "Facebook" en el modal de detalle. A futuro, cuando se conecte
+// el CMS real, este campo vendrá de una columna en Google Sheets con el
+// link de Facebook específico que cada vecino cargue al publicar su aviso
+// (ver campo `newFacebook` en el formulario de MascotasView.tsx).
 export const LOST_PETS_DATA: LostPet[] = [
   {
     id: 'lp1',
@@ -2316,9 +2322,9 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se perdió en la tarde del 23 de mayo. Es un Golden Retriever, muy dócil, juguetón y amigable. Tiene un pelaje dorado brillante, mide unos 60 cm, pesa 30 kg y responde a su nombre. Llevaba collar marrón de cuero cuando desapareció.',
     lastSeen: 'Calle Las Palmeras',
     contact: '4 664 7890',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Las Palmeras',
     date: '23 de mayo de 2024',
-    facebook: 'https://facebook.com/mascota.max.trigal',
     images: [
       'https://images.dog.ceo/breeds/retriever-golden/n02099601_1249.jpg',
       'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60',
@@ -2336,6 +2342,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción por familia que se muda. Es una perrita Golden Retriever de 2 años, vacunada, esterilizada, muy dócil y buena con niños. Busca hogar responsable. Tiene pelaje dorado claro y sedoso, ojos marrones expresivos y cola inquieta. Entrenada en comandos básicos como sentarse y dar la pata.',
     lastSeen: 'Calle Las Palmeras #234',
     contact: '4 611 4455',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Las Palmeras',
     date: '25 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&auto=format&fit=crop&q=60']
@@ -2349,6 +2356,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado deambulando por la Av. Potosí. Es un gato pequeño color blanco con manchas negras, collar rojo, muy cariñoso. Fue resguardado temporalmente. Tiene patas cortas, orejas paradas y una mancha negra alrededor del ojo izquierdo. Es muy energético y salta de alegría al ver personas.',
     lastSeen: 'Av. Potosí #450',
     contact: '4 611 2233',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Molino',
     date: '24 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=360&h=640&fit=crop&q=80','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=640&h=360&fit=crop&q=80','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=60']
@@ -2362,6 +2370,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Gatita de 1 año, color gris con rayas, vacunada, esterilizada, arenera, muy cariñosa y juguetona. Se entrega con cama y juguetes. Tiene ojos verdes grandes, patas blancas como calcetines y mancha blanca en el pecho. Le encanta cazar pelotas de papel y jugar con plumas.',
     lastSeen: 'Av. Potosí #567',
     contact: '4 622 5566',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Molino',
     date: '24 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1561948955-570b270e7c36?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1570458436416-b8fcccfe883f?w=400&auto=format&fit=crop&q=60']
@@ -2375,6 +2384,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se perdió el 22 de mayo en horas de la noche. Es gris con rayas oscuras y tiene un collar rosado con cascabel. Es de tamaño mediano, ojos color ámbar, muy cariñosa pero desconfiada con extraños. Tiene una mancha blanca en el pecho.',
     lastSeen: 'Av. Potosí',
     contact: '4 611 3344',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Molino',
     date: '22 de mayo de 2024',
     images: [
@@ -2394,6 +2404,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado en el techo de una casa en la Calle Sucre. Es un gato gris con ojos verdes, collar azul con cascabel, se ve bien cuidado. Tiene pelaje corto y brillante, tamaño mediano de 4 kg, es muy maullador. Tiene una mancha blanca en la barbilla y sus uñas están recién cortadas.',
     lastSeen: 'Calle Sucre #789',
     contact: '4 622 3344',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Roque',
     date: '23 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1570458436416-b8fcccfe883f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1561948955-570b270e7c36?w=400&auto=format&fit=crop&q=60']
@@ -2407,6 +2418,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se escapó el 21 de mayo por la mañana. Es un loro hablador, verde brillante con plumas amarillas en la cabeza. Mide 30 cm de pico a cola, tiene el pico negro y ojos naranjas. Responde a su nombre y silba canciones.',
     lastSeen: 'Pasaje El Trigal',
     contact: '4 673 2211',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Trigal',
     date: '21 de mayo de 2024',
     images: [
@@ -2426,6 +2438,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Canario amarillo cantor, macho, 6 meses, jaula incluida, alimentación incluida por un mes. Canta muy bonito. Tiene plumaje amarillo intenso, pico corto naranja claro y canto melodioso matutino. Viene con jaula metálica blanca, comedero y bebedero.',
     lastSeen: 'Calle Comercio #456',
     contact: '4 633 6677',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Centro',
     date: '23 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&auto=format&fit=crop&q=60']
@@ -2439,6 +2452,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado en un árbol de la Plaza Central. Es un periquito azul celeste con blanco, muy manso, se posa en el dedo. Resguardado en una jaula. Tiene plumaje azul celeste en el lomo y blanco en el pecho con rayas grises en la cabeza. Es muy sociable y silba melodías alegres.',
     lastSeen: 'Plaza Principal de Tarija',
     contact: '4 633 4455',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Centro',
     date: '22 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=60']
@@ -2452,6 +2466,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Perro mestizo de 3 años, rescatado de la calle, desparasitado, vacunado, de tamaño mediano, muy agradecido y fiel. Busca hogar con patio. Es blanco con manchas negras irregulares, orejas semierguidas y cola larga. Tranquilo en casa y enérgico al aire libre, se lleva bien con otros perros.',
     lastSeen: 'Calle Sucre #890',
     contact: '4 644 7788',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Roque',
     date: '22 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1544568100-847a948585b9?w=400&auto=format&fit=crop&q=60']
@@ -2465,6 +2480,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se perdió en la plaza central. Es un perrito mestizo color marrón claro, de tamaño mediano, muy cariñoso. Tiene orejas caídas, cola larga con punta blanca y una mancha oscura en el lomo. Usaba collar azul con identificación.',
     lastSeen: 'Plaza Principal de Tarija',
     contact: '4 693 6677',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Centro',
     date: '15 de junio de 2026',
     images: [
@@ -2484,6 +2500,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado cerca del mercado central. Es un perrito mestizo blanco con manchas negras, tamaño mediano, collar verde, muy juguetón y tranquilo. Tiene orejas caídas, cola larga con punta blanca y una mancha negra en forma de silla en la espalda. Es amigable con otros perros y personas.',
     lastSeen: 'Mercado Central',
     contact: '4 644 5566',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Centro',
     date: '21 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1544568100-847a948585b9?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&auto=format&fit=crop&q=60']
@@ -2497,6 +2514,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se escapó por la ventana. Es una gata blanca con manchas negras, ojos verdes y muy esquiva con extraños. Tiene pelo corto y sedoso, pesa 3 kg y es muy ágil. Tiene una mancha negra en forma de corazón en el costado izquierdo.',
     lastSeen: 'Calle Sucre #456',
     contact: '4 694 7788',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Roque',
     date: '14 de junio de 2026',
     images: [
@@ -2516,6 +2534,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Hámster sirio dorado de 4 meses, muy manso, jaula con rueda incluida, alimento para 2 meses. Ideal para niños. Tiene pelaje dorado suave con vientre blanco, ojos negros brillantes y orejas pequeñas. La jaula incluye rueda de ejercicio, bebedero y casita para dormir.',
     lastSeen: 'Pasaje El Trigal #456',
     contact: '4 655 8899',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Trigal',
     date: '21 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&auto=format&fit=crop&q=60']
@@ -2529,6 +2548,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado en el jardín de una casa en El Trigal. Es un conejo blanco de tamaño pequeño, ojos rojos, muy asustadizo. Se resguarda en un corral. Tiene pelaje blanco puro y esponjoso, orejas largas erguidas y nariz rosada. Se calma con caricias suaves y come heno, verduras y pellets.',
     lastSeen: 'Pasaje El Trigal #123',
     contact: '4 655 6677',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Trigal',
     date: '20 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=60']
@@ -2542,6 +2562,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se escapó de su jaula. Es un perico australiano azul y blanco, muy hablador, repite palabras. Tiene el pecho blanco con rayas grises, lomo azul celeste y cabeza gris perla. Dice "Paco lindo" y "hola" constantemente.',
     lastSeen: 'Av. La Paz #789',
     contact: '4 695 8899',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Centro',
     date: '13 de junio de 2026',
     images: [
@@ -2561,6 +2582,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Gata naranja atigrada de 2 años, vacunada, esterilizada, muy tranquila y limpia. Se entrega con arenero y rascador. Tiene rayas oscuras marcadas, pecho y punta de cola blancos, ojos color miel. Independiente pero cariñosa, ideal para departamentos.',
     lastSeen: 'Av. La Paz #345',
     contact: '4 666 9900',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Centro',
     date: '20 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1561948955-570b270e7c36?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1570458436416-b8fcccfe883f?w=400&auto=format&fit=crop&q=60']
@@ -2574,6 +2596,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado en la Av. Las Américas. Es un Pitbull color marrón claro, collar negro, herida leve en la pata trasera. Fue atendido y está en recuperación. Tiene contextura musculosa, orejas cortadas y una cicatriz en el hocico. Es muy cariñoso y juguetón a pesar de su apariencia imponente.',
     lastSeen: 'Av. Las Américas #500',
     contact: '4 666 7788',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Las Américas',
     date: '19 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=60']
@@ -2587,6 +2610,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Tortuga de tierra de 5 años, caparazón saludable, alimentación incluida por 3 meses, terrario disponible. Ideal para hogar con jardín. Su caparazón mide 25 cm con patrón hexagonal café y amarillo. Activa de día, come verduras frescas y frutas con suplementos de calcio.',
     lastSeen: 'Calle Libertad #678',
     contact: '4 677 0011',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'La Merced',
     date: '19 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=60']
@@ -2600,6 +2624,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se escapó del jardín. Es un conejo blanco de angora, ojos rosados, muy manso y dócil. Tiene el pelaje largo y esponjoso, pesa 2 kg y es de tamaño pequeño. Le gusta que lo acaricien y come zanahorias y heno de alfalfa.',
     lastSeen: 'Calle Las Flores',
     contact: '4 696 9900',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Trigal',
     date: '12 de junio de 2026',
     images: [
@@ -2619,6 +2644,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrada maullando en la puerta de una casa. Es una gata blanca de pelo largo, ojos celestes, collar rosado, muy cariñosa y desconfiada. Tiene pelaje largo y sedoso con melena alrededor del cuello y cola muy peluda. Se acerca para caricias pero se asusta con movimientos bruscos.',
     lastSeen: 'Calle Bolívar #234',
     contact: '4 677 8899',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Jorge',
     date: '18 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1561948955-570b270e7c36?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1570458436416-b8fcccfe883f?w=400&auto=format&fit=crop&q=60']
@@ -2632,6 +2658,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se perdió durante un paseo. Es un Pitbull color marrón, de contextura fuerte, collar negro con placas.',
     lastSeen: 'Av. Potosí esq. Sucre',
     contact: '4 697 0011',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Molino',
     date: '11 de junio de 2026',
     images: [
@@ -2651,6 +2678,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Pastor Alemán de 1 año, vacunado, desparasitado, muy inteligente y obediente. Ideal para casa con jardín y dueño con experiencia. Tiene lomo negro con patas y pecho marrones, orejas erguidas y porte elegante. Responde a órdenes y necesita ejercicio diario intenso.',
     lastSeen: 'Av. San Martín #901',
     contact: '4 688 1122',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Martín',
     date: '18 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1560807707-8cc77767d783?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=400&auto=format&fit=crop&q=60']
@@ -2664,6 +2692,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrada cruzando la calle lentamente. Es una tortuga de tierra mediana, caparazón café oscuro con manchas amarillas, sin marcas visibles. El caparazón mide 20 cm con patrón geométrico de escamas amarillas y marrones. Sus patas son robustas con uñas cortas y está en buen estado de salud.',
     lastSeen: 'Calle Cochabamba #567',
     contact: '4 688 9900',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Roque',
     date: '17 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=60']
@@ -2677,6 +2706,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se perdió en la noche del 10 de junio. Es una gata naranja con rayas atigradas, muy cariñosa y maulladora. Tiene ojos grandes verde claro, pecho blanco y patas con manchas claras. Maúlla fuerte cuando tiene hambre y no tiene collar.',
     lastSeen: 'Calle Comercio #321',
     contact: '4 698 1122',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Trigal',
     date: '10 de junio de 2026',
     images: [
@@ -2696,6 +2726,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Loro cabeza amarilla de 8 meses, criado a mano, muy hablador, dice frases. Jaula grande incluida. Ideal para hogar con espacio. Tiene cuerpo verde brillante, cabeza amarilla intensa y pico negro. Dice frases como "Kiwi quiere comer" y "hola, buenos días".',
     lastSeen: 'Calle Bolívar #123',
     contact: '4 699 2233',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Jorge',
     date: '17 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&auto=format&fit=crop&q=60']
@@ -2709,6 +2740,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado en una tienda de mascotas donde fue entregado. Es un hámster dorado, pequeño, con una mancha blanca en la cabeza, muy inquieto. Mide 10 cm de largo, tiene mejillas llenas, ojos negros brillantes y orejas pequeñas. Es muy activo y corre sin parar en la rueda.',
     lastSeen: 'Av. Potosí #123',
     contact: '4 699 0011',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Molino',
     date: '16 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&auto=format&fit=crop&q=60']
@@ -2722,6 +2754,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Se escapó de su jaula. Es un hámster sirio dorado, pequeño y muy rápido, con una mancha blanca en la cabeza. Mide 12 cm, tiene orejas redondas y mejillas abultadas. Es muy activo de noche y se escapó por un agujero en la rejilla.',
     lastSeen: 'Calle Junín #567',
     contact: '4 699 2233',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'San Roque',
     date: '9 de junio de 2026',
     images: [
@@ -2741,6 +2774,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'En adopción. Cobaya (conejillo de Indias) blanca con manchas marrones, 3 meses de edad, muy mansita. Jaula y alimento incluidos. Tiene pelo corto y suave, ojos negros grandes y orejas caídas. Emite sonidos agudos cuando se emociona o reconoce a su dueño.',
     lastSeen: 'Calle Potosí #234',
     contact: '4 600 3344',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'El Molino',
     date: '16 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&auto=format&fit=crop&q=60']
@@ -2754,6 +2788,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     description: 'Encontrado posado en la ventana de una casa. Es un loro verde pequeño, con plumas amarillas en la cabeza, repite palabras como "hola" y "adiós". Tiene pico curvo gris oscuro, ojos con anillo blanco y patas grises. Es confiado, se posa en hombros y dice "Kiwi bonito".',
     lastSeen: 'Calle Del Valle #890',
     contact: '4 600 1122',
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     neighborhood: 'Del Valle',
     date: '15 de junio de 2026',
     images: ['https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&auto=format&fit=crop&q=60','https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&auto=format&fit=crop&q=60']
