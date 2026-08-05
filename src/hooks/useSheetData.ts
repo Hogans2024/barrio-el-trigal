@@ -107,7 +107,7 @@ export function useSheetData(): SheetData {
           proyectos: json.proyectos ?? FALLBACK.proyectos,
           eventos:   json.eventos   ?? FALLBACK.eventos,
           // ═══════════════════════════════════════════════════════════════════════════════════
-          //  WORKAROUND — Datos locales de respaldo para Farmacias, Negocios y Mascotas
+          //  WORKAROUND — Datos locales de respaldo para Farmacias y Negocios
           // ═══════════════════════════════════════════════════════════════════════════════════
           //
           //  PROBLEMA IDENTIFICADO:
@@ -115,23 +115,23 @@ export function useSheetData(): SheetData {
           //  El archivo `public/data.json` es servido por el CMS y contiene los datos
           //  actuales provenientes de Google Sheets. Sin embargo, dicho archivo NO incluye
           //  los campos `transport` (ni `schedule`, `phones`, `facebook`, `actionText`)
-          //  en sus objetos `farmacias` y `mascotas`, porque la hoja de cálculo vinculada
-          //  al endpoint de Apps Script aún no ha sido actualizada con estas columnas.
+          //  en sus objetos `farmacias`, porque la hoja de cálculo vinculada al endpoint
+          //  de Apps Script aún no ha sido actualizada con estas columnas.
           //
           //  Como consecuencia directa, al usar `json.farmacias ?? FALLBACK.farmacias`,
           //  el operador `??` (Nullish coalescing) **no** activaba el fallback, ya que
           //  `json.farmacias` sí existía como un arreglo válido —aunque careciera de los
           //  campos requeridos—. Esto provocaba que la sección "Cómo llegar" dentro del
           //  modal de detalle mostrara invariablemente "No disponible", al no encontrar
-          //  la propiedad `transport` en los objetos de farmacia/mascota.
+          //  la propiedad `transport` en los objetos de farmacia.
           //
           //  SOLUCIÓN APLICADA:
           //  ──────────────────
-          //  Se fuerza el uso de `FALLBACK.farmacias` y `FALLBACK.mascotas` (datos mock
-          //  definidos en `src/data.ts`) que sí incluyen la estructura `TransportInfo`
-          //  completa con sus rutas `micros[]`, `taxitrufis[]`, `trufis[]` y
-          //  `radioTaxis[]`. Esto permite visualizar y probar la funcionalidad de
-          //  transporte durante el desarrollo.
+          //  Se fuerza el uso de `FALLBACK.farmacias` (datos mock definidos en
+          //  `src/data.ts`) que sí incluyen la estructura `TransportInfo` completa con
+          //  sus rutas `micros[]`, `taxitrufis[]`, `trufis[]` y `radioTaxis[]`. Esto
+          //  permite visualizar y probar la funcionalidad de transporte durante el
+          //  desarrollo.
           //
           //  MIGRACIÓN FUTURA (cuando se conecte al CMS):
           //  ────────────────────────────────────────────
@@ -143,17 +143,20 @@ export function useSheetData(): SheetData {
           //     - `phones[]`, `facebook`, `actionText` según corresponda.
           //  2. Modificar el endpoint de Google Apps Script para que devuelva estos
           //     campos en el JSON de respuesta.
-          //  3. Revertir esta línea a: `farmacias: json.farmacias ?? FALLBACK.farmacias`
-          //     (y lo mismo para `mascotas`).
+          //  3. Revertir esta línea a: `farmacias: json.farmacias ?? FALLBACK.farmacias`.
           //
           //  NOTA: La sección "Negocios" sigue el mismo patrón (`FALLBACK.negocios`)
           //  porque sus tipos también fueron extendidos con campos que la hoja actual
           //  no posee. Una vez que el CMS esté completo, se unificará el tratamiento
           //  de todas las secciones.
+          //
+          //  Mascotas YA NO forma parte de este workaround: su tipo `LostPet` fue
+          //  limpiado (se eliminaron `schedule`, `phones`, `actionText` y `address`) y
+          //  ahora se conecta directo al JSON del CMS (`json.mascotas ?? FALLBACK.mascotas`).
           // ═══════════════════════════════════════════════════════════════════════════════════
           farmacias: FALLBACK.farmacias,
           negocios:  FALLBACK.negocios,
-          mascotas:  FALLBACK.mascotas,
+          mascotas:  json.mascotas  ?? FALLBACK.mascotas,
           noticias:  json.noticias  ?? FALLBACK.noticias,
         });
         setError(null);
