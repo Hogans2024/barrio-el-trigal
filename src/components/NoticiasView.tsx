@@ -676,23 +676,14 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
-              const portrait = portraitNews[activeNews.id];
-              const square = squareNews[activeNews.id];
-              const singleHorizontal = !portrait && !square;
               return (
                 <>
-                  <div className={`relative bg-gray-950 overflow-hidden ${singleHorizontal ? 'h-36' : 'h-[264px]'}`}>
-                    {(portrait || square) && (
-                      <>
-                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeNews.imageUrl})` }} />
-                        <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
-                      </>
-                    )}
+                  <div className="relative bg-gray-950">
                     <img
                       src={activeNews.imageUrl}
                       alt={activeNews.title}
                       referrerPolicy="no-referrer"
-                      className={`z-10 cursor-pointer ${singleHorizontal ? 'relative w-full h-full object-cover' : 'relative w-full h-full object-contain'}`}
+                      className="z-10 cursor-pointer w-full h-auto"
                       onDoubleClick={() => setFullscreenImg(activeNews.imageUrl)}
                       onClick={() => setFullscreenImg(activeNews.imageUrl)}
                       onLoad={(e) => {
