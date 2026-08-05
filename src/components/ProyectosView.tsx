@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, MessageSquare, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, MessageSquare, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
 import { Project } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -31,11 +31,26 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
   const [viewMode, setViewMode] = useState<string>('proyectos');
   const [showViewModal, setShowViewModal] = useState(false);
   const [shimmer, setShimmer] = useState(false);
+  const [likes, setLikes] = useState<Record<string, number>>(() => {
+    try { return JSON.parse(localStorage.getItem('barrio_proyectos_likes') || '{}'); } catch { return {}; }
+  });
+  const [portraitProjects, setPortraitProjects] = useState<Record<string, boolean>>({});
+  const [squareProjects, setSquareProjects] = useState<Record<string, boolean>>({});
+  const [fullscreenImg, setFullscreenImg] = useState<string | null>(null);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const touchState = useRef({ dist: 0, midX: 0, midY: 0, panX: 0, panY: 0, scale: 1 });
   const barRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('barrio_proyectos_likes', JSON.stringify(likes));
+  }, [likes]);
+
+  useEffect(() => { setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }, [fullscreenImg]);
 
   useEffect(() => {
     if (!highlightId || !onClearHighlight) return;
@@ -48,15 +63,21 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
 
   // Register back handler to close detail view when top-bar back button is pressed
   useEffect(() => {
-    if (activeProject) {
+    if (activeProject || fullscreenImg) {
       onRegisterBackHandler?.(() => {
-        setActiveProject(null);
+        if (fullscreenImg) {
+          setFullscreenImg(null);
+          setZoomScale(1);
+          setZoomPos({ x: 0, y: 0 });
+        } else {
+          setActiveProject(null);
+        }
         return true;
       });
     } else {
       onRegisterBackHandler?.(null);
     }
-  }, [activeProject, onRegisterBackHandler]);
+  }, [activeProject, fullscreenImg, onRegisterBackHandler]);
 
   useEffect(() => {
     const t2 = setTimeout(() => setShimmer(true), 2900);
@@ -538,35 +559,98 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
             );
           }
 
-          // Default: Proyectos view (split horizontal)
+          // Default: Proyectos view (nuevo diseño tipo Mascotas)
           return (
             <div
               key={proj.id}
-              className="bg-white/[0.02] rounded-2xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition flex h-[145px] tall:h-[165px] group"
+              className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              <div onClick={() => setActiveProject(proj)} className="w-[55%] tall:w-[38%] h-full bg-gray-950 overflow-hidden shrink-0 cursor-pointer">
-                <img src={proj.imageUrl} alt={proj.title} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-              </div>
-              <div className="w-[45%] tall:w-[62%] p-2 tall:p-3.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start gap-1.5 mb-1.5">
-                    <h3 className="text-white text-sm font-bold leading-tight group-hover:text-[#FFD700] transition line-clamp-2">
-                      {proj.title}
-                    </h3>
-                  </div>
-                  <p className="text-gray-300 text-[10px] tall:text-[11px] leading-[1.4] line-clamp-3 tall:line-clamp-4">
+              {/* Header: título + descripción ANTES de la imagen */}
+              <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
+                    <span className="truncate min-w-0">{proj.title}</span>
+                  </h3>
+                  <p className="text-gray-400 text-xs line-clamp-3 leading-relaxed">
                     {proj.description}
                   </p>
                 </div>
-                <div className="flex items-center justify-center tall:justify-between mt-2 w-full">
-                  <div className="hidden tall:flex items-center space-x-1 text-[#22c55e] text-[10px]">
-                    <MapPin className="h-3 w-3 shrink-0" />
-                    <span className="truncate max-w-[90px]">{proj.location}</span>
-                  </div>
-                  <span onClick={() => setActiveProject(proj)} className="bg-[#FFD700]/10 text-[#FFD700] text-[10px] tall:text-[11px] font-bold px-[5px] tall:px-4 py-1.5 rounded-lg hover:bg-[#FFD700]/20 transition border border-[#FFD700]/40 cursor-pointer shrink-0 text-center inline-block">
-                    Ver Detalles
-                  </span>
-                </div>
+              </div>
+
+              {/* Imagen con soporte de formatos 1:1 / 16:9 / 9:16 */}
+              <div
+                className={`relative ${portraitProjects[proj.id] ? 'h-[264px]' : squareProjects[proj.id] ? 'aspect-square' : 'h-36'} w-full bg-slate-900 overflow-hidden cursor-pointer`}
+                onClick={() => setActiveProject(proj)}
+                style={{ clipPath: 'inset(0)' }}
+              >
+                {portraitProjects[proj.id] && (
+                  <>
+                    <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${proj.imageUrl})` }} />
+                    <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                  </>
+                )}
+                <img
+                  src={proj.imageUrl}
+                  alt={proj.title}
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
+                  className={`relative z-10 w-full h-full transition duration-500 ${portraitProjects[proj.id] ? 'object-contain' : 'object-cover group-hover:scale-105'}`}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const ratio = img.naturalWidth / img.naturalHeight;
+                    if (ratio < 0.8) {
+                      setPortraitProjects(prev => ({ ...prev, [proj.id]: true }));
+                    } else if (ratio >= 0.8 && ratio <= 1.2) {
+                      setSquareProjects(prev => ({ ...prev, [proj.id]: true }));
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Fila de botones */}
+              <div className="flex items-center justify-center pt-[10px] pb-[11px] px-3 gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLikes(prev => ({ ...prev, [proj.id]: (prev[proj.id] || 0) + 1 }));
+                  }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-red-400 hover:border-red-400/40"
+                >
+                  <Heart className={`h-3.5 w-3.5 ${likes[proj.id] ? 'fill-red-400 text-red-400' : ''}`} />
+                  <span>{likes[proj.id] || 0}</span>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveProject(proj);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white shrink min-w-0"
+                >
+                  <Phone className="h-3 w-3" />
+                  <span>Contactar</span>
+                </button>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveProject(proj);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold transition flex items-center justify-center gap-1 whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 cursor-pointer shrink min-w-0"
+                >
+                  Ver Detalles
+                </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" overflow="visible" style={{ transform: 'scale(1.25)', transformOrigin: 'center' }}><path d="M12 5l7 7-7 7v-4c-5 0-8 3-9 6 1.5-4.5 4-9 9-10V5z"/></svg>
+                </button>
               </div>
             </div>
           );
@@ -593,6 +677,8 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                 alt={activeProject.title}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
+                onClick={() => setFullscreenImg(activeProject.imageUrl)}
+                onDoubleClick={() => setFullscreenImg(activeProject.imageUrl)}
               />
               <button
                 onClick={() => setActiveProject(null)}
@@ -612,7 +698,12 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
               <h4 className="text-white text-xl font-bold tracking-tight">{activeProject.title}</h4>
 
               <div>
-                <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest block mb-1">Estado del Proyecto</span>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
+                <p className="text-gray-300 text-xs leading-relaxed">{activeProject.description}</p>
+              </div>
+
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Estado del Proyecto</h5>
                 <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-full ${
                   activeProject.status === 'Completado' 
                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500' 
@@ -623,19 +714,14 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                 </span>
               </div>
 
-              <div>
-                <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest block mb-1">Detalles de la Obra</span>
-                <p className="text-gray-300 text-xs leading-relaxed font-sans">{activeProject.description}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 bg-white/[0.02] p-3 rounded-xl border border-white/10 text-xs">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <span className="text-gray-500 block mb-0.5">Ubicación:</span>
-                  <span className="text-white font-semibold font-mono">{activeProject.location}</span>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Ubicación</h5>
+                  <p className="text-white text-sm font-semibold">{activeProject.location}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500 block mb-0.5">Dirección técnica:</span>
-                  <span className="text-white font-semibold font-mono">El Trigal Directiva</span>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Dirección técnica</h5>
+                  <p className="text-white text-sm font-semibold">El Trigal Directiva</p>
                 </div>
               </div>
 
@@ -678,6 +764,69 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen image viewer */}
+      {fullscreenImg && (
+        <div
+          className="fixed left-0 right-0 z-[70] bg-black flex flex-col overflow-hidden"
+          style={{ top: '3.5rem', bottom: '3.5rem' }}
+          onTouchStart={(e) => {
+            if (e.touches.length === 2) {
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+              const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+              touchState.current = { dist: Math.hypot(dx, dy), midX: mx, midY: my, panX: zoomPos.x, panY: zoomPos.y, scale: zoomScale };
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+              touchState.current.midX = e.touches[0].clientX;
+              touchState.current.midY = e.touches[0].clientY;
+            }
+          }}
+          onTouchMove={(e) => {
+            if (e.touches.length === 2) {
+              e.preventDefault();
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+              const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+              const newDist = Math.hypot(dx, dy);
+              const ratio = newDist / touchState.current.dist;
+              const newScale = Math.max(1, Math.min(5, touchState.current.scale * ratio));
+              const cx = touchState.current.midX;
+              const cy = touchState.current.midY;
+              setZoomPos({ x: touchState.current.panX + (mx - cx), y: touchState.current.panY + (my - cy) });
+              setZoomScale(newScale);
+              touchState.current.dist = newDist;
+              touchState.current.midX = mx;
+              touchState.current.midY = my;
+              touchState.current.scale = newScale;
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+              setZoomPos({ x: zoomPos.x + (e.touches[0].clientX - touchState.current.midX), y: zoomPos.y + (e.touches[0].clientY - touchState.current.midY) });
+              touchState.current.midX = e.touches[0].clientX;
+              touchState.current.midY = e.touches[0].clientY;
+            }
+          }}
+          onTouchEnd={() => {
+            if (zoomScale <= 1) setZoomPos({ x: 0, y: 0 });
+          }}
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            <button
+              onClick={() => { setFullscreenImg(null); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }}
+              className="absolute top-[18px] right-[3px] bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-[99]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="w-full h-full flex items-center justify-center" style={{ transform: `translate(${zoomPos.x}px, ${zoomPos.y}px) scale(${zoomScale})` }}>
+              <img
+                src={fullscreenImg}
+                alt=""
+                className="max-w-full max-h-full object-contain"
+              />
             </div>
           </div>
         </div>

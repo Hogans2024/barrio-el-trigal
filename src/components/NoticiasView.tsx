@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, X, Bell, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -26,11 +26,26 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
   const [viewMode, setViewMode] = useState<string>('noticias');
   const [showViewModal, setShowViewModal] = useState(false);
   const [shimmer, setShimmer] = useState(false);
+  const [likes, setLikes] = useState<Record<string, number>>(() => {
+    try { return JSON.parse(localStorage.getItem('barrio_noticias_likes') || '{}'); } catch { return {}; }
+  });
+  const [portraitNews, setPortraitNews] = useState<Record<string, boolean>>({});
+  const [squareNews, setSquareNews] = useState<Record<string, boolean>>({});
+  const [fullscreenImg, setFullscreenImg] = useState<string | null>(null);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const touchState = useRef({ dist: 0, midX: 0, midY: 0, panX: 0, panY: 0, scale: 1 });
   const barRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [showFloatingBtns, setShowFloatingBtns] = useState(false);
   const [stickyBarWidth, setStickyBarWidth] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('barrio_noticias_likes', JSON.stringify(likes));
+  }, [likes]);
+
+  useEffect(() => { setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }, [fullscreenImg]);
 
   useEffect(() => {
     if (!highlightId || !onClearHighlight) return;
@@ -521,23 +536,13 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
             );
           }
 
-          // Default: Noticias view
+          // Default: Noticias view (nuevo diseño tipo Mascotas)
           return (
             <div
               key={item.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              <div onClick={() => setActiveNews(item)} className="relative h-36 w-full bg-slate-900 overflow-hidden cursor-pointer">
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                />
-              </div>
-
+              {/* Header: título + descripción ANTES de la imagen */}
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
                 {getIcon(item.icon)}
 
@@ -545,33 +550,86 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
+                  <p className="text-gray-400 text-xs line-clamp-3 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-center pb-[11px] px-3 gap-5">
+              {/* Imagen con soporte de formatos 1:1 / 16:9 / 9:16 */}
+              <div
+                className={`relative ${portraitNews[item.id] ? 'h-[264px]' : squareNews[item.id] ? 'aspect-square' : 'h-36'} w-full bg-slate-900 overflow-hidden cursor-pointer`}
+                onClick={() => setActiveNews(item)}
+                style={{ clipPath: 'inset(0)' }}
+              >
+                {portraitNews[item.id] && (
+                  <>
+                    <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${item.imageUrl})` }} />
+                    <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                  </>
+                )}
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
+                  className={`relative z-10 w-full h-full transition duration-500 ${portraitNews[item.id] ? 'object-contain' : 'object-cover group-hover:scale-105'}`}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const ratio = img.naturalWidth / img.naturalHeight;
+                    if (ratio < 0.8) {
+                      setPortraitNews(prev => ({ ...prev, [item.id]: true }));
+                    } else if (ratio >= 0.8 && ratio <= 1.2) {
+                      setSquareNews(prev => ({ ...prev, [item.id]: true }));
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Fila de botones */}
+              <div className="flex items-center justify-center pt-[10px] pb-[11px] px-3 gap-1.5">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSubscribe(item.id, item.title);
+                    setLikes(prev => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }));
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer whitespace-nowrap ${
-                    subscribedNews[item.id]
-                      ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20'
-                      : 'bg-white/5 text-gray-300 border border-white/10 hover:text-white'
-                  }`}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-red-400 hover:border-red-400/40"
                 >
-                  <Bell className={`h-3 w-3 ${subscribedNews[item.id] ? 'fill-current' : ''}`} />
-                  <span>{subscribedNews[item.id] ? 'Suscrito' : 'Notificarme'}</span>
+                  <Heart className={`h-3.5 w-3.5 ${likes[item.id] ? 'fill-red-400 text-red-400' : ''}`} />
+                  <span>{likes[item.id] || 0}</span>
                 </button>
-                <span className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-500/40 whitespace-nowrap">
-                  {categoryLabels[item.category] || item.category}
-                </span>
-                <span onClick={() => setActiveNews(item)} className="bg-[#FFD700]/10 text-[#FFD700] text-[11px] font-extrabold px-3.5 py-1.5 rounded-lg group-hover:bg-[#FFD700]/20 border border-[#FFD700]/40 transition cursor-pointer whitespace-nowrap">
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveNews(item);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white shrink min-w-0"
+                >
+                  <Phone className="h-3 w-3" />
+                  <span>Contactar</span>
+                </button>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveNews(item);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold transition flex items-center justify-center gap-1 whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 cursor-pointer shrink min-w-0"
+                >
                   Ver Detalles
                 </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" overflow="visible" style={{ transform: 'scale(1.25)', transformOrigin: 'center' }}><path d="M12 5l7 7-7 7v-4c-5 0-8 3-9 6 1.5-4.5 4-9 9-10V5z"/></svg>
+                </button>
               </div>
             </div>
           );
@@ -597,6 +655,8 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                 alt={activeNews.title}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
+                onClick={() => setFullscreenImg(activeNews.imageUrl)}
+                onDoubleClick={() => setFullscreenImg(activeNews.imageUrl)}
               />
               <button
                 onClick={() => setActiveNews(null)}
@@ -613,16 +673,26 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
 
             <div className="p-5 space-y-4 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeNews.title}</h4>
-              <p className="text-gray-300 text-xs leading-relaxed">{activeNews.description}</p>
 
-              <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Calendar className="h-4 w-4 text-[#FFD700] shrink-0" />
-                  <span className="text-white">{activeNews.date || 'Sin fecha'}</span>
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
+                <p className="text-gray-300 text-xs leading-relaxed">{activeNews.description}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Fecha</h5>
+                  <p className="text-white text-sm font-semibold flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-[#FFD700] shrink-0" />
+                    {activeNews.date || 'Sin fecha'}
+                  </p>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                  <span className="text-white">{activeNews.location || 'Barrio El Trigal'}</span>
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Ubicación</h5>
+                  <p className="text-white text-sm font-semibold flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
+                    {activeNews.location || 'Barrio El Trigal'}
+                  </p>
                 </div>
               </div>
 
@@ -657,6 +727,69 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
               <span>Buscar</span>
             </button>
           </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen image viewer */}
+      {fullscreenImg && (
+        <div
+          className="fixed left-0 right-0 z-[70] bg-black flex flex-col overflow-hidden"
+          style={{ top: '3.5rem', bottom: '3.5rem' }}
+          onTouchStart={(e) => {
+            if (e.touches.length === 2) {
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+              const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+              touchState.current = { dist: Math.hypot(dx, dy), midX: mx, midY: my, panX: zoomPos.x, panY: zoomPos.y, scale: zoomScale };
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+              touchState.current.midX = e.touches[0].clientX;
+              touchState.current.midY = e.touches[0].clientY;
+            }
+          }}
+          onTouchMove={(e) => {
+            if (e.touches.length === 2) {
+              e.preventDefault();
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+              const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+              const newDist = Math.hypot(dx, dy);
+              const ratio = newDist / touchState.current.dist;
+              const newScale = Math.max(1, Math.min(5, touchState.current.scale * ratio));
+              const cx = touchState.current.midX;
+              const cy = touchState.current.midY;
+              setZoomPos({ x: touchState.current.panX + (mx - cx), y: touchState.current.panY + (my - cy) });
+              setZoomScale(newScale);
+              touchState.current.dist = newDist;
+              touchState.current.midX = mx;
+              touchState.current.midY = my;
+              touchState.current.scale = newScale;
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+              setZoomPos({ x: zoomPos.x + (e.touches[0].clientX - touchState.current.midX), y: zoomPos.y + (e.touches[0].clientY - touchState.current.midY) });
+              touchState.current.midX = e.touches[0].clientX;
+              touchState.current.midY = e.touches[0].clientY;
+            }
+          }}
+          onTouchEnd={() => {
+            if (zoomScale <= 1) setZoomPos({ x: 0, y: 0 });
+          }}
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            <button
+              onClick={() => { setFullscreenImg(null); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }}
+              className="absolute top-[18px] right-[3px] bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-[99]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="w-full h-full flex items-center justify-center" style={{ transform: `translate(${zoomPos.x}px, ${zoomPos.y}px) scale(${zoomScale})` }}>
+              <img
+                src={fullscreenImg}
+                alt=""
+                className="max-w-full max-h-full object-contain"
+              />
             </div>
           </div>
         </div>
