@@ -213,7 +213,6 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activePet, setActivePet] = useState<LostPet | null>(null);
   const [contactPet, setContactPet] = useState<LostPet | null>(null);
-  const [schedulePet, setSchedulePet] = useState<LostPet | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
   const [searchFocused, setSearchFocused] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
@@ -228,14 +227,12 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       onRegisterBackHandler?.(() => { setFullscreenImg(null); setZoomScale(1); setZoomPos({ x: 0, y: 0 }); return true; });
     } else if (contactPet) {
       onRegisterBackHandler?.(() => { setContactPet(null); return true; });
-    } else if (schedulePet) {
-      onRegisterBackHandler?.(() => { setSchedulePet(null); return true; });
     } else if (activePet) {
       onRegisterBackHandler?.(() => { setActivePet(null); return true; });
     } else {
       onRegisterBackHandler?.(null);
     }
-  }, [activePet, contactPet, schedulePet, fullscreenImg, onRegisterBackHandler, mascotas]);
+  }, [activePet, contactPet, fullscreenImg, onRegisterBackHandler, mascotas]);
   const autoPlayRef = useRef(true);
   const slideCountRef = useRef(1);
   const touchStartX = useRef(0);
@@ -255,8 +252,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const [newType, setNewType] = useState<string>('Perro');
   const [newDesc, setNewDesc] = useState('');
   const [newSeen, setNewSeen] = useState('');
-  const [newPhones, setNewPhones] = useState<string[]>(['']);
-  const [phoneWhatsapp, setPhoneWhatsapp] = useState<boolean[]>([false]);
+  const [newPhone, setNewPhone] = useState('');
+  const [newFacebook, setNewFacebook] = useState('');
   const [newNeigh, setNewNeigh] = useState('');
   const [newDateDay, setNewDateDay] = useState('');
   const [newDateMonth, setNewDateMonth] = useState('');
@@ -412,13 +409,12 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   const { visibleItems: visiblePets, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredPets);
 
   const getPhoneNumbers = (pet: LostPet): string[] => {
-    if (pet.phones && pet.phones.length > 0) return pet.phones;
     return pet.contact ? [pet.contact] : [];
   };
 
   const handlePostReport = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName || !newPhones[0] || !newSeen) return;
+    if (!newName || !newPhone || !newSeen) return;
 
     const allImages = [...petImageUrls, ...petDeviceImages];
 
@@ -430,10 +426,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
       imageUrl: allImages[0] || DEFAULT_IMAGES[newType] || DEFAULT_IMAGES.Otras,
       description: newDesc,
       lastSeen: newSeen,
-      contact: newPhones[0],
-      phones: newPhones.filter(p => p.trim()).length > 0
-        ? newPhones.map((p, i) => p.trim() ? `${p}${phoneWhatsapp[i] ? ' 📱WhatsApp' : ''}` : '').filter(Boolean)
-        : undefined,
+      contact: newPhone,
+      facebook: newFacebook.trim() || undefined,
       neighborhood: newNeigh || 'El Trigal',
       date: newDateDay && newDateMonth && newDateYear ? `${newDateDay} de ${newDateMonth} de ${newDateYear}` : 'Hoy mismo',
       images: allImages.length > 0 ? allImages : undefined,
@@ -455,8 +449,8 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
     setNewName('');
     setNewDesc('');
     setNewSeen('');
-    setNewPhones(['']);
-    setPhoneWhatsapp([false]);
+    setNewPhone('');
+    setNewFacebook('');
     setNewNeigh('');
     setNewDateDay('');
     setNewDateMonth('');
@@ -1215,7 +1209,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                                 setContactPet(activePet);
                               }
                             }}
-                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[66px] text-center"
+                            className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer w-[66px] text-center whitespace-nowrap"
                           >
                             {window.innerWidth < 1024 ? 'Llamar' : 'Enviar Mensaje'}
                           </button>
@@ -1224,15 +1218,22 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                     });
                   })()}
                   {activePet.facebook && (
-                    <a
-                      href={activePet.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition"
-                    >
-                      <span className="text-[10px] font-bold">f</span>
-                      <span className="text-xs">Ver en Facebook</span>
-                    </a>
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center space-x-2 text-gray-400">
+                        <span className="w-5 h-5 rounded-full bg-gradient-to-br from-[#1877F2] to-[#0a4db0] flex items-center justify-center shadow-[0_1px_4px_rgba(24,119,242,0.5)] shrink-0">
+                          <span className="text-white text-[11px] font-black leading-none">f</span>
+                        </span>
+                        <span className="text-white text-xs">Facebook</span>
+                      </div>
+                      <a
+                        href={activePet.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer w-[66px] text-center inline-block"
+                      >
+                        Facebook
+                      </a>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1383,56 +1384,6 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
         </div>
       )}
 
-      {/* Schedule Modal */}
-      {schedulePet && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
-          <div className="bg-[#0c101d] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-5 space-y-4">
-              <div className="text-center">
-                <h4 className="text-white text-lg font-bold">Horarios de Atención</h4>
-                <p className="text-gray-400 text-xs mt-1">{schedulePet.name}</p>
-              </div>
-              <div className="space-y-1.5">
-                {(schedulePet.schedule || []).length > 0 ? (
-                  schedulePet.schedule!.map((item, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs ${
-                        item.open
-                          ? 'bg-[#22c55e]/10 border border-[#22c55e]/20'
-                          : 'bg-white/5 border border-white/5'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                            item.open ? 'bg-[#22c55e]' : 'bg-gray-500'
-                          }`}
-                        />
-                        <span className={`font-bold ${item.open ? 'text-white' : 'text-gray-500'}`}>
-                          {item.day}
-                        </span>
-                      </div>
-                      <span className={`font-mono text-[11px] ${item.open ? 'text-gray-300' : 'text-gray-500'}`}>
-                        {item.hours}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-xs text-center py-4">No hay horarios disponibles</p>
-                )}
-              </div>
-              <button
-                onClick={() => setSchedulePet(null)}
-                className="w-full bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Add Pet Picker Modal */}
       {showFormPicker && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1552,78 +1503,26 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
               <div className="border-t border-white/5" />
 
               <div className="space-y-2">
-                <div className="grid grid-cols-[1fr_auto] gap-1.5 items-end">
+                <div className="space-y-1">
                   <label className="text-emerald-400 text-[10px] uppercase font-bold">Celular/Teléfono <span className="text-red-400">*</span> <span className="text-[8px] text-gray-500 font-normal lowercase">obligatorio/llenar</span></label>
-                  <label className="text-emerald-400 text-[10px] uppercase font-bold text-center">¿WhatsApp?</label>
+                  <input
+                    type="text"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="Coloca tu número de celular aquí"
+                    className="w-full bg-[#080a0f] text-white px-3 py-2 rounded-lg border border-white/10 text-xs focus:outline-none focus:border-[#FFD700]"
+                  />
                 </div>
-                {newPhones.map((phone, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_auto_auto] gap-1.5 items-start">
-                    <input
-                      type="text"
-                      value={phone}
-                      onChange={(e) => {
-                        const next = [...newPhones];
-                        next[i] = e.target.value;
-                        setNewPhones(next);
-                      }}
-                      placeholder="Coloca tu número de celular aquí"
-                      className="w-full bg-[#080a0f] text-white px-3 py-2 rounded-lg border border-white/10 text-xs focus:outline-none focus:border-[#FFD700]"
-                    />
-                    <div className="flex gap-2 items-center h-full py-2">
-                      {['Sí', 'No'].map(opt => {
-                        const isSelected = opt === 'Sí' ? phoneWhatsapp[i] : !phoneWhatsapp[i];
-                        return (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() =>
-                              setPhoneWhatsapp(prev => {
-                                const next = [...prev];
-                                next[i] = opt === 'Sí';
-                                return next;
-                              })
-                            }
-                            className={`flex items-center gap-1 text-[10px] font-semibold transition cursor-pointer ${
-                              isSelected ? 'text-gray-400' : 'text-gray-500'
-                            }`}
-                          >
-                            <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition ${
-                              isSelected ? 'border-gray-400' : 'border-gray-500'
-                            }`}>
-                              {isSelected && <span className="w-2 h-2 rounded-full bg-gray-400" />}
-                            </span>
-                            {opt}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {newPhones.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNewPhones(prev => prev.filter((_, j) => j !== i));
-                          setPhoneWhatsapp(prev => prev.filter((_, j) => j !== i));
-                        }}
-                        className="text-red-400 hover:text-red-300 p-1.5 transition cursor-pointer"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                {newPhones.length < 3 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNewPhones(prev => [...prev, '']);
-                      setPhoneWhatsapp(prev => [...prev, false]);
-                    }}
-                    className="bg-white/5 border border-dashed border-white/20 hover:border-[#FFD700]/40 text-gray-400 hover:text-[#FFD700] px-3 py-1.5 rounded-lg text-[10px] font-semibold transition cursor-pointer flex items-center gap-1.5"
-                  >
-                    <PlusCircle className="h-3 w-3" />
-                    <span>Agregar Celular/Teléfono</span>
-                  </button>
-                )}
+                <div className="space-y-1">
+                  <label className="text-emerald-400 text-[10px] uppercase font-bold">Link de Facebook <span className="text-[8px] text-gray-500 font-normal lowercase">opcional</span></label>
+                  <input
+                    type="url"
+                    value={newFacebook}
+                    onChange={(e) => setNewFacebook(e.target.value)}
+                    placeholder="Ej: https://facebook.com/perfil-o-publicacion"
+                    className="w-full bg-[#080a0f] text-white px-3 py-2 rounded-lg border border-white/10 text-xs focus:outline-none focus:border-[#FFD700]"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">

@@ -2318,6 +2318,7 @@ export const LOST_PETS_DATA: LostPet[] = [
     contact: '4 664 7890',
     neighborhood: 'Las Palmeras',
     date: '23 de mayo de 2024',
+    facebook: 'https://facebook.com/mascota.max.trigal',
     images: [
       'https://images.dog.ceo/breeds/retriever-golden/n02099601_1249.jpg',
       'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=400&auto=format&fit=crop&q=60',

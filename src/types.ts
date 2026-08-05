@@ -94,10 +94,6 @@ export interface LostPet {
   date: string;
   images?: string[];
   videoUrl?: string;
-  phones?: string[];
-  schedule?: DaySchedule[];
-  actionText?: string;
-  address?: string;
   facebook?: string;
 }
 
