@@ -1,6 +1,9 @@
 # 🤖 PROMPT PARA AGENTE DE IA — Proyecto "Barrio El Trigal"
-> **Versión:** 1.0 · **Fecha:** Julio 2026
-> Instrucciones: Copia y pega todo este documento como el primer mensaje al agente de IA.
+
+> ⚠️ **SUPERSEDIDO (v2.0, Agosto 2026):** Este documento queda **obsoleto** y se conserva en el repo únicamente como **historial**. La única fuente de verdad es **`PROMPT_MAESTRO_v2.md`** (raíz). NO usar este archivo como fuente de reglas ni de comportamiento; sigue siempre `PROMPT_MAESTRO_v2.md`. Todo lo que aquí difiera con el Prompt Maestro se resuelve a favor del Prompt Maestro.
+
+> **Versión original:** 1.0 · **Fecha:** Julio 2026 (histórico)
+> Instrucciones originales: Copia y pega todo este documento como el primer mensaje al agente de IA.
 > El agente debe leer CADA SECCIÓN en orden antes de tocar una sola línea de código.
 
 ---

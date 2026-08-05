@@ -3,7 +3,8 @@
 App web comunitaria (React 19 + TypeScript + Vite 6 + Tailwind CSS v4) para la asociación vecinal del Barrio El Trigal, Tarija, Bolivia. SPA de pestañas, sin router. Hosting: GitHub Pages (`base: '/barrio-el-trigal/'`). Repo: `Hogans2024/barrio-el-trigal`.
 
 ## Instrucciones maestras
-- `Como_debes_trabajar.md` (raíz) es el contrato completo del proyecto. Este archivo tiene prioridad donde ambos difieran (tags de comentarios, uso de `any`).
+- `PROMPT_MAESTRO_v2.md` (raíz) es la **única fuente de verdad** del proyecto (contrato completo: roles, arquitectura CMS, reglas absolutas, formato de trabajo). Este `AGENTS.md` es solo un resumen operativo rápido. Donde ambos difieran, prevalece `PROMPT_MAESTRO_v2.md`.
+- ⚠ `Como_debes_trabajar.md` (raíz) está **SUPERSEDIDO** por `PROMPT_MAESTRO_v2.md`. Se conserva en el repo únicamente como historial; no se usa como fuente de reglas.
 - El proyecto está en **Fase Frontend**: NO se toca `Code.gs` ni Google Sheets.
 
 ## Comandos
