@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, MessageSquare, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
 import { Project } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -21,12 +21,6 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [comments, setComments] = useState<Record<string, string[]>>({
-    'pr1': ['¡Excelente iniciativa! Hacía falta empedrar estas cuadras.', '¿Saben cuándo estiman terminar la obra?'],
-    'pr2': ['Por fin llegará el gas a nuestro manzano!', 'Una gran mejora para la economía del hogar.'],
-    'pr3': ['¡Muy seguro el sistema! Ya configuré mi número.'],
-  });
-  const [newComment, setNewComment] = useState('');
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('proyectos');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -167,20 +161,21 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
   const { visibleItems: visibleProjects, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredProjects);
 
-  const handleAddComment = (id: string) => {
-    if (!newComment.trim()) return;
-    setComments(prev => ({
-      ...prev,
-      [id]: [...(prev[id] || []), newComment.trim()]
-    }));
-    setNewComment('');
-  };
-
   const getStatusIcon = (status: string) => {
     switch(status) {
       case 'Completado': return <CheckCircle className="h-3.5 w-3.5" />;
       case 'En Progreso': return <Clock className="h-3.5 w-3.5" />;
       default: return <FileText className="h-3.5 w-3.5" />;
+    }
+  };
+
+  const getSmallIcon = (category: string) => {
+    const cat = category.charAt(0) + category.slice(1).toLowerCase();
+    switch(cat) {
+      case 'Infraestructura': return <Building2 className="h-[18px] w-[18px] text-amber-400 shrink-0 mr-1" />;
+      case 'Servicios': return <Zap className="h-[18px] w-[18px] text-[#22c55e] shrink-0 mr-1" />;
+      case 'Seguridad': return <Shield className="h-[18px] w-[18px] text-blue-400 shrink-0 mr-1" />;
+      default: return <LayoutGrid className="h-[18px] w-[18px] text-[#FFD700] shrink-0 mr-1" />;
     }
   };
 
@@ -416,7 +411,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
 
       {/* Project Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {visibleProjects.map((proj) => {
+        {visibleProjects.map((proj, idx) => {
           // Vista tipo Eventos (icon + content + centered buttons)
           if (viewMode === 'eventos') {
             return (
@@ -565,11 +560,12 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
               key={proj.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              {/* Header: título + descripción ANTES de la imagen */}
+              {/* Header: número + icono + título ANTES de la imagen (estilo Mascotas) */}
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
-                    <span className="truncate min-w-0">{proj.title}</span>
+                    {getSmallIcon(proj.category)}
+                    <span className="truncate min-w-0"><span className="text-white">{idx + 1}.</span><span className="text-white ml-2 truncate">{proj.title}</span></span>
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-3 leading-relaxed">
                     {proj.description}
@@ -606,6 +602,9 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                     }
                   }}
                 />
+                <span className="absolute bottom-2 left-2 z-20 bg-black/55 text-white text-[10px] font-extrabold px-2 py-0.5 rounded border border-white/20 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap pointer-events-none">
+                  {proj.category.charAt(0) + proj.category.slice(1).toLowerCase()}
+                </span>
               </div>
 
               {/* Fila de botones */}
@@ -669,64 +668,54 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
       {/* Project Detail Modal Overlay */}
       {activeProject && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
-          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden max-h-full flex flex-col animate-in fade-in zoom-in duration-200">
-            {/* Header */}
-            <div className={`relative ${portraitProjects[activeProject.id] ? 'h-[264px]' : squareProjects[activeProject.id] ? 'aspect-square' : 'h-44'} bg-gray-950 overflow-hidden`}>
-              {portraitProjects[activeProject.id] && (
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
+            {(() => {
+              const portrait = portraitProjects[activeProject.id];
+              const square = squareProjects[activeProject.id];
+              const singleHorizontal = !portrait && !square;
+              return (
                 <>
-                  <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeProject.imageUrl})` }} />
-                  <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                  <div className={`relative bg-gray-950 overflow-hidden ${singleHorizontal ? 'h-36' : 'h-[264px]'}`}>
+                    {(portrait || square) && (
+                      <>
+                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeProject.imageUrl})` }} />
+                        <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                      </>
+                    )}
+                    <img
+                      src={activeProject.imageUrl}
+                      alt={activeProject.title}
+                      referrerPolicy="no-referrer"
+                      className={`z-10 cursor-pointer ${singleHorizontal ? 'relative w-full h-full object-cover' : 'relative w-full h-full object-contain'}`}
+                      onDoubleClick={() => setFullscreenImg(activeProject.imageUrl)}
+                      onClick={() => setFullscreenImg(activeProject.imageUrl)}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        const ratio = img.naturalWidth / img.naturalHeight;
+                        if (ratio < 0.8) {
+                          setPortraitProjects(prev => ({ ...prev, [activeProject.id]: true }));
+                        } else if (ratio >= 0.8 && ratio <= 1.2) {
+                          setSquareProjects(prev => ({ ...prev, [activeProject.id]: true }));
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => setActiveProject(null)}
+                      className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-20"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </>
-              )}
-              <img
-                src={activeProject.imageUrl}
-                alt={activeProject.title}
-                referrerPolicy="no-referrer"
-                className={`relative z-10 w-full h-full ${portraitProjects[activeProject.id] ? 'object-contain' : 'object-cover'}`}
-                onClick={() => setFullscreenImg(activeProject.imageUrl)}
-                onDoubleClick={() => setFullscreenImg(activeProject.imageUrl)}
-                onLoad={(e) => {
-                  const img = e.currentTarget;
-                  const ratio = img.naturalWidth / img.naturalHeight;
-                  if (ratio < 0.8) {
-                    setPortraitProjects(prev => ({ ...prev, [activeProject.id]: true }));
-                  } else if (ratio >= 0.8 && ratio <= 1.2) {
-                    setSquareProjects(prev => ({ ...prev, [activeProject.id]: true }));
-                  }
-                }}
-              />
-              <button
-                onClick={() => setActiveProject(null)}
-                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <div className="absolute bottom-4 left-4">
-                <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                  {activeProject.category.charAt(0) + activeProject.category.slice(1).toLowerCase()}
-                </span>
-              </div>
-            </div>
+              );
+            })()}
 
-            {/* Info contents scrolling */}
-            <div className="p-5 overflow-y-auto space-y-4 flex-1 pb-16 sm:pb-5">
+            <div className="px-5 pt-1 space-y-1.5 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeProject.title}</h4>
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
                 <p className="text-gray-300 text-xs leading-relaxed">{activeProject.description}</p>
-              </div>
-
-              <div>
-                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Estado del Proyecto</h5>
-                <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-full ${
-                  activeProject.status === 'Completado' 
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500' 
-                    : 'bg-orange-500/20 text-orange-400 border border-orange-500'
-                }`}>
-                  {getStatusIcon(activeProject.status)}
-                  {activeProject.status}
-                </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -740,44 +729,37 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
                 </div>
               </div>
 
-              {/* Interactive Comments Area */}
-              <div className="border-t border-white/5 pt-4">
-                <h5 className="text-white text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <MessageSquare className="h-3.5 w-3.5 text-[#FFD700]" />
-                  <span>Participación Ciudadana ({comments[activeProject.id]?.length || 0})</span>
-                </h5>
+              <div>
+                <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Estado del Proyecto</h5>
+                <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-full ${
+                  activeProject.status === 'Completado'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500'
+                    : 'bg-orange-500/20 text-orange-400 border border-orange-500'
+                }`}>
+                  {getStatusIcon(activeProject.status)}
+                  {activeProject.status}
+                </span>
+              </div>
 
-                <div className="space-y-2.5 max-h-36 overflow-y-auto pr-1 mb-3">
-                  {comments[activeProject.id]?.map((cmt, idx) => (
-                     <div key={idx} className="bg-black/40 p-2.5 rounded-lg border border-white/5 text-xs">
-                       <p className="text-gray-300 line-clamp-3">{cmt}</p>
-                       <div className="text-right mt-1">
-                         <span className="text-[9px] text-gray-500 font-mono">Vecino Verificado</span>
-                       </div>
-                     </div>
-                  ))}
-                  {(!comments[activeProject.id] || comments[activeProject.id].length === 0) && (
-                    <p className="text-gray-500 text-xs italic">Sé el primero en comentar este proyecto...</p>
-                  )}
+              {activeProject.contact && (
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Contactos</h5>
+                  <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                      <span className="text-white">{activeProject.contact}</span>
+                    </div>
+                  </div>
                 </div>
+              )}
 
-                {/* Add Comment input */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Escribe tu opinión..."
-                    className="flex-1 bg-[#080a0f] text-white px-3 py-1.5 rounded-lg border border-white/10 text-xs focus:outline-none focus:border-[#FFD700]"
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddComment(activeProject.id)}
-                  />
-                  <button
-                    onClick={() => handleAddComment(activeProject.id)}
-                    className="bg-[#FFD700]/10 text-[#FFD700] px-3 py-1 rounded-lg text-xs font-bold hover:bg-[#FFD700]/20 border border-[#FFD700]/40 cursor-pointer"
-                  >
-                    Enviar
-                  </button>
-                </div>
+              <div className="flex pt-2">
+                <button
+                  onClick={() => setActiveProject(null)}
+                  className="flex-1 bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>

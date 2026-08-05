@@ -2768,7 +2768,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La ciudad de Tarija fue elegida como sede del Congreso Nacional de Tecnología e Innovación 2026, evento que reunirá a más de 200 expertos en desarrollo de software, inteligencia artificial y ciberseguridad. El encuentro se realizará del 15 al 18 de agosto en el Centro de Convenciones y contará con la participación de universidades y empresas tecnológicas de todo el país.',
     icon: 'users',
     date: 'Lunes, 30 de Junio de 2026',
-    location: 'Centro de Convenciones, Tarija'
+    location: 'Centro de Convenciones, Tarija',
+    publisher: 'Administrador',
   },
   {
     id: 'n2',
@@ -2778,7 +2779,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'El Concejo Municipal de Tarija aprobó en primera instancia el presupuesto anual 2026 por un monto de 450 millones de bolivianos. Los recursos estarán destinados principalmente a obras de infraestructura vial, mejoramiento de servicios básicos y programas sociales para las zonas periurbanas del municipio.',
     icon: 'users',
     date: 'Viernes, 27 de Junio de 2026',
-    location: 'Concejo Municipal, Tarija'
+    location: 'Concejo Municipal, Tarija',
+    publisher: 'Presidente del Barrio',
   },
   {
     id: 'n3',
@@ -2788,7 +2790,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'El equipo de fútbol de Tarija se consagró campeón del torneo nacional de la COFA después de vencer 3-1 al equipo de Cochabamba en una final disputada en el Estadio IV Centenarios. Miles de tarijeños celebraron en las calles el título obtenido tras 15 años de sequía deportiva.',
     icon: 'users',
     date: 'Domingo, 29 de Junio de 2026',
-    location: 'Estadio IV Centenarios, Tarija'
+    location: 'Estadio IV Centenarios, Tarija',
+    publisher: 'Vecino',
   },
   {
     id: 'n4',
@@ -2798,7 +2801,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'Las exportaciones de uva de la región de Tarija al mercado europeo crecieron un 35% durante el primer semestre de 2026, según datos de la Cámara de Exportadores. Los vinos y singanis tarijeños continúan ganando reconocimiento internacional, generando divisas y empleo para cientos de familias productoras del Valle Central.',
     icon: 'gift',
     date: 'Jueves, 26 de Junio de 2026',
-    location: 'Valle Central de Tarija'
+    location: 'Valle Central de Tarija',
+    publisher: 'Secretaría de Cultura',
   },
   {
     id: 'n5',
@@ -2808,7 +2812,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'Voluntarios de Tarija plantaron más de 5.000 árboles nativos en el cerro San Juan como parte de la campaña "Tarija Pulmón Verde". La iniciativa liderada por la Gobernación busca reforestar 50 hectáreas hasta fin de año para recuperar la cobertura vegetal de la zona y mitigar los efectos del cambio climático en la región.',
     icon: 'trash',
     date: 'Sábado, 28 de Junio de 2026',
-    location: 'Cerro San Juan, Tarija'
+    location: 'Cerro San Juan, Tarija',
+    publisher: 'Junta Vecinal',
   },
   {
     id: 'n6',
@@ -2818,7 +2823,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'Estudiantes de la Universidad Juan Misael Saracho desarrollaron una aplicación móvil que permite a los ciudadanos de Tarija realizar denuncias en tiempo real sobre baches, alumbrado público dañado y recolección de basura. La app "Tarija Reporta" ya cuenta con más de 10.000 descargas en su primera semana de lanzamiento.',
     icon: 'heart-pulse',
     date: 'Martes, 24 de Junio de 2026',
-    location: 'Universidad Juan Misael Saracho, Tarija'
+    location: 'Universidad Juan Misael Saracho, Tarija',
+    publisher: 'Vecina',
   },
   {
     id: 'n7',
@@ -2828,7 +2834,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La Alcaldía de Tarija inauguró una nueva línea de transporte público eléctrico que conecta la zona sur con el centro de la ciudad. Los modernos minibuses con capacidad para 30 pasajeros realizarán el recorrido cada 10 minutos en horario de 6:00 a 22:00, contribuyendo a la reducción de la contaminación auditiva y atmosférica.',
     icon: 'users',
     date: 'Miércoles, 25 de Junio de 2026',
-    location: 'Zona Sur - Centro, Tarija'
+    location: 'Zona Sur - Centro, Tarija',
+    publisher: 'Presidente del Barrio',
   },
   {
     id: 'n8',
@@ -2838,7 +2845,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'El Ministerio de Turismo en coordinación con la Gobernación de Tarija lanzó la "Ruta de las Bodegas Históricas", un recorrido que incluye visitas a 12 bodegas tradicionales con más de 100 años de antigüedad. Los turistas podrán degustar vinos y singanis, conocer el proceso de elaboración y disfrutar de la gastronomía local.',
     icon: 'gift',
     date: 'Sábado, 28 de Junio de 2026',
-    location: 'Valle de la Concepción, Tarija'
+    location: 'Valle de la Concepción, Tarija',
+    publisher: 'Secretaría de Cultura',
   },
   {
     id: 'n9',
@@ -2848,7 +2856,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'El Gobierno Nacional anunció la construcción del nuevo Hospital Municipal de Tarija con una inversión de 120 millones de bolivianos. El centro de salud contará con 200 camas, equipos de última generación y servicios de maternidad, pediatría, traumatología y cardiología. Las obras comenzarán en agosto y se estima su conclusión en 2028.',
     icon: 'heart-pulse',
     date: 'Viernes, 27 de Junio de 2026',
-    location: 'Av. Víctor Paz, Tarija'
+    location: 'Av. Víctor Paz, Tarija',
+    publisher: 'Administrador',
   },
   {
     id: 'n10',
@@ -2858,7 +2867,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La Feria Internacional del Libro de Tarija 2026 abrió sus puertas con la participación de más de 50 escritores bolivianos y 30 editoriales internacionales. El evento cultural más importante del sur del país se desarrolla en el recinto ferial de la ciudad y ofrece talleres, presentaciones de libros y conferencias sobre literatura contemporánea.',
     icon: 'gift',
     date: 'Lunes, 23 de Junio de 2026',
-    location: 'Recinto Ferial, Tarija'
+    location: 'Recinto Ferial, Tarija',
+    publisher: 'Presidente del Barrio',
   },
   {
     id: 'n11',
@@ -2868,7 +2878,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La carrera de Ingeniería de Sistemas de la Universidad Autónoma Juan Misael Saracho organizó las Olimpiadas de Robótica Tarija 2026 con la participación de más de 200 estudiantes de colegios secundarios. Los jóvenes compitieron en categorías de robots seguidores de línea, sumo robótico y drones programables.',
     icon: 'users',
     date: 'Domingo, 22 de Junio de 2026',
-    location: 'Universidad Juan Misael Saracho, Tarija'
+    location: 'Universidad Juan Misael Saracho, Tarija',
+    publisher: 'Vecino',
   },
   {
     id: 'n12',
@@ -2878,7 +2889,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La Cámara de Diputados inició el debate del proyecto de Ley de Desarrollo Productivo para el departamento de Tarija, una normativa que busca impulsar los sectores vitivinícola, oleícola y turístico de la región. La ley contempla incentivos fiscales, créditos blandos y asistencia técnica para pequeños y medianos productores.',
     icon: 'users',
     date: 'Jueves, 19 de Junio de 2026',
-    location: 'Asamblea Legislativa, Tarija'
+    location: 'Asamblea Legislativa, Tarija',
+    publisher: 'Secretaría de Cultura',
   },
   {
     id: 'n13',
@@ -2888,7 +2900,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La selección de básquetbol de Tarija clasificó a la liguilla final del campeonato nacional después de vencer 87-72 al equipo de Potosí. El equipo tarijeño, dirigido por el entrenador Carlos López, mostró un juego sólido y promete dar pelea en la fase decisiva del torneo que se jugará en la ciudad de Santa Cruz.',
     icon: 'users',
     date: 'Martes, 17 de Junio de 2026',
-    location: 'Coliseo Deportivo, Tarija'
+    location: 'Coliseo Deportivo, Tarija',
+    publisher: 'Junta Vecinal',
   },
   {
     id: 'n14',
@@ -2898,7 +2911,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La ciudad de Tarija fue elegida como sede del Encuentro Nacional de Artesanos 2026, evento que congrega a más de 300 artesanos de los nueve departamentos de Bolivia. La feria se realiza en la Plaza Principal de Tarija y exhibe tejidos, cerámica, tallados en madera, joyería tradicional y productos gastronómicos típicos de cada región.',
     icon: 'gift',
     date: 'Sábado, 21 de Junio de 2026',
-    location: 'Plaza Principal, Tarija'
+    location: 'Plaza Principal, Tarija',
+    publisher: 'Vecina',
   },
   {
     id: 'n15',
@@ -2908,7 +2922,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La Gobernación de Tarija inició la construcción de un nuevo puente vehicular sobre el río Guadalquivir que conectará los distritos 6 y 7 de la ciudad. La obra, con una inversión de 35 millones de bolivianos, beneficiará a más de 40.000 habitantes y permitirá descongestionar el tráfico en el puente San Martín, actualmente colapsado en horas pico.',
     icon: 'users',
     date: 'Lunes, 16 de Junio de 2026',
-    location: 'Río Guadalquivir, Tarija'
+    location: 'Río Guadalquivir, Tarija',
+    publisher: 'Presidente del Barrio',
   },
   {
     id: 'n16',
@@ -2918,7 +2933,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'El Festival del Singani Tarijeño 2026 rompió récord de asistencia con más de 15 mil visitantes durante el fin de semana. Productores locales ofrecieron degustaciones y recorridos por las bodegas más tradicionales del Valle Central.',
     icon: 'gift',
     date: 'Domingo, 13 de Julio de 2026',
-    location: 'Valle Central, Tarija'
+    location: 'Valle Central, Tarija',
+    publisher: 'Secretaría de Cultura',
   },
   {
     id: 'n17',
@@ -2928,7 +2944,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La Alcaldía de Tarija lanzó un programa gratuito de alfabetización digital dirigido a adultos mayores. Los cursos incluyen uso de smartphones, redes sociales, banca en línea y trámites digitales para reducir la brecha tecnológica.',
     icon: 'users',
     date: 'Viernes, 11 de Julio de 2026',
-    location: 'Casas de la Cultura, Tarija'
+    location: 'Casas de la Cultura, Tarija',
+    publisher: 'Administrador',
   },
   {
     id: 'n18',
@@ -2938,7 +2955,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La Gobernación inauguró el Parque Ecológico Norte con 5 hectáreas de áreas verdes, juegos infantiles, ciclovía y laguna artificial. El espacio beneficiará a más de 20 mil vecinos de los distritos 1 y 2.',
     icon: 'trash',
     date: 'Miércoles, 9 de Julio de 2026',
-    location: 'Zona Norte, Tarija'
+    location: 'Zona Norte, Tarija',
+    publisher: 'Presidente del Barrio',
   },
   {
     id: 'n19',
@@ -2948,7 +2966,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'La cosecha de uva 2026 en Tarija alcanzó un récord histórico de 850 mil toneladas, superando en un 20% la producción del año anterior. Los vitivinicultores atribuyen el incremento a las condiciones climáticas favorables.',
     icon: 'gift',
     date: 'Lunes, 7 de Julio de 2026',
-    location: 'Valle Central de Tarija'
+    location: 'Valle Central de Tarija',
+    publisher: 'Vecino',
   },
   {
     id: 'n20',
@@ -2958,7 +2977,8 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     description: 'Más de 120 jóvenes ajedrecistas de todo el país participan en el Torneo Nacional de Ajedrez Juvenil que se realiza en el Centro de Convenciones de Tarija. El evento promueve el pensamiento estratégico y la sana competencia.',
     icon: 'users',
     date: 'Sábado, 5 de Julio de 2026',
-    location: 'Centro de Convenciones, Tarija'
+    location: 'Centro de Convenciones, Tarija',
+    publisher: 'Secretaría de Cultura',
   }
 ];
 

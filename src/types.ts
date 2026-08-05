@@ -27,6 +27,10 @@ export interface NeighborhoodEvent {
   icon: string;
   date?: string;
   location?: string;
+  /* CMS_READY: contacto opcional para la sección Contactos del modal (pendiente de datos en Sheets) */
+  contact?: string;
+  /* CMS_PENDING: autor/editor que publicó la noticia (Administrador, Presidente del Barrio, Vecino, etc.) */
+  publisher?: string;
 }
 
 export interface DaySchedule {
@@ -103,6 +107,8 @@ export interface Project {
   description: string;
   location: string;
   status: 'Completado' | 'En Progreso' | 'Planificado';
+  /* CMS_READY: contacto opcional para la sección Contactos del modal (pendiente de datos en Sheets) */
+  contact?: string;
 }
 
 export interface AffiliateForm {

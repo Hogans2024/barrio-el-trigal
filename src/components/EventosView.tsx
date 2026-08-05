@@ -17,11 +17,10 @@ interface EventosViewProps {
   onClearHighlight?: () => void;
 }
 
-export default function EventosView({ eventos, onShowNotification, highlightId, onClearHighlight }: EventosViewProps) {
+export default function EventosView({ eventos, highlightId, onClearHighlight }: EventosViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeEvent, setActiveEvent] = useState<NeighborhoodEvent | null>(null);
-  const [subscribedEvents, setSubscribedEvents] = useState<Record<string, boolean>>({});
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('eventos');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -146,28 +145,13 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
   const { visibleItems: visibleEvents, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredEvents);
 
-  const handleSubscribe = (id: string, name: string) => {
-    const nextStatus = !subscribedEvents[id];
-    setSubscribedEvents(prev => ({
-      ...prev,
-      [id]: nextStatus
-    }));
-
-    if (nextStatus) {
-      onShowNotification(
-        '🔔 Inscripción Confirmada',
-        `Te has suscrito para recibir recordatorios prácticos sobre el evento: "${name}".`
-      );
-    }
-  };
-
-  const getIcon = (type: string) => {
+  const getSmallIcon = (type: string) => {
     switch(type) {
-      case 'trash': return <div className="text-rose-400 bg-rose-500/10 p-2.5 rounded-lg shrink-0"><Calendar className="h-5 w-5" /></div>;
-      case 'users': return <div className="text-[#22c55e] bg-[#22c55e]/10 p-2.5 rounded-lg shrink-0"><Users className="h-5 w-5" /></div>;
-      case 'gift': return <div className="text-amber-400 bg-amber-500/10 p-2.5 rounded-lg shrink-0"><HeartHandshake className="h-5 w-5" /></div>;
-      case 'heart-pulse': return <div className="text-blue-400 bg-blue-500/10 p-2.5 rounded-lg shrink-0"><Eye className="h-5 w-5" /></div>;
-      default: return <div className="text-[#FFD700] bg-[#FFD700]/10 p-2.5 rounded-lg shrink-0"><HelpCircle className="h-5 w-5" /></div>;
+      case 'trash': return <Calendar className="h-[18px] w-[18px] text-rose-400 shrink-0 mr-1" />;
+      case 'users': return <Users className="h-[18px] w-[18px] text-[#22c55e] shrink-0 mr-1" />;
+      case 'gift': return <HeartHandshake className="h-[18px] w-[18px] text-amber-400 shrink-0 mr-1" />;
+      case 'heart-pulse': return <Eye className="h-[18px] w-[18px] text-blue-400 shrink-0 mr-1" />;
+      default: return <HelpCircle className="h-[18px] w-[18px] text-[#FFD700] shrink-0 mr-1" />;
     }
   };
 
@@ -403,7 +387,7 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
 
       {/* Event Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {visibleEvents.map((evt) => {
+        {visibleEvents.map((evt, idx) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
@@ -530,13 +514,12 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
               key={evt.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              {/* Header: título + descripción ANTES de la imagen */}
+              {/* Header: número + icono + título ANTES de la imagen (estilo Mascotas) */}
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
-                {getIcon(evt.icon)}
-
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    {evt.title}
+                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
+                    {getSmallIcon(evt.icon)}
+                    <span className="truncate min-w-0"><span className="text-white">{idx + 1}.</span><span className="text-white ml-2 truncate">{evt.title}</span></span>
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-3 leading-relaxed">
                     {evt.description}
@@ -573,6 +556,9 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
                     }
                   }}
                 />
+                <span className="absolute bottom-2 left-2 z-20 bg-black/55 text-white text-[10px] font-extrabold px-2 py-0.5 rounded border border-white/20 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap pointer-events-none">
+                  {categoryLabels[evt.category] || evt.category}
+                </span>
               </div>
 
               {/* Fila de botones */}
@@ -637,44 +623,48 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
       {activeEvent && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
-            <div className={`relative ${portraitEvents[activeEvent.id] ? 'h-[264px]' : squareEvents[activeEvent.id] ? 'aspect-square' : 'h-44'} bg-gray-950 overflow-hidden`}>
-              {portraitEvents[activeEvent.id] && (
+            {(() => {
+              const portrait = portraitEvents[activeEvent.id];
+              const square = squareEvents[activeEvent.id];
+              const singleHorizontal = !portrait && !square;
+              return (
                 <>
-                  <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeEvent.imageUrl})` }} />
-                  <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                  <div className={`relative bg-gray-950 overflow-hidden ${singleHorizontal ? 'h-36' : 'h-[264px]'}`}>
+                    {(portrait || square) && (
+                      <>
+                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeEvent.imageUrl})` }} />
+                        <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                      </>
+                    )}
+                    <img
+                      src={activeEvent.imageUrl}
+                      alt={activeEvent.title}
+                      referrerPolicy="no-referrer"
+                      className={`z-10 cursor-pointer ${singleHorizontal ? 'relative w-full h-full object-cover' : 'relative w-full h-full object-contain'}`}
+                      onDoubleClick={() => setFullscreenImg(activeEvent.imageUrl)}
+                      onClick={() => setFullscreenImg(activeEvent.imageUrl)}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        const ratio = img.naturalWidth / img.naturalHeight;
+                        if (ratio < 0.8) {
+                          setPortraitEvents(prev => ({ ...prev, [activeEvent.id]: true }));
+                        } else if (ratio >= 0.8 && ratio <= 1.2) {
+                          setSquareEvents(prev => ({ ...prev, [activeEvent.id]: true }));
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => setActiveEvent(null)}
+                      className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-20"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </>
-              )}
-              <img
-                src={activeEvent.imageUrl}
-                alt={activeEvent.title}
-                referrerPolicy="no-referrer"
-                className={`relative z-10 w-full h-full ${portraitEvents[activeEvent.id] ? 'object-contain' : 'object-cover'}`}
-                onClick={() => setFullscreenImg(activeEvent.imageUrl)}
-                onDoubleClick={() => setFullscreenImg(activeEvent.imageUrl)}
-                onLoad={(e) => {
-                  const img = e.currentTarget;
-                  const ratio = img.naturalWidth / img.naturalHeight;
-                  if (ratio < 0.8) {
-                    setPortraitEvents(prev => ({ ...prev, [activeEvent.id]: true }));
-                  } else if (ratio >= 0.8 && ratio <= 1.2) {
-                    setSquareEvents(prev => ({ ...prev, [activeEvent.id]: true }));
-                  }
-                }}
-              />
-              <button
-                onClick={() => setActiveEvent(null)}
-                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <div className="absolute bottom-4 left-4">
-                <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                  {activeEvent.category === 'Medio' ? 'Medio Ambiente' : activeEvent.category}
-                </span>
-              </div>
-            </div>
+              );
+            })()}
 
-            <div className="p-5 space-y-4 pb-16 sm:pb-5">
+            <div className="px-5 pt-1 space-y-1.5 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeEvent.title}</h4>
 
               <div>
@@ -699,35 +689,24 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
                 </div>
               </div>
 
-              <div className="flex space-x-2 pt-2">
+              {activeEvent.contact && (
+                <div>
+                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Contactos</h5>
+                  <div className="bg-white/[0.02] rounded-xl border border-white/10 p-3.5 space-y-2.5 text-xs">
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <Phone className="h-4 w-4 text-[#FFD700] shrink-0" />
+                      <span className="text-white">{activeEvent.contact}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex pt-2">
                 <button
                   onClick={() => setActiveEvent(null)}
                   className="flex-1 bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
                 >
                   Cerrar
-                </button>
-                <button
-                  onClick={() => {
-                    handleSubscribe(activeEvent.id, activeEvent.title);
-                  }}
-                  className={`flex-1 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer ${
-                    subscribedEvents[activeEvent.id]
-                      ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20'
-                      : 'bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40'
-                  }`}
-                >
-                  {subscribedEvents[activeEvent.id] ? 'Inscripto ✓' : 'Anotarse al Evento'}
-                </button>
-                <button
-                  onClick={() => {
-                    const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar eventos..."]');
-                    el?.focus();
-                    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }}
-                  className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  <span>Buscar</span>
                 </button>
               </div>
             </div>

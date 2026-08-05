@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard, Copy, Share2, User } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -17,11 +17,10 @@ interface NoticiasViewProps {
   onClearHighlight?: () => void;
 }
 
-export default function NoticiasView({ noticias, onShowNotification, highlightId, onClearHighlight }: NoticiasViewProps) {
+export default function NoticiasView({ noticias, highlightId, onClearHighlight }: NoticiasViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [activeNews, setActiveNews] = useState<NeighborhoodEvent | null>(null);
-  const [subscribedNews, setSubscribedNews] = useState<Record<string, boolean>>({});
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [viewMode, setViewMode] = useState<string>('noticias');
   const [showViewModal, setShowViewModal] = useState(false);
@@ -35,6 +34,20 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
   const [zoomScale, setZoomScale] = useState(1);
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const touchState = useRef({ dist: 0, midX: 0, midY: 0, panX: 0, panY: 0, scale: 1 });
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const [descOverflow, setDescOverflow] = useState(false);
+  const [expandedDesc, setExpandedDesc] = useState(false);
+
+  useLayoutEffect(() => {
+    if (expandedDesc) return;
+    setDescOverflow(false);
+    const el = descriptionRef.current;
+    if (!el) return;
+    const raf = requestAnimationFrame(() => {
+      setDescOverflow(el.scrollHeight > el.clientHeight + 1);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [activeNews, expandedDesc]);
   const barRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
@@ -158,29 +171,47 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
   const { visibleItems: visibleNews, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredNews);
 
-  const handleSubscribe = (id: string, name: string) => {
-    const nextStatus = !subscribedNews[id];
-    setSubscribedNews(prev => ({
-      ...prev,
-      [id]: nextStatus
-    }));
-
-    if (nextStatus) {
-      onShowNotification(
-        '🔔 Suscripción Confirmada',
-        `Te has suscrito para recibir notificaciones sobre: "${name}".`
-      );
+  const getSmallIcon = (type: string) => {
+    switch(type) {
+      case 'trash': return <Calendar className="h-[18px] w-[18px] text-rose-400 shrink-0 mr-1" />;
+      case 'users': return <Users className="h-[18px] w-[18px] text-[#22c55e] shrink-0 mr-1" />;
+      case 'gift': return <HeartHandshake className="h-[18px] w-[18px] text-amber-400 shrink-0 mr-1" />;
+      case 'heart-pulse': return <Eye className="h-[18px] w-[18px] text-blue-400 shrink-0 mr-1" />;
+      default: return <HelpCircle className="h-[18px] w-[18px] text-[#FFD700] shrink-0 mr-1" />;
     }
   };
 
-  const getIcon = (type: string) => {
-    switch(type) {
-      case 'trash': return <div className="text-rose-400 bg-rose-500/10 p-2.5 rounded-lg shrink-0"><Calendar className="h-5 w-5" /></div>;
-      case 'users': return <div className="text-[#22c55e] bg-[#22c55e]/10 p-2.5 rounded-lg shrink-0"><Users className="h-5 w-5" /></div>;
-      case 'gift': return <div className="text-amber-400 bg-amber-500/10 p-2.5 rounded-lg shrink-0"><HeartHandshake className="h-5 w-5" /></div>;
-      case 'heart-pulse': return <div className="text-blue-400 bg-blue-500/10 p-2.5 rounded-lg shrink-0"><Eye className="h-5 w-5" /></div>;
-      default: return <div className="text-[#FFD700] bg-[#FFD700]/10 p-2.5 rounded-lg shrink-0"><HelpCircle className="h-5 w-5" /></div>;
-    }
+  const formatNewsDate = (dateStr?: string): string => {
+    if (!dateStr) return '';
+    // Fecha origen tipo: "Lunes, 30 de Junio de 2026" → "Lunes 30-06-2026"
+    const match = dateStr.match(/^\s*([A-Za-zñÑ]+),?\s*(\d{1,2})\s+de\s+([A-Za-z]+)\s+de\s+(\d{4})/i);
+    if (!match) return dateStr;
+    const [, day, dayNum, month, year] = match;
+    const months: Record<string, string> = {
+      enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
+      julio: '07', agosto: '08', septiembre: '09', setiembre: '09', octubre: '10', noviembre: '11', diciembre: '12',
+    };
+    const mm = months[month.toLowerCase()] || '01';
+    const dd = dayNum.padStart(2, '0');
+    const weekday = day.toLowerCase();
+    return `${weekday}-${dd}-${mm}-${year}`;
+  };
+
+  const getHashtags = (cat: string): string[] => {
+    const map: Record<string, string[]> = {
+      Tecnologia: ['#Tecnología', '#Innovación', '#Barrio'],
+      Politica: ['#Política', '#Comunidad', '#Barrio'],
+      Deportes: ['#Deportes', '#Barrio', '#Comunidad'],
+      Economia: ['#Economía', '#Barrio', '#Progreso'],
+      Medio: ['#MedioAmbiente', '#Verde', '#Barrio'],
+      Salud: ['#Salud', '#Bienestar', '#Comunidad'],
+      Transporte: ['#Transporte', '#Movilidad', '#Barrio'],
+      Turismo: ['#Turismo', '#Cultura', '#Barrio'],
+      Cultura: ['#Cultura', '#Barrio', '#Comunidad'],
+      Seguridad: ['#Seguridad', '#Barrio', '#Comunidad'],
+      Servicios: ['#Servicios', '#Barrio', '#Comunidad'],
+    };
+    return map[cat] || ['#Comunidad', '#Barrio', '#Latinoamérica'];
   };
 
   return (
@@ -415,7 +446,7 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
 
       {/* News Cards Section */}
       <div ref={cardsContainerRef} className="space-y-4 -mt-[4px]">
-        {visibleNews.map((item) => {
+        {visibleNews.map((item, idx) => {
           // Vista tipo Proyectos (split horizontal)
           if (viewMode === 'proyectos') {
             return (
@@ -542,13 +573,12 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
               key={item.id}
               className="bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden hover:border-[#FFD700]/30 transition group"
             >
-              {/* Header: título + descripción ANTES de la imagen */}
+              {/* Header: número + icono + título ANTES de la imagen (estilo Mascotas) */}
               <div className="px-[10px] pt-[10px] pb-[6px] flex space-x-3 items-start">
-                {getIcon(item.icon)}
-
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition truncate">
-                    {item.title}
+                  <h3 className="text-white text-sm font-bold tracking-tight mb-0.5 group-hover:text-[#FFD700] transition flex items-center w-full">
+                    {getSmallIcon(item.icon)}
+                    <span className="truncate min-w-0"><span className="text-white">{idx + 1}.</span><span className="text-white ml-2 truncate">{item.title}</span></span>
                   </h3>
                   <p className="text-gray-400 text-xs line-clamp-3 leading-relaxed">
                     {item.description}
@@ -585,6 +615,9 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
                     }
                   }}
                 />
+                <span className="absolute bottom-2 left-2 z-20 bg-black/55 text-white text-[10px] font-extrabold px-2 py-0.5 rounded border border-white/20 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] whitespace-nowrap pointer-events-none">
+                  {categoryLabels[item.category] || item.category}
+                </span>
               </div>
 
               {/* Fila de botones */}
@@ -649,99 +682,121 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
       {activeNews && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
-            <div className={`relative ${portraitNews[activeNews.id] ? 'h-[264px]' : squareNews[activeNews.id] ? 'aspect-square' : 'h-44'} bg-gray-950 overflow-hidden`}>
-              {portraitNews[activeNews.id] && (
+            {(() => {
+              const portrait = portraitNews[activeNews.id];
+              const square = squareNews[activeNews.id];
+              const singleHorizontal = !portrait && !square;
+              return (
                 <>
-                  <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeNews.imageUrl})` }} />
-                  <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                  <div className={`relative bg-gray-950 overflow-hidden ${singleHorizontal ? 'h-36' : 'h-[264px]'}`}>
+                    {(portrait || square) && (
+                      <>
+                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeNews.imageUrl})` }} />
+                        <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                      </>
+                    )}
+                    <img
+                      src={activeNews.imageUrl}
+                      alt={activeNews.title}
+                      referrerPolicy="no-referrer"
+                      className={`z-10 cursor-pointer ${singleHorizontal ? 'relative w-full h-full object-cover' : 'relative w-full h-full object-contain'}`}
+                      onDoubleClick={() => setFullscreenImg(activeNews.imageUrl)}
+                      onClick={() => setFullscreenImg(activeNews.imageUrl)}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        const ratio = img.naturalWidth / img.naturalHeight;
+                        if (ratio < 0.8) {
+                          setPortraitNews(prev => ({ ...prev, [activeNews.id]: true }));
+                        } else if (ratio >= 0.8 && ratio <= 1.2) {
+                          setSquareNews(prev => ({ ...prev, [activeNews.id]: true }));
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => setActiveNews(null)}
+                      className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-20"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </>
-              )}
-              <img
-                src={activeNews.imageUrl}
-                alt={activeNews.title}
-                referrerPolicy="no-referrer"
-                className={`relative z-10 w-full h-full ${portraitNews[activeNews.id] ? 'object-contain' : 'object-cover'}`}
-                onClick={() => setFullscreenImg(activeNews.imageUrl)}
-                onDoubleClick={() => setFullscreenImg(activeNews.imageUrl)}
-                onLoad={(e) => {
-                  const img = e.currentTarget;
-                  const ratio = img.naturalWidth / img.naturalHeight;
-                  if (ratio < 0.8) {
-                    setPortraitNews(prev => ({ ...prev, [activeNews.id]: true }));
-                  } else if (ratio >= 0.8 && ratio <= 1.2) {
-                    setSquareNews(prev => ({ ...prev, [activeNews.id]: true }));
-                  }
-                }}
-              />
-              <button
-                onClick={() => setActiveNews(null)}
-                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition focus:outline-none"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <div className="absolute bottom-4 left-4">
-                <span className="bg-[#FFD700]/10 text-[#FFD700] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wide border border-[#FFD700]/40">
-                  {categoryLabels[activeNews.category] || activeNews.category}
-                </span>
-              </div>
-            </div>
+              );
+            })()}
 
-            <div className="p-5 space-y-4 pb-16 sm:pb-5">
+            <div className="px-5 pt-1 space-y-1.5 pb-16 sm:pb-5">
               <h4 className="text-white text-xl font-bold tracking-tight">{activeNews.title}</h4>
+
+              {/* Fecha (izquierda) + Quién publicó (derecha) — misma línea */}
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[#FFD700] text-xs">
+                  {formatNewsDate(activeNews.date) || 'Sin fecha'}
+                </p>
+                <p className="text-gray-300 text-xs flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+                  <span className="truncate">{activeNews.publisher || 'Administrador'}</span>
+                </p>
+              </div>
 
               <div>
                 <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Descripción</h5>
-                <p className="text-gray-300 text-xs leading-relaxed">{activeNews.description}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Fecha</h5>
-                  <p className="text-white text-sm font-semibold flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4 text-[#FFD700] shrink-0" />
-                    {activeNews.date || 'Sin fecha'}
+                <div className="relative">
+                  <p
+                    ref={descriptionRef}
+                    className={`text-gray-300 text-xs leading-relaxed ${expandedDesc ? '' : 'line-clamp-[9]'}`}
+                  >
+                    {activeNews.description}
                   </p>
-                </div>
-                <div>
-                  <h5 className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Ubicación</h5>
-                  <p className="text-white text-sm font-semibold flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 text-[#22c55e] shrink-0" />
-                    {activeNews.location || 'Barrio El Trigal'}
-                  </p>
+                  {descOverflow && !expandedDesc && (
+                    <button
+                      onClick={() => setExpandedDesc(true)}
+                      className="block text-rose-400 text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:text-rose-300 transition mt-1"
+                    >
+                      Seguir leyendo
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className="flex space-x-2 pt-2">
+              {/* Hashtags — primera letra mayúscula, resto minúsculas */}
+              <div className="flex items-center justify-between gap-2 pt-1">
+                {getHashtags(activeNews.category).map((tag, i) => {
+                  const clean = tag.replace(/^#/, '');
+                  const normalized = clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+                  return (
+                    <span key={i} className="text-[10px] font-bold tracking-wider">
+                      <span className="text-emerald-400">#</span>
+                      <span className="text-gray-300">{normalized}</span>
+                    </span>
+                  );
+                })}
+              </div>
+
+              <div className="border-t border-white/10 my-3"></div>
+
+              {/* Botones: COMPARTIR, COPIAR, CERRAR — solo icono + texto */}
+              <div className="flex items-center justify-between">
                 <button
-                  onClick={() => setActiveNews(null)}
-                  className="flex-1 bg-black text-gray-300 hover:text-white border border-white/10 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="flex items-center gap-1.5 text-white text-[10px] font-bold tracking-wider uppercase transition cursor-pointer hover:text-gray-300"
                 >
-                  Cerrar
+                  <Share2 className="h-3.5 w-3.5 text-white" />
+                  Compartir
                 </button>
                 <button
-                  onClick={() => {
-                    handleSubscribe(activeNews.id, activeNews.title);
-                  }}
-                  className={`flex-1 py-2.5 rounded-lg text-xs font-extrabold transition cursor-pointer ${
-                    subscribedNews[activeNews.id]
-                      ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20'
-                      : 'bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 border border-[#FFD700]/40'
-                  }`}
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="flex items-center gap-1.5 text-white text-[10px] font-bold tracking-wider uppercase transition cursor-pointer hover:text-gray-300"
                 >
-                  {subscribedNews[activeNews.id] ? 'Suscrito ✓' : 'Notificarme'}
-            </button>
-            <button
-              onClick={() => {
-                const el = document.querySelector<HTMLInputElement>('input[placeholder="Buscar noticias..."]');
-                el?.focus();
-                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }}
-              className="relative inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition cursor-pointer border bg-gray-500/10 text-gray-400 border-gray-500/40 hover:bg-gray-500/20"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Buscar</span>
-            </button>
-          </div>
+                  <Copy className="h-3.5 w-3.5 text-white" />
+                  Copiar
+                </button>
+                <button
+                  onClick={() => setActiveNews(null)}
+                  className="flex items-center gap-1.5 text-white text-[10px] font-bold tracking-wider uppercase transition cursor-pointer hover:text-gray-300"
+                >
+                  <X className="h-3.5 w-3.5 text-white" />
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>
