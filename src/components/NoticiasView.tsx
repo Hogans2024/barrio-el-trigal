@@ -621,45 +621,38 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
               </div>
 
               {/* Fila de botones */}
-              <div className="flex items-center justify-center pt-[10px] pb-[11px] px-3 gap-1.5">
+              <div className="flex items-stretch justify-between pt-[10px] pb-[11px] px-1.5">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setLikes(prev => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }));
                   }}
-                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-red-400 hover:border-red-400/40"
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-red-400 hover:border-red-400/40"
                 >
                   <Heart className={`h-3.5 w-3.5 ${likes[item.id] ? 'fill-red-400 text-red-400' : ''}`} />
                   <span>{likes[item.id] || 0}</span>
                 </button>
+                <div className="flex items-stretch gap-1.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); }}
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    <span>Comentar</span>
+                  </button>
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveNews(item);
+                    }}
+                    className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold transition whitespace-nowrap cursor-pointer shrink min-w-0 bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10"
+                  >
+                    Ver Detalles
+                  </span>
+                </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); }}
-                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveNews(item);
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:text-white shrink min-w-0"
-                >
-                  <Phone className="h-3 w-3" />
-                  <span>Contactar</span>
-                </button>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveNews(item);
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold transition flex items-center justify-center gap-1 whitespace-nowrap bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 cursor-pointer shrink min-w-0"
-                >
-                  Ver Detalles
-                </span>
-                <button
-                  onClick={(e) => { e.stopPropagation(); }}
-                  className="px-2 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer shrink-0 bg-white/5 text-gray-300 border border-white/10 hover:text-sky-400 hover:border-sky-400/40"
                 >
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" overflow="visible" style={{ transform: 'scale(1.25)', transformOrigin: 'center' }}><path d="M12 5l7 7-7 7v-4c-5 0-8 3-9 6 1.5-4.5 4-9 9-10V5z"/></svg>
                 </button>
