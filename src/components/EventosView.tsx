@@ -637,14 +637,29 @@ export default function EventosView({ eventos, onShowNotification, highlightId, 
       {activeEvent && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
-            <div className="relative h-44 bg-gray-950">
+            <div className={`relative ${portraitEvents[activeEvent.id] ? 'h-[264px]' : squareEvents[activeEvent.id] ? 'aspect-square' : 'h-44'} bg-gray-950 overflow-hidden`}>
+              {portraitEvents[activeEvent.id] && (
+                <>
+                  <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeEvent.imageUrl})` }} />
+                  <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                </>
+              )}
               <img
                 src={activeEvent.imageUrl}
                 alt={activeEvent.title}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                className={`relative z-10 w-full h-full ${portraitEvents[activeEvent.id] ? 'object-contain' : 'object-cover'}`}
                 onClick={() => setFullscreenImg(activeEvent.imageUrl)}
                 onDoubleClick={() => setFullscreenImg(activeEvent.imageUrl)}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  const ratio = img.naturalWidth / img.naturalHeight;
+                  if (ratio < 0.8) {
+                    setPortraitEvents(prev => ({ ...prev, [activeEvent.id]: true }));
+                  } else if (ratio >= 0.8 && ratio <= 1.2) {
+                    setSquareEvents(prev => ({ ...prev, [activeEvent.id]: true }));
+                  }
+                }}
               />
               <button
                 onClick={() => setActiveEvent(null)}

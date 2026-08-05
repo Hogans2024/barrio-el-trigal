@@ -649,14 +649,29 @@ export default function NoticiasView({ noticias, onShowNotification, highlightId
       {activeNews && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
-            <div className="relative h-44 bg-gray-950">
+            <div className={`relative ${portraitNews[activeNews.id] ? 'h-[264px]' : squareNews[activeNews.id] ? 'aspect-square' : 'h-44'} bg-gray-950 overflow-hidden`}>
+              {portraitNews[activeNews.id] && (
+                <>
+                  <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeNews.imageUrl})` }} />
+                  <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
+                </>
+              )}
               <img
                 src={activeNews.imageUrl}
                 alt={activeNews.title}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                className={`relative z-10 w-full h-full ${portraitNews[activeNews.id] ? 'object-contain' : 'object-cover'}`}
                 onClick={() => setFullscreenImg(activeNews.imageUrl)}
                 onDoubleClick={() => setFullscreenImg(activeNews.imageUrl)}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  const ratio = img.naturalWidth / img.naturalHeight;
+                  if (ratio < 0.8) {
+                    setPortraitNews(prev => ({ ...prev, [activeNews.id]: true }));
+                  } else if (ratio >= 0.8 && ratio <= 1.2) {
+                    setSquareNews(prev => ({ ...prev, [activeNews.id]: true }));
+                  }
+                }}
               />
               <button
                 onClick={() => setActiveNews(null)}
