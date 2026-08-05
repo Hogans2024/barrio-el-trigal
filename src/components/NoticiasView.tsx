@@ -693,8 +693,8 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
               const portrait = portraitSlides[activeNews.id]?.[0] ?? portraitNews[activeNews.id];
-              const slides = [activeNews.imageUrl, ...(activeNews.images || [])];
-              const hasSlideshow = slides.length > 2;
+              const slides = [activeNews.imageUrl, ...(activeNews.images || [])].slice(0, 5);
+              const hasSlideshow = slides.length > 1;
               slideCountRef.current = slides.length;
               return (
                 <>
