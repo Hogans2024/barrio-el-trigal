@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard, Copy, Share2, User } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Zap, Images, FileText, UserCircle2, IdCard, Copy, Share2, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NeighborhoodEvent } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -37,6 +37,13 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [descOverflow, setDescOverflow] = useState(false);
   const [expandedDesc, setExpandedDesc] = useState(false);
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const autoPlayRef = useRef(true);
+  const slideCountRef = useRef(1);
+  const touchStartX = useRef(0);
+  const [portraitSlides, setPortraitSlides] = useState<Record<string, Record<number, boolean>>>({});
+  const [squareSlides, setSquareSlides] = useState<Record<string, Record<number, boolean>>>({});
 
   useLayoutEffect(() => {
     if (expandedDesc) return;
@@ -57,6 +64,15 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
   useEffect(() => {
     localStorage.setItem('barrio_noticias_likes', JSON.stringify(likes));
   }, [likes]);
+
+  useEffect(() => { setSlideIdx(0); setAutoPlay(true); autoPlayRef.current = true; }, [activeNews]);
+  useEffect(() => {
+    if (!autoPlay) return;
+    const id = setInterval(() => setSlideIdx(prev => {
+      return prev >= slideCountRef.current - 1 ? 0 : prev + 1;
+    }), 4000);
+    return () => clearInterval(id);
+  }, [autoPlay, activeNews]);
 
   useEffect(() => { setZoomScale(1); setZoomPos({ x: 0, y: 0 }); }, [fullscreenImg]);
 
@@ -676,33 +692,88 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center pt-14 pb-14 md:pt-4 md:pb-4 px-4">
           <div className="bg-[#080a0f] border border-white/10 rounded-2xl w-full max-w-md overflow-y-auto max-h-full animate-in fade-in zoom-in duration-200">
             {(() => {
-              const portrait = portraitNews[activeNews.id];
+              const portrait = portraitSlides[activeNews.id]?.[0] ?? portraitNews[activeNews.id];
+              const slides = [activeNews.imageUrl, ...(activeNews.images || [])];
+              const hasSlideshow = slides.length > 2;
+              slideCountRef.current = slides.length;
               return (
                 <>
-                  <div className={`relative bg-gray-950 ${portrait ? 'h-[264px] overflow-hidden' : ''}`}>
-                    {portrait && (
+                  <div className={`relative bg-gray-950 ${!hasSlideshow && portrait ? 'h-[264px] overflow-hidden' : hasSlideshow ? 'h-[264px] overflow-hidden' : ''}`}
+                    onMouseEnter={() => { setAutoPlay(false); autoPlayRef.current = false; }}
+                    onMouseLeave={() => { setAutoPlay(true); autoPlayRef.current = true; }}
+                    onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                    onTouchMove={(e) => { e.preventDefault(); }}
+                    onTouchEnd={(e) => {
+                      const diff = touchStartX.current - e.changedTouches[0].clientX;
+                      if (Math.abs(diff) > 60) {
+                        if (diff > 0) {
+                          setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1);
+                          setAutoPlay(false);
+                        } else {
+                          setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1);
+                          setAutoPlay(false);
+                        }
+                      }
+                    }}
+                  >
+                    {(portraitSlides[activeNews.id]?.[slideIdx] || squareSlides[activeNews.id]?.[slideIdx]) && (
                       <>
-                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${activeNews.imageUrl})` }} />
+                        <div className="absolute inset-0 bg-cover bg-center opacity-60 scale-110" style={{ backgroundImage: `url(${slides[slideIdx]})` }} />
                         <div className="absolute inset-0 bg-white/[0.0075] backdrop-blur-[2px] border border-white/[0.0125] shadow-[inset_0_1px_0_rgba(255,255,255,0.0125)]" />
                       </>
                     )}
                     <img
-                      src={activeNews.imageUrl}
+                      src={slides[slideIdx]}
                       alt={activeNews.title}
                       referrerPolicy="no-referrer"
-                      className={`z-10 cursor-pointer ${portrait ? 'relative w-full h-full object-contain' : 'w-full h-auto'}`}
-                      onDoubleClick={() => setFullscreenImg(activeNews.imageUrl)}
-                      onClick={() => setFullscreenImg(activeNews.imageUrl)}
+                      className={`z-10 cursor-pointer ${
+                        hasSlideshow
+                          ? (portraitSlides[activeNews.id]?.[slideIdx] || squareSlides[activeNews.id]?.[slideIdx])
+                            ? 'relative w-full h-full object-contain'
+                            : 'absolute inset-x-0 top-[calc(50%-24px)] -translate-y-1/2 w-full h-auto'
+                          : portrait
+                            ? 'relative w-full h-full object-contain'
+                            : 'w-full h-auto'
+                      }`}
+                      onDoubleClick={() => setFullscreenImg(slides[slideIdx])}
+                      onClick={() => setFullscreenImg(slides[slideIdx])}
                       onLoad={(e) => {
                         const img = e.currentTarget;
                         const ratio = img.naturalWidth / img.naturalHeight;
                         if (ratio < 0.8) {
-                          setPortraitNews(prev => ({ ...prev, [activeNews.id]: true }));
+                          setPortraitSlides(prev => ({ ...prev, [activeNews.id]: { ...prev[activeNews.id], [slideIdx]: true } }));
                         } else if (ratio >= 0.8 && ratio <= 1.2) {
-                          setSquareNews(prev => ({ ...prev, [activeNews.id]: true }));
+                          setSquareSlides(prev => ({ ...prev, [activeNews.id]: { ...prev[activeNews.id], [slideIdx]: true } }));
                         }
                       }}
                     />
+                    {hasSlideshow && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev <= 0 ? slides.length - 1 : prev - 1); setAutoPlay(false); autoPlayRef.current = false; }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSlideIdx(prev => prev >= slides.length - 1 ? 0 : prev + 1); setAutoPlay(false); autoPlayRef.current = false; }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-10"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 z-20 flex gap-1.5 px-3 py-2 justify-center bg-gradient-to-t from-black/60 to-transparent">
+                          {slides.map((src, j) => (
+                            <button
+                              key={j}
+                              onClick={(e) => { e.stopPropagation(); setSlideIdx(j); setAutoPlay(false); autoPlayRef.current = false; }}
+                              className={`shrink-0 rounded overflow-hidden border-2 cursor-pointer ${j === slideIdx ? 'border-[#FFD700] opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
+                            >
+                              <img src={src} alt="" className="w-10 h-10 object-cover" />
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                     <button
                       onClick={() => setActiveNews(null)}
                       className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition cursor-pointer z-20"

@@ -2973,6 +2973,12 @@ export const NEWS_DATA: NeighborhoodEvent[] = [
     id: 'n20',
     title: 'Tarija acoge el torneo nacional de ajedrez juvenil',
     imageUrl: 'https://picsum.photos/seed/noticia20/600/400',
+    images: [
+      'https://picsum.photos/seed/noticia20a/600/400',
+      'https://picsum.photos/seed/noticia20b/600/400',
+      'https://picsum.photos/seed/noticia20v1/400/600',
+      'https://picsum.photos/seed/noticia20v2/400/600'
+    ],
     category: 'Deportes',
     description: 'Más de 120 jóvenes ajedrecistas de todo el país participan en el Torneo Nacional de Ajedrez Juvenil que se realiza en el Centro de Convenciones de Tarija. El evento promueve el pensamiento estratégico y la sana competencia.',
     icon: 'users',

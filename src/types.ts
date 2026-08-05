@@ -31,6 +31,8 @@ export interface NeighborhoodEvent {
   contact?: string;
   /* CMS_PENDING: autor/editor que publicó la noticia (Administrador, Presidente del Barrio, Vecino, etc.) */
   publisher?: string;
+  /* CMS_PENDING: galería de imágenes extra para la noticia (slideshow cuando hay más de 2). imageUrl es la primera. */
+  images?: string[];
 }
 
 export interface DaySchedule {
