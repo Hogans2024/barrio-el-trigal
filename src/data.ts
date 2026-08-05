@@ -857,7 +857,7 @@ export const EVENTS_DATA: NeighborhoodEvent[] = [
   {
     id: 'e1',
     title: 'Limpieza General del Barrio',
-    imageUrl: 'https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=600&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=1920&h=1080&auto=format&fit=crop&q=80',
     category: 'Medio',
     description: 'Jornada de limpieza en calles, parques y espacios públicos para mantener nuestro barrio limpio y agradable para todos.',
     icon: 'trash'
