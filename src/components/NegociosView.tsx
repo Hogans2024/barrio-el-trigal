@@ -46,6 +46,21 @@ import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 //  Hogar, Electrodomésticos, Mecánica).
 // ═══════════════════════════════════════════════════════════════════════════════
 
+//  FASE 2 PENDIENTE (después de Farmacias):
+//  Actualmente el formulario de esta sección SÍ permite a cualquier vecino
+//  cargar facebook/tiktok/instagram/youtube al registrar un negocio (ver
+//  el objeto `newBiz` más abajo), pero la vista de detalle SOLO renderiza
+//  el botón de Facebook — tiktok, instagram y youtube se guardan pero
+//  nunca se muestran. Cuando se aborde la Fase 2 de este proyecto, agregar
+//  los 3 botones faltantes en el modal de detalle (activeBiz), replicando
+//  el patrón de botones implementado en Farmacias (ver FarmaciasView.tsx).
+//  A diferencia de Farmacias, aquí SÍ deben seguir siendo editables tanto
+//  por el vecino (formulario) como por el administrador (Google Sheets).
+//  Además, LocalBusiness tiene un campo `distanceInfo?: string` que hoy
+//  no se usa en ningún lugar (ni se lee ni se escribe) — evaluar en Fase 2
+//  si se implementa o se elimina, siguiendo el mismo criterio que se usó
+//  para limpiar los campos fantasma de LostPet (Mascotas).
+
 interface NegociosViewProps {
   negocios: LocalBusiness[];
   onShowNotification: (title: string, message: string) => void;

@@ -2,6 +2,19 @@
  * Type declarations for Barrio El Trigal community application.
  */
 
+/**
+ * NOTA CMS (Farmacias): facebook, tiktok, instagram, youtube son opcionales
+ * y de SOLO LECTURA desde la app — no hay formulario en FarmaciasView.tsx
+ * para cargarlos. Su origen exclusivo, a futuro, será una columna por cada
+ * red social en la hoja de Google Sheets, cargada manualmente por el
+ * administrador. El doGet de Apps Script deberá incluir estos 4 campos en
+ * el JSON de salida para que useSheetData los reciba.
+ *
+ * IMPORTANTE: resolver estos 4 campos NO deja lista toda la interfaz.
+ * `transport` y `schedule` siguen sin una fuente de datos definida y son
+ * la razón real por la que `useSheetData.ts` sigue forzando
+ * FALLBACK.farmacias (ver comentario ahí). No revertir esa línea todavía.
+ */
 export interface Pharmacy {
   id: string;
   name: string;
@@ -15,6 +28,9 @@ export interface Pharmacy {
   schedule?: DaySchedule[];
   transport?: TransportInfo;
   facebook?: string;
+  tiktok?: string;
+  instagram?: string;
+  youtube?: string;
   actionText?: string;
 }
 

@@ -668,6 +668,45 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
                       );
                     });
                   })()}
+                  {/*
+                    ═══════════════════════════════════════════════════════════════════════════════
+                    REDES SOCIALES (Facebook / TikTok / Instagram / YouTube)
+                    ───────────────────────────────────────────────────────────────────────────────
+                    Solo lectura. Estos 4 campos únicamente los carga el administrador
+                    directo en Google Sheets (no hay formulario de farmacias en la app).
+                    Cada botón solo aparece si el campo correspondiente tiene valor.
+                    ═══════════════════════════════════════════════════════════════════════════════
+                  */}
+                  {[
+                    { key: 'facebook', label: 'Facebook', icon: 'f', color: '#1877F2' },
+                    { key: 'tiktok', label: 'TikTok', icon: '♪', color: '#000000' },
+                    { key: 'instagram', label: 'Instagram', icon: '◎', color: '#E1306C' },
+                    { key: 'youtube', label: 'YouTube', icon: '▶', color: '#FF0000' },
+                  ].map(({ key, label, icon, color }) => {
+                    const url = activePharmacy[key as 'facebook' | 'tiktok' | 'instagram' | 'youtube'];
+                    if (!url) return null;
+                    return (
+                      <div key={key} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-gray-400">
+                          <span
+                            className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white text-[10px] font-black"
+                            style={{ backgroundColor: color }}
+                          >
+                            {icon}
+                          </span>
+                          <span className="text-white text-xs">{label}</span>
+                        </div>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[66px] text-center inline-block"
+                        >
+                          Ver
+                        </a>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

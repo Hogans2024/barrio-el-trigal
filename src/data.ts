@@ -10,6 +10,11 @@ export const PHARMACIES_DATA: Pharmacy[] = [
     neighborhood: 'Centro',
     description: 'Atenci�n las 24 horas con una amplia variedad de medicamentos y productos de cuidado personal.',
     isOnDuty: true,
+    // NOTA TEMPORAL: valores de prueba para verificar visualmente los botones
+    // de redes sociales en el modal de Farmacias. A futuro estos datos
+    // vendrán exclusivamente de columnas cargadas por el administrador en
+    // Google Sheets. No son datos reales de ninguna farmacia.
+    facebook: 'https://www.facebook.com/groups/343556692482348/',
     transport: {
       micros: [
         { name: 'L�nea A', flagColor: 'Rojo', proximity: 'Pasa por la puerta' },

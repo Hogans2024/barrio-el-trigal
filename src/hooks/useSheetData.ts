@@ -114,9 +114,11 @@ export function useSheetData(): SheetData {
           //  ──────────────────────
           //  El archivo `public/data.json` es servido por el CMS y contiene los datos
           //  actuales provenientes de Google Sheets. Sin embargo, dicho archivo NO incluye
-          //  los campos `transport` (ni `schedule`, `phones`, `facebook`, `actionText`)
-          //  en sus objetos `farmacias`, porque la hoja de cálculo vinculada al endpoint
-          //  de Apps Script aún no ha sido actualizada con estas columnas.
+          //  los campos `transport` y `schedule` en sus objetos `farmacias`, porque la
+          //  hoja de cálculo vinculada al endpoint de Apps Script aún no ha sido
+          //  actualizada con estas columnas. (Los demás campos de Pharmacy — `phones`,
+          //  `facebook`, `tiktok`, `instagram`, `youtube` y `actionText` — ya están
+          //  resueltos en el frontend.)
           //
           //  Como consecuencia directa, al usar `json.farmacias ?? FALLBACK.farmacias`,
           //  el operador `??` (Nullish coalescing) **no** activaba el fallback, ya que
@@ -139,8 +141,11 @@ export function useSheetData(): SheetData {
           //     - `transport.micros`, `transport.taxitrufis`, `transport.trufis`,
           //       `transport.radioTaxis` (cada una como un arreglo de objetos con
           //       `name`, `flagColor`, `proximity`, `detail`).
-          //     - `schedule[]` (arreglo de objetos con `day`, `open`, `hours`).
-          //     - `phones[]`, `facebook`, `actionText` según corresponda.
+          //     - `schedule[]` (arreglo de objetos con `day`, `open`, `hours`) — último
+          //       campo sin resolver junto con `transport`.
+          //     - Para `phones[]`, `facebook`, `tiktok`, `instagram`, `youtube` y
+          //       `actionText` solo faltará agregar las columnas en la hoja; el
+          //       frontend ya los implementa y los consume con `??` y fallback.
           //  2. Modificar el endpoint de Google Apps Script para que devuelva estos
           //     campos en el JSON de respuesta.
           //  3. Revertir esta línea a: `farmacias: json.farmacias ?? FALLBACK.farmacias`.
