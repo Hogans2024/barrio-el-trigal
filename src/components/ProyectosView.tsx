@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Users, HeartHandshake, HelpCircle, Heart, MessageCircle, X, Eye, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, Phone, Building2, Home, Newspaper, Trophy, Briefcase, Bus, Globe, Cpu, Clock, FileText, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Search, MapPin, Heart, MessageCircle, X, LayoutGrid, CheckCircle, PanelLeft, Phone, Building2, Home, Clock, FileText, Zap, Shield, Images, UserCircle2, IdCard } from 'lucide-react';
 import { Project } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -103,18 +103,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
 
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const stickyBarRef = useRef<HTMLDivElement>(null);
-  const [stickyBarHeight, setStickyBarHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(true);
-
-  useLayoutEffect(() => {
-    if (!showFloatingBtns) return;
-    const el = stickyBarRef.current;
-    if (!el) return;
-    setStickyBarHeight(el.offsetHeight);
-    const ro = new ResizeObserver(() => setStickyBarHeight(el.offsetHeight));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [showFloatingBtns]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -159,7 +148,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
   }), [projects, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visibleProjects, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<Project>(filteredProjects);
+  const { visibleItems: visibleProjects, sentinelRef: batchSentinelRef } = useIncrementalBatch<Project>(filteredProjects);
 
   const getStatusIcon = (status: string) => {
     switch(status) {
