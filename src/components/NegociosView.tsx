@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { Search, Calendar, MapPin, Phone, Building2, X, LayoutGrid, CheckCircle, PanelLeft, Pill, PawPrint, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
+import { Search, MapPin, Phone, X, LayoutGrid, CheckCircle, PanelLeft, Store, HelpCircle, Star, Clock, ShoppingCart, PlusCircle, Upload, Home, MessageCircle, Bus, Navigation, ChevronRight, Zap, Images, FileText, UserCircle2, IdCard } from 'lucide-react';
 import { LocalBusiness, TransportLine, TransportInfo } from '../types';
 import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 
@@ -238,7 +238,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
   }), [businesses, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visibleBusinesses, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<LocalBusiness>(filteredBusinesses);
+  const { visibleItems: visibleBusinesses, sentinelRef: batchSentinelRef } = useIncrementalBatch<LocalBusiness>(filteredBusinesses);
 
   const handleRegisterBusiness = (e: React.FormEvent) => {
     e.preventDefault();
