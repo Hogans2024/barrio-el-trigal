@@ -1089,7 +1089,6 @@ export const BUSINESSES_DATA: LocalBusiness[] = [
       { day: 'Sábado', open: true, hours: '6:00 AM - 9:00 PM' },
       { day: 'Domingo', open: true, hours: '6:00 AM - 9:00 PM' }
     ],
-    distanceInfo: 'A 200m de la Plaza Central',
     actionText: 'Pedir Ya',
     transport: {
       micros: [

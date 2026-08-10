@@ -185,7 +185,7 @@ export default function NoticiasView({ noticias, highlightId, onClearHighlight }
   }), [noticias, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visibleNews, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredNews);
+  const { visibleItems: visibleNews, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<NeighborhoodEvent>(filteredNews);
 
   const getSmallIcon = (type: string) => {
     switch(type) {

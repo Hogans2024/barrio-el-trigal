@@ -110,8 +110,8 @@ Este archivo es el puente central entre Sheets y React. Estado actual en producc
 | `proyectos` | id, title, imageUrl, category, description, location, status | 7 | ✅ Sin gap |
 | `eventos` | id, title, imageUrl, category, description, icon | 8 | ⚠ Faltan: `date`, `location` (opcionales) |
 | `noticias` | id, title, imageUrl, category, description, icon, date, location | 8 | ✅ Sin gap (pero hoja no existe en Sheets) |
-| `farmacias` | id, name, imageUrl, address, phone, neighborhood, description, isOnDuty | 13 | ⚠ Faltan: `phones[]`, `schedule[]`, `transport`, `facebook`, `actionText` |
-| `negocios` | id, name, imageUrl, category, description, rating, reviewsCount, isFreeDelivery, actionText | 20+ | ⚠ Faltan: `phone`, `phones[]`, `address`, `openHours`, `schedule[]`, redes sociales, `images[]`, `videoUrl`, `transport`, `distanceInfo` |
+| `farmacias` | id, name, imageUrl, address, phone, neighborhood, description, isOnDuty | 13 | ⚠ Faltan: `phones[]`, `schedule[]`, `transport`, `actionText`. Resueltos en frontend (el CMS solo necesita la columna): `facebook`, `tiktok`, `instagram`, `youtube` |
+| `negocios` | id, name, imageUrl, category, description, rating, reviewsCount, isFreeDelivery, actionText | 20+ | ⚠ Faltan: `phone`, `phones[]`, `address`, `openHours`, `schedule[]`, `images[]`, `videoUrl`, `transport`. Resueltos en frontend (Fase 2 completa): redes sociales (`socialNetworks`, `facebook`, `tiktok`, `instagram`, `youtube`). ~~`distanceInfo`~~ ELIMINADO del tipo (era campo fantasma) |
 | `mascotas` | id, name, type, imageUrl, description, lastSeen, contact, neighborhood, date | 15+ | ⚠ Faltan: `phones[]`, `schedule[]`, `images[]`, `videoUrl`, `address`, `facebook`, `actionText` |
 
 **⚠ Nota crítica sobre Noticias:** La sección `noticias` existe en `data.json` con 15 ítems agregados manualmente. El Apps Script actual NO exporta una hoja Noticias (no existe en `HOJAS_CMS`). Cuando el trigger se active por primera vez, sobrescribirá `data.json` sin noticias. Se resuelve en Fase Backend, no ahora.
@@ -542,6 +542,31 @@ No ejecutas esto ahora. Lo conoces para orientar tus decisiones de frontend.
 **Paso 2 — Noticias:** Crear hoja "Noticias" en Sheets. Añadir `'Noticias'` a `HOJAS_CMS` en Code.gs. Frontend ya está listo.
 
 **Paso 3 — Farmacias:** Añadir columnas extendidas a Sheets. Convención: `transport` como JSON string en celda → `JSON.parse()` en Apps Script. Revertir `useSheetData.ts` a `json.farmacias ?? FALLBACK.farmacias` con merge campo a campo.
+
+> ### ✅ CHECKLIST FASE BACKEND — Farmacias (`transport` y `schedule` siguen sin resolver — razón real del FALLBACK FORZADO)
+>
+> El frontend ya está listo; pendiente del lado CMS. **No revertir la línea forzada de `useSheetData.ts` hasta cumplir TODO esto:**
+>
+> **1. Hoja de Google Sheets "Farmacias" — nuevas columnas:**
+> - [ ] `phones[]` — arreglo de strings (o JSON string, según convención de la hoja).
+> - [ ] `schedule[]` — arreglo de objetos `{ day, open, hours }` (horarios de atención).
+> - [ ] `transport` — JSON string con estructura `TransportInfo` (ver `src/data.ts` mock completo):
+>     `{ micros: [...], taxitrufis: [...], trufis: [...], radioTaxis: [...] }`
+>     cada línea con `{ name, flagColor, proximity, detail }`.
+> - [ ] `actionText` — texto del botón de acción (opcional).
+> - [ ] (Redes sociales) `facebook`, `tiktok`, `instagram`, `youtube` — columnas simples; el frontend ya las lee.
+>
+> **2. Apps Script (`Code.gs`) — exportación:**
+> - [ ] El `doGet` debe incluir los campos extendidos en el objeto `farmacias` del JSON de salida.
+> - [ ] `JSON.parse()` de la columna `transport` ANTES de exportar (ver convención en Paso 3).
+> - [ ] Verificar que todos los registros de la hoja tengan `transport` y `schedule` válidos (no vacíos).
+>
+> **3. Frontend — reconexión (orden explícita del dueño, nunca automática):**
+> - [ ] En `useSheetData.ts` BLOQUE B: revertir `farmacias: FALLBACK.farmacias` → merge campo a campo tipo `json.farmacias.map(f => ({ ...f, transport: f.transport ?? FALLBACK..., schedule: f.schedule ?? [] }))`.
+> - [ ] Prueba manual: sección "Cómo llegar" del modal debe mostrar transporte real, no "No disponible".
+> - [ ] Actualizar el comentario `WORKAROUND` de `useSheetData.ts` y `NOTA CMS (Farmacias)` de `types.ts` cuando se complete.
+>
+> ⚠ **Riesgo documentado:** revertir ANTES de este checklist hace que "Cómo llegar" se rompa para todos los vecinos (bug histórico, ver comentario en `useSheetData.ts`).
 
 **Paso 4 — Negocios y Mascotas:** Migrar submit de localStorage a doPost. Definir si requieren Google Auth. Actualizar hojas Sheets. Revertir `useSheetData.ts`.
 

@@ -406,7 +406,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
   }), [pets, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visiblePets, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredPets);
+  const { visibleItems: visiblePets, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<LostPet>(filteredPets);
 
   const getPhoneNumbers = (pet: LostPet): string[] => {
     return pet.contact ? [pet.contact] : [];
@@ -1590,7 +1590,7 @@ export default function MascotasView({ mascotas, onShowNotification, highlightId
                         return;
                       }
                       const toRead = Array.from(files).slice(0, remaining);
-                      const readers = toRead.map(file => new Promise<string>((resolve) => {
+                      const readers = toRead.map((file: File) => new Promise<string>((resolve) => {
                         const reader = new FileReader();
                         reader.onload = () => resolve(reader.result as string);
                         reader.readAsDataURL(file);

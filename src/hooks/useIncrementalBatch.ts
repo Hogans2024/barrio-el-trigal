@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import type { RefObject } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 //  Hook de carga incremental por lotes (Capa 1 — render)
@@ -35,7 +36,7 @@ interface UseIncrementalBatchResult<T> {
   /** Sub-arreglo de ítems actualmente montados en el DOM. */
   visibleItems: T[];
   /** Ref para el div sentinela — SIEMPRE debe estar montado en el DOM (no condicionar con hasMore). */
-  sentinelRef: React.RefObject<HTMLDivElement | null>;
+  sentinelRef: RefObject<HTMLDivElement | null>;
   /** `true` si quedan ítems por cargar más allá del lote actual. */
   hasMore: boolean;
 }

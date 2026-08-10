@@ -143,7 +143,7 @@ export default function EventosView({ eventos, highlightId, onClearHighlight }: 
   }), [eventos, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visibleEvents, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredEvents);
+  const { visibleItems: visibleEvents, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<NeighborhoodEvent>(filteredEvents);
 
   const getSmallIcon = (type: string) => {
     switch(type) {

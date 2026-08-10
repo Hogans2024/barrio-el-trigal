@@ -82,11 +82,12 @@ export interface EmergencyContact {
 export interface AlarmLog {
   id: string;
   timestamp: string;
-  type: 'panic' | 'suspicious' | 'test' | 'medical';
+  type: 'panic' | 'suspicious' | 'test' | 'medical' | 'cancel';
   user: string;
   status: 'active' | 'resolved';
   resolvedBy?: string;
   resolutionTime?: string;
+  message?: string;
 }
 
 // --- Tipos propios de la sección "Registro de Afiliados" ---

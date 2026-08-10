@@ -46,20 +46,17 @@ import { useIncrementalBatch } from '../hooks/useIncrementalBatch';
 //  Hogar, Electrodomésticos, Mecánica).
 // ═══════════════════════════════════════════════════════════════════════════════
 
-//  FASE 2 PENDIENTE (después de Farmacias):
-//  Actualmente el formulario de esta sección SÍ permite a cualquier vecino
-//  cargar facebook/tiktok/instagram/youtube al registrar un negocio (ver
-//  el objeto `newBiz` más abajo), pero la vista de detalle SOLO renderiza
-//  el botón de Facebook — tiktok, instagram y youtube se guardan pero
-//  nunca se muestran. Cuando se aborde la Fase 2 de este proyecto, agregar
-//  los 3 botones faltantes en el modal de detalle (activeBiz), replicando
-//  el patrón de botones implementado en Farmacias (ver FarmaciasView.tsx).
-//  A diferencia de Farmacias, aquí SÍ deben seguir siendo editables tanto
-//  por el vecino (formulario) como por el administrador (Google Sheets).
-//  Además, LocalBusiness tiene un campo `distanceInfo?: string` que hoy
-//  no se usa en ningún lugar (ni se lee ni se escribe) — evaluar en Fase 2
-//  si se implementa o se elimina, siguiendo el mismo criterio que se usó
-//  para limpiar los campos fantasma de LostPet (Mascotas).
+//  FASE 2 COMPLETADA (redes sociales en el modal de detalle):
+//  El formulario de esta sección permite a cualquier vecino cargar
+//  facebook/tiktok/instagram/youtube al registrar un negocio (ver `newBiz`),
+//  y el modal de detalle (activeBiz) renderiza UN botón por cada red social
+//  con valor, replicando el patrón de Farmacias (FarmaciasView.tsx). A
+//  diferencia de Farmacias, aquí los campos SÍ siguen siendo editables tanto
+//  por el vecino (formulario) como por el administrador (Google Sheets a futuro).
+//  Además: el campo `distanceInfo?: string` de LocalBusiness NO se usa en
+//  ningún lugar (ni se lee ni se renderiza) y fue ELIMINADO en esta fase,
+//  siguiendo el mismo criterio que se usó para limpiar los campos fantasma
+//  de LostPet (Mascotas).
 
 interface NegociosViewProps {
   negocios: LocalBusiness[];
@@ -241,7 +238,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
   }), [businesses, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visibleBusinesses, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredBusinesses);
+  const { visibleItems: visibleBusinesses, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<LocalBusiness>(filteredBusinesses);
 
   const handleRegisterBusiness = (e: React.FormEvent) => {
     e.preventDefault();
@@ -905,17 +902,45 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
                       );
                     });
                   })()}
-                  {activeBiz.facebook && (
-                    <a
-                      href={activeBiz.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition"
-                    >
-                      <span className="text-[10px] font-bold">f</span>
-                      <span className="text-xs">Ver en Facebook</span>
-                    </a>
-                  )}
+                  {/*
+                    ═══════════════════════════════════════════════════════════════════════════════
+                    REDES SOCIALES (Facebook / TikTok / Instagram / YouTube)
+                    ───────────────────────────────────────────────────────────────────────────────
+                    Editables desde el formulario de registro (newBiz → socialNetworks) y, a
+                    futuro, desde Google Sheets por el administrador. Cada botón solo aparece
+                    si el campo correspondiente tiene valor.
+                    ═══════════════════════════════════════════════════════════════════════════════
+                  */}
+                  {[
+                    { key: 'facebook', label: 'Facebook', icon: 'f', color: '#1877F2' },
+                    { key: 'tiktok', label: 'TikTok', icon: '♪', color: '#000000' },
+                    { key: 'instagram', label: 'Instagram', icon: '◎', color: '#E1306C' },
+                    { key: 'youtube', label: 'YouTube', icon: '▶', color: '#FF0000' },
+                  ].map(({ key, label, icon, color }) => {
+                    const url = activeBiz[key as 'facebook' | 'tiktok' | 'instagram' | 'youtube'];
+                    if (!url) return null;
+                    return (
+                      <div key={key} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-gray-400">
+                          <span
+                            className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white text-[10px] font-black"
+                            style={{ backgroundColor: color }}
+                          >
+                            {icon}
+                          </span>
+                          <span className="text-white text-xs">{label}</span>
+                        </div>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-blue-500/10 text-blue-400 border border-blue-500/40 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition cursor-pointer min-w-[66px] text-center inline-block"
+                        >
+                          Ver
+                        </a>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1567,7 +1592,7 @@ export default function NegociosView({ negocios, onShowNotification, highlightId
                         return;
                       }
                       const toRead = Array.from(files).slice(0, remaining);
-                      const readers = toRead.map(file => new Promise<string>((resolve) => {
+                      const readers = toRead.map((file: File) => new Promise<string>((resolve) => {
                         const reader = new FileReader();
                         reader.onload = () => resolve(reader.result as string);
                         reader.readAsDataURL(file);

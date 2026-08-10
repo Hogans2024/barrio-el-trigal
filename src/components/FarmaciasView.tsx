@@ -128,7 +128,7 @@ export default function FarmaciasView({ farmacias, onShowNotification, highlight
   }), [farmacias, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visiblePharmacies, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredPharmacies);
+  const { visibleItems: visiblePharmacies, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<Pharmacy>(filteredPharmacies);
 
   const handleNavigate = (pharmacyName: string, address: string) => {
     onShowNotification(

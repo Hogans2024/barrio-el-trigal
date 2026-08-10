@@ -89,7 +89,6 @@ export interface LocalBusiness {
   reviewsCount?: number;
   openHours?: string;
   schedule?: DaySchedule[];
-  distanceInfo?: string;
   isFreeDelivery?: boolean;
   actionText: string;
   images?: string[];

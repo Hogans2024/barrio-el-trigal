@@ -159,7 +159,7 @@ export default function ProyectosView({ projects, highlightId, onClearHighlight,
   }), [projects, search, selectedCategory]);
 
   // Carga incremental: solo monta `batchSize` tarjetas a la vez (Capa 1 — render)
-  const { visibleItems: visibleProjects, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch(filteredProjects);
+  const { visibleItems: visibleProjects, sentinelRef: batchSentinelRef, hasMore } = useIncrementalBatch<Project>(filteredProjects);
 
   const getStatusIcon = (status: string) => {
     switch(status) {

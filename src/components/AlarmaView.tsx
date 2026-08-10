@@ -82,6 +82,8 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
           id: `log-${Date.now()}`,
           timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
           type: 'cancel' as const,
+          user: 'Sistema',
+          status: 'resolved',
           message: 'Modal cerrado manualmente'
         });
         return true;
