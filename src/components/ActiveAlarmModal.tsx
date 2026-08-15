@@ -292,14 +292,23 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const detenerCapturaVoz = () => {
-    mediaRecorderRef.current?.stop();
+    const recorder = mediaRecorderRef.current;
+    if (!recorder) return;
     mediaRecorderRef.current = null;
-    // CRÍTICO: detener las pistas del stream, o el ícono de micrófono queda
-    // encendido aunque MediaRecorder ya haya parado.
-    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
-    mediaStreamRef.current = null;
-    publicarFinVoz();
-    setVozTransmitiendo(false);
+    // CRÍTICO: publicar 'voz_fin' solo cuando el MediaRecorder haya terminado
+    // de emitir su último chunk ('stop' se dispara DESPUÉS del último
+    // 'dataavailable'). Si se publica aquí de forma síncrona, el chunk final
+    // (asíncrono) puede llegar a Página B DESPUÉS del 'voz_fin', dejando un
+    // estado "huérfano" que rompe la siguiente transmisión.
+    recorder.addEventListener('stop', () => {
+      // CRÍTICO: detener las pistas del stream, o el ícono de micrófono queda
+      // encendido aunque MediaRecorder ya haya parado.
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+      publicarFinVoz();
+      setVozTransmitiendo(false);
+    });
+    recorder.stop();
   };
 
   const handleToggleVoz = () => {
