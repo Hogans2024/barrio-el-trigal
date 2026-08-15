@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
+import { publicarEventoAlarma } from '../lib/ablyClient';
 
 interface ActiveAlarmModalProps {
   isOpen: boolean;
@@ -43,6 +44,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   const [showKeypadForDeactivation, setShowKeypadForDeactivation] = useState(false);
 
   const [dispatchLogs, setDispatchLogs] = useState<string[]>([]);
+
+  // sirenId de la sesión de alarma actual. Se genera al ACTIVAR (Fase 3) y se
+  // reutiliza en el evento de DESACTIVAR para correlacionar ambos en Página B.
+  // useRef (no useState): no provoca re-render y sobrevive sin duplicarse.
+  const sirenIdRef = useRef<string | null>(null);
 
   // Setup modal state on open
   useEffect(() => {
@@ -125,6 +131,16 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   useEffect(() => {
     if (step !== 'flashing' || autoDeactivateCountdown > 0) return;
     stopSiren();
+    // Fase 3 — desactivación automática por tiempo agotado: anunciar a Página B.
+    if (sirenIdRef.current) {
+      publicarEventoAlarma('desactivar_alarma', {
+        tipo: type,
+        activatedBy: activatedByPhone,
+        timestamp: Date.now(),
+        sirenId: sirenIdRef.current,
+      });
+      sirenIdRef.current = null;
+    }
     onClose({
       id: `log-${Date.now()}`,
       timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
@@ -171,9 +187,29 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         setActivatedByPhone(enteredPin);
         setEnteredPin('');
         setStep('flashing');
+        // Fase 3 — anunciar a Página B que la alarma quedó activa.
+        // El sirenId correlaciona este evento con el de desactivación posterior.
+        const nuevoSirenId = crypto.randomUUID();
+        sirenIdRef.current = nuevoSirenId;
+        publicarEventoAlarma('activar_alarma', {
+          tipo: type,
+          activatedBy: enteredPin,
+          timestamp: Date.now(),
+          sirenId: nuevoSirenId,
+        });
       } else {
         stopSiren();
         const durationStr = formatTime(seconds);
+        // Fase 3 — desactivación manual con PIN: anunciar a Página B antes de cerrar.
+        if (sirenIdRef.current) {
+          publicarEventoAlarma('desactivar_alarma', {
+            tipo: type,
+            activatedBy: activatedByPhone,
+            timestamp: Date.now(),
+            sirenId: sirenIdRef.current,
+          });
+          sirenIdRef.current = null;
+        }
         onClose({
           id: `log-${Date.now()}`,
           timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
