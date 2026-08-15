@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone } from 'lucide-react';
+import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone, Mic, MicOff } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
-import { publicarEventoAlarma } from '../lib/ablyClient';
+import { publicarEventoAlarma, publicarChunkVoz, publicarFinVoz } from '../lib/ablyClient';
 
 interface ActiveAlarmModalProps {
   isOpen: boolean;
@@ -29,6 +29,11 @@ const COORDINATORS = [
  */
 const AUTO_DEACTIVATE_SECONDS = 90;
 
+// PIN secreto del modo "Mensaje de voz" (Fase 6). Cambiará en el futuro;
+// por ahora se fija como ejemplo. El botón de voz solo aparece si el
+// usuario teclea exactamente este PIN en el teclado digital.
+const VOZ_PIN = '4555';
+
 export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmModalProps) {
   const [seconds, setSeconds] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
@@ -45,6 +50,26 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
   const [dispatchLogs, setDispatchLogs] = useState<string[]>([]);
 
+  // ---- Fase 6: Mensaje de voz en tiempo real ----
+  // `vozTransmitiendo`: true mientras se está grabando/enviando voz.
+  // `vozPermisoDenegado`: mensaje claro si el usuario denegó el micrófono.
+  const [vozTransmitiendo, setVozTransmitiendo] = useState(false);
+  const [vozError, setVozError] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  // Limpieza de la captura de voz al cerrar/desmontar el modal (no solo al
+  // soltar el botón): corta el stream del micrófono para que el ícono de
+  // "micrófono en uso" del navegador no quede encendido indefinidamente.
+  useEffect(() => {
+    return () => {
+      mediaRecorderRef.current?.stop();
+      mediaRecorderRef.current = null;
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    };
+  }, []);
+
   // sirenId de la sesión de alarma actual. Se genera al ACTIVAR (Fase 3) y se
   // reutiliza en el evento de DESACTIVAR para correlacionar ambos en Página B.
   // useRef (no useState): no provoca re-render y sobrevive sin duplicarse.
@@ -60,6 +85,8 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       setIsMuted(false);
       setShowUnregisteredModal(false);
       setShowKeypadForDeactivation(false);
+      setVozTransmitiendo(false);
+      setVozError(null);
       setDispatchLogs([
         'Iniciando secuencia de validación de identidad...',
         'Esperando ingreso de número de celular de 8 dígitos para activación...',
@@ -226,6 +253,58 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       setAttemptedPhone(enteredPin);
       setShowUnregisteredModal(true);
       setEnteredPin('');
+    }
+  };
+
+  // ---- Fase 6: Captura de voz (walkie-talkie) ----
+  // No todos los navegadores soportan el mismo mimeType; se verifica antes
+  // de instanciar MediaRecorder o lanza excepción en runtime.
+  const iniciarCapturaVoz = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+
+      const mimeTypeCandidatos = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+      const mimeType = mimeTypeCandidatos.find((t) => MediaRecorder.isTypeSupported(t));
+      if (!mimeType) {
+        throw new Error('Ningún formato de audio soportado por este navegador.');
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) publicarChunkVoz(e.data);
+      };
+      // Un Blob cada 250ms — balance entre latencia percibida y overhead.
+      mediaRecorder.start(250);
+      mediaRecorderRef.current = mediaRecorder;
+      setVozTransmitiendo(true);
+      setVozError(null);
+    } catch (err) {
+      // getUserMedia rechaza si el usuario denegó el permiso o el navegador
+      // lo bloqueó previamente. Se muestra un mensaje claro, no se rompe el modal.
+      console.warn('[Voz] Error al iniciar captura:', err);
+      setVozTransmitiendo(false);
+      setVozError('Permiso de micrófono denegado. Habilítelo en el navegador para enviar voz.');
+    }
+  };
+
+  const detenerCapturaVoz = () => {
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current = null;
+    // CRÍTICO: detener las pistas del stream, o el ícono de micrófono queda
+    // encendido aunque MediaRecorder ya haya parado.
+    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+    mediaStreamRef.current = null;
+    publicarFinVoz();
+    setVozTransmitiendo(false);
+  };
+
+  const handleToggleVoz = () => {
+    playTone(880, 100);
+    if (vozTransmitiendo) {
+      detenerCapturaVoz();
+    } else {
+      iniciarCapturaVoz();
     }
   };
 
@@ -537,6 +616,42 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
             </button>
             ) : null}
+
+            {/* Fase 6 — Botón "Mandar Mensaje de Voz" (solo si se tecleó el PIN secreto) */}
+            {step === 'enter_activation_phone' && enteredPin === VOZ_PIN && (
+              <div className="w-[90%] mx-auto mt-3 space-y-2">
+                <button
+                  onClick={handleToggleVoz}
+                  className={`w-full py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer gap-1.5 sm:gap-2 border-2 ${
+                    vozTransmitiendo
+                      ? 'bg-red-500 hover:bg-red-600 text-white border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.25)] ring-4 ring-red-500/30'
+                      : 'bg-[#22c55e]/10 hover:bg-[#22c55e]/20 text-[#22c55e] border-[#22c55e]/50 shadow-[0_0_30px_rgba(34,197,94,0.15)]'
+                  }`}
+                >
+                  {vozTransmitiendo ? (
+                    <>
+                      <MicOff className="w-4 h-4 flex-shrink-0 animate-pulse" />
+                      <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">DESACTIVAR MENSAJE DE VOZ</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="w-4 h-4 flex-shrink-0" />
+                      <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">MANDAR MENSAJE DE VOZ</span>
+                    </>
+                  )}
+                </button>
+                {vozTransmitiendo && (
+                  <p className="text-center text-[#22c55e] text-[10px] uppercase tracking-wider animate-pulse">
+                    Transmitiendo voz en tiempo real...
+                  </p>
+                )}
+                {vozError && (
+                  <p className="text-center text-red-400 text-[10px] uppercase tracking-wider">
+                    {vozError}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Pasos 1,2,3 — pegado al teclado y solo visible en modo de activación */}
             {step === 'enter_activation_phone' && (

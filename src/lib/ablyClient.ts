@@ -65,3 +65,35 @@ export function publicarEventoAlarma(
     console.error('[Ably] Error al publicar evento de alarma:', err);
   });
 }
+
+// ===== Mensaje de voz en tiempo real (Fase 6) =====
+// Eventos de voz publicados en el MISMO canal de la alarma. La publish key
+// actual está restringida por capability al canal `barrio-trigal:alarma`
+// (un canal nuevo `barrio-trigal:voz` daría 40160), y la sección 9.3 del
+// PROMPT_INTEGRACION_ABLY_ALARMA_VOZ.md permite explícitamente esta opción.
+// Los chunks se envían como payload binario nativo (sin base64).
+
+export const VOZ_CHUNK_EVENT = 'voz_chunk';
+export const VOZ_FIN_EVENT = 'voz_fin';
+
+/** Publica un fragmento de audio hacia Página B. Fire-and-forget. */
+export function publicarChunkVoz(blob: Blob): void {
+  const client = getAblyRestClient();
+  if (!client) return;
+  blob.arrayBuffer().then((buffer) => {
+    client.channels
+      .get(ALARMA_CHANNEL_NAME)
+      .publish(VOZ_CHUNK_EVENT, buffer)
+      .catch((err) => console.error('[Ably] Error enviando chunk de voz:', err));
+  });
+}
+
+/** Señal de "dejé de hablar": Página B vacía su cola de reproducción. */
+export function publicarFinVoz(): void {
+  const client = getAblyRestClient();
+  if (!client) return;
+  client.channels
+    .get(ALARMA_CHANNEL_NAME)
+    .publish(VOZ_FIN_EVENT, { timestamp: Date.now() })
+    .catch((err) => console.error('[Ably] Error enviando fin de voz:', err));
+}
