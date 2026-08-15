@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone, Mic, MicOff } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
-import { publicarEventoAlarma, publicarChunkVoz, publicarFinVoz } from '../lib/ablyClient';
+import { publicarEventoAlarma, publicarChunkVoz, publicarFinVoz, publicarInicioVoz } from '../lib/ablyClient';
 
 interface ActiveAlarmModalProps {
   isOpen: boolean;
@@ -271,6 +271,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       }
 
       const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      // Anunciar el formato ANTES del primer chunk: Página B necesita el
+      // mimeType para construir el Blob y reproducir con <audio> nativo.
+      publicarInicioVoz(mimeType);
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) publicarChunkVoz(e.data);
       };

@@ -75,6 +75,19 @@ export function publicarEventoAlarma(
 
 export const VOZ_CHUNK_EVENT = 'voz_chunk';
 export const VOZ_FIN_EVENT = 'voz_fin';
+/** Anuncia el mimeType del audio que se va a transmitir (necesario para que
+ * Página B construya el Blob correcto al reproducir con <audio> nativo). */
+export const VOZ_INICIO_EVENT = 'voz_inicio';
+
+/** Anuncia el formato de audio que se transmitirá a continuación. */
+export function publicarInicioVoz(mimeType: string): void {
+  const client = getAblyRestClient();
+  if (!client) return;
+  client.channels
+    .get(ALARMA_CHANNEL_NAME)
+    .publish(VOZ_INICIO_EVENT, { mimeType, timestamp: Date.now() })
+    .catch((err) => console.error('[Ably] Error enviando inicio de voz:', err));
+}
 
 /** Publica un fragmento de audio hacia Página B. Fire-and-forget. */
 export function publicarChunkVoz(blob: Blob): void {
