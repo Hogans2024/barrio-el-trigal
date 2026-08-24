@@ -191,3 +191,53 @@ function doPostAlarma(e) {
 - [ ] Eliminar `VITE_ABLY_PUBLISH_KEY` del workflow de Página A (y del secret).
 - [ ] Test end-to-end (Página A → Apps Script → Ably → Página B).
 - [ ] Actualizar los informes `paso 7` y este documento con el resultado.
+
+---
+
+## 9. PIN de voz — extensión del plan de backend
+
+**Fecha:** 24/08/2026 · **Estado:** 📄 DOCUMENTADO (NO implementado — pertenece a la misma Fase Backend que este plan)
+
+Hoy el botón "Mandar Mensaje de Voz" (Fase 6) se habilita con un PIN de prueba
+único (`VOZ_PIN = '4555'` en `ActiveAlarmModal.tsx`) validado 100% en el cliente.
+Esta sección extiende el plan de las secciones 2–5 para que la voz use el mismo
+esquema seguro cuando exista backend.
+
+### 9.1 Estructura futura en Google Sheets
+
+Hoja sugerida: reutilizar `Autorizados_Alarma` (sección 8) o crear `Autorizados_Voz`.
+
+| Columna | Tipo | Obligatoria |
+|---|---|---|
+| Nombre | Texto | Sí |
+| Celular | 8 dígitos (texto) | Sí |
+| PIN de voz | 4 dígitos (texto) | **OPCIONAL** |
+
+- Columna vacía en "PIN de voz" → ese vecino **no puede** transmitir voz.
+- Los permisos de voz y de alarma son **independientes** (decisión del dueño):
+  un vecino puede tener PIN de voz sin permiso de alarma y viceversa.
+
+### 9.2 Validación futura en Code.gs (mismo patrón — Variante B, token temporal)
+
+1. Página A envía `{ tokenGoogle, celular, pinVoz, accion: 'token_voz' }`.
+2. Apps Script verifica el JWT (mismo patrón `verificarToken()` de Afiliación),
+   busca la fila por celular y compara el PIN de voz.
+3. Válido → firma `TokenRequest` con TTL corto (~120 s) y capability `publish`
+   solo para los eventos de voz (`voz_inicio`, `voz_chunk`, `voz_fin` en
+   `barrio-trigal:alarma`).
+4. El frontend publica con ese token temporal y `VOZ_PIN = '4555'` desaparece
+   del código.
+
+### 9.3 Requisito: límite de 5 intentos con bloqueo temporal
+
+- Máximo **5 intentos fallidos** de PIN por celular; al superarlos, bloqueo
+  temporal del reintento (ej. 15 minutos).
+- ⚠ **NO implementable hoy**: exige estado server-side (contador por usuario).
+  Una versión client-side se salta trivialmente limpiando storage. Queda como
+  requisito duro de la Fase Backend.
+
+### 9.4 Aclaración permanente
+
+Cualquier PIN que viva en el frontend es **públicamente visible** (bundle de
+GitHub Pages inspeccionable). Hasta que exista este backend, el PIN actual es
+un valor de PRUEBA aceptado, no una medida de seguridad real.
