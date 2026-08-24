@@ -97,14 +97,36 @@ export function publicarInicioVoz(mimeType: string): void {
     .catch((err) => console.error('[Ably] Error enviando inicio de voz:', err));
 }
 
-/** Publica un fragmento de audio hacia Página B. Fire-and-forget. */
-export function publicarChunkVoz(blob: Blob): void {
+/**
+ * Publica un fragmento de audio hacia Página B. Fire-and-forget.
+ *
+ * IMPORTANTE — orden de entrega: cada fragmento se numera con "seq" (asignado
+ * de forma SÍNCRONA por quien llama a esta función, antes de que empiece la
+ * conversión asíncrona de abajo — ver ActiveAlarmModal.tsx). El número viaja
+ * embebido en los primeros 4 bytes del paquete binario (Uint32 big-endian),
+ * seguido de los bytes de audio reales. Página B usa ese número para
+ * reordenar los fragmentos antes de reproducirlos, porque ni la conversión
+ * Blob→ArrayBuffer ni las peticiones HTTP de Ably.Rest garantizan que los
+ * fragmentos lleguen en el mismo orden en que se generaron.
+ *
+ * @param blob El fragmento de audio crudo, tal como lo entrega MediaRecorder.
+ * @param seq  Número de secuencia de este fragmento (0, 1, 2, 3...), asignado
+ *             por el llamador de forma síncrona, antes de esta función.
+ */
+export function publicarChunkVoz(blob: Blob, seq: number): void {
   const client = getAblyRestClient();
   if (!client) return;
   blob.arrayBuffer().then((buffer) => {
+    // Empaquetar: 4 bytes de secuencia (Uint32 big-endian) + los bytes de
+    // audio originales, sin modificar. Página B debe usar EXACTAMENTE este
+    // mismo formato al leer (ver voicePlayer.ts en el repo de Página B).
+    const framed = new Uint8Array(4 + buffer.byteLength);
+    const seqView = new DataView(framed.buffer, 0, 4);
+    seqView.setUint32(0, seq, false); // false = big-endian, OBLIGATORIO
+    framed.set(new Uint8Array(buffer), 4);
     client.channels
       .get(ALARMA_CHANNEL_NAME)
-      .publish(VOZ_CHUNK_EVENT, buffer)
+      .publish(VOZ_CHUNK_EVENT, framed.buffer)
       .catch((err) => console.error('[Ably] Error enviando chunk de voz:', err));
   });
 }

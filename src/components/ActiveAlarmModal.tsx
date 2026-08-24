@@ -80,6 +80,12 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   const [vozError, setVozError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  // Contador de secuencia de los fragmentos de voz de la transmisión ACTUAL.
+  // Se asigna de forma SÍNCRONA en ondataavailable (antes de cualquier
+  // conversión asíncrona) para que el número refleje el orden real de
+  // creación de cada fragmento. Se reinicia a 0 en cada nueva transmisión
+  // (ver iniciarCapturaVoz). useRef, no useState: no debe causar re-render.
+  const vozSeqRef = useRef<number>(0);
 
   // Limpieza de la captura de voz al cerrar/desmontar el modal (no solo al
   // soltar el botón): corta el stream del micrófono para que el ícono de
@@ -293,12 +299,23 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         throw new Error('Ningún formato de audio soportado por este navegador.');
       }
 
+      // Reiniciar el contador de secuencia: cada transmisión nueva empieza en 0.
+      vozSeqRef.current = 0;
       const mediaRecorder = new MediaRecorder(stream, { mimeType });
       // Anunciar el formato ANTES del primer chunk: Página B necesita el
       // mimeType para construir el Blob y reproducir con <audio> nativo.
       publicarInicioVoz(mimeType);
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) publicarChunkVoz(e.data);
+        if (e.data.size > 0) {
+          // Asignación SÍNCRONA del número de secuencia — debe ocurrir aquí,
+          // dentro del propio callback de ondataavailable, ANTES de que
+          // publicarChunkVoz inicie su conversión asíncrona (blob.arrayBuffer()).
+          // Si esto se moviera dentro de una función async, el orden de creación
+          // ya no quedaría garantizado y todo el fix perdería su efecto.
+          const seq = vozSeqRef.current;
+          vozSeqRef.current += 1;
+          publicarChunkVoz(e.data, seq);
+        }
       };
       // Un Blob cada 250ms — balance entre latencia percibida y overhead.
       mediaRecorder.start(250);
