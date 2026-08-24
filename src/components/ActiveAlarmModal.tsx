@@ -29,9 +29,32 @@ const COORDINATORS = [
  */
 const AUTO_DEACTIVATE_SECONDS = 90;
 
-// PIN secreto del modo "Mensaje de voz" (Fase 6). Cambiará en el futuro;
-// por ahora se fija como ejemplo. El botón de voz solo aparece si el
-// usuario teclea exactamente este PIN en el teclado digital.
+// ═══════════════════════════════════════════════════════════════════════
+//  VOZ_PIN = '4555' — VALOR DE PRUEBA TEMPORAL (Fase 6)
+// ═══════════════════════════════════════════════════════════════════════
+//  ⚠ RIESGO CONOCIDO Y ACEPTADO (mismo criterio que COORDINATORS y el
+//    celular autorizado '12345678'):
+//    Este PIN se valida 100% EN EL CLIENTE, por lo que queda VISIBLE en el
+//    bundle público desplegado en GitHub Pages (verificado directamente por
+//    el dueño en el archivo fuente del repo). Cualquier persona puede leerlo
+//    con las herramientas de desarrollador. Se acepta temporalmente porque
+//    la mitigación real exige backend.
+//
+//  🔮 FASE BACKEND (Code.gs + Google Sheets):
+//    Cuando exista el backend, cada vecino tendrá un PIN de voz DISTINTO
+//    (columna opcional "PIN de voz 4 dígitos" en la hoja de autorizados),
+//    validado EN SERVIDOR por Apps Script antes de emitir un token temporal
+//    de publicación (Variante B del PLAN_SEGURIDAD_ABLY_APPS_SCRIPT.md,
+//    sección 9). Este valor fijo desaparecerá del frontend.
+//
+//  DECISIÓN EXPLÍCITA DEL DUEÑO: el botón de voz es INDEPENDIENTE de la
+//    activación de la alarma (no dispara sirena en ninguna página y solo
+//    aparece en step === 'enter_activation_phone', nunca junto a la sirena
+//    activa). Esto NO sigue la sección 9.1 del prompt original de la Fase 6;
+//    fue definido así por el dueño durante el desarrollo (ver informe
+//    "paso 7.5"). El botón aparece si el usuario teclea exactamente este
+//    PIN en el teclado digital.
+// ═══════════════════════════════════════════════════════════════════════
 const VOZ_PIN = '4555';
 
 export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmModalProps) {

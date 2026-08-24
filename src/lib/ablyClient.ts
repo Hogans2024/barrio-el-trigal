@@ -72,6 +72,14 @@ export function publicarEventoAlarma(
 // (un canal nuevo `barrio-trigal:voz` daría 40160), y la sección 9.3 del
 // PROMPT_INTEGRACION_ABLY_ALARMA_VOZ.md permite explícitamente esta opción.
 // Los chunks se envían como payload binario nativo (sin base64).
+//
+// NOTA sobre la puerta de entrada: quién puede transmitir voz se controla
+// hoy con el MISMO PIN de prueba temporal VOZ_PIN = '4555' definido en
+// ActiveAlarmModal.tsx (validación 100% cliente, visible en el bundle
+// público — riesgo conocido y aceptado igual que la key embebida). Cuando
+// exista el backend (Apps Script + Sheets, ver sección 9 del
+// PLAN_SEGURIDAD_ABLY_APPS_SCRIPT.md), este canal quedará protegido por
+// tokens temporales emitidos tras validar el JWT + PIN de voz por vecino.
 
 export const VOZ_CHUNK_EVENT = 'voz_chunk';
 export const VOZ_FIN_EVENT = 'voz_fin';
