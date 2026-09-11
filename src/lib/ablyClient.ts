@@ -66,20 +66,13 @@ export function publicarEventoAlarma(
   });
 }
 
-// ===== Mensaje de voz en tiempo real (Fase 6) =====
-// Eventos de voz publicados en el MISMO canal de la alarma. La publish key
-// actual está restringida por capability al canal `barrio-trigal:alarma`
-// (un canal nuevo `barrio-trigal:voz` daría 40160), y la sección 9.3 del
-// PROMPT_INTEGRACION_ABLY_ALARMA_VOZ.md permite explícitamente esta opción.
+// ===== Mensaje de voz en tiempo real (Autenticación por Token Backend) =====
+// Eventos de voz publicados en el MISMO canal de la alarma (`barrio-trigal:alarma`).
+// A diferencia del canal de alarma (que usa la key embebida para activación local),
+// los eventos de voz (voz_inicio, voz_chunk, voz_fin) están protegidos y requieren
+// un cliente autenticado con un TokenRequest firmado por Google Apps Script con
+// TTL de 10 minutos (ver módulo 4 en Code.gs).
 // Los chunks se envían como payload binario nativo (sin base64).
-//
-// NOTA sobre la puerta de entrada: quién puede transmitir voz se controla
-// hoy con el MISMO PIN de prueba temporal VOZ_PIN = '4555' definido en
-// ActiveAlarmModal.tsx (validación 100% cliente, visible en el bundle
-// público — riesgo conocido y aceptado igual que la key embebida). Cuando
-// exista el backend (Apps Script + Sheets, ver sección 9 del
-// PLAN_SEGURIDAD_ABLY_APPS_SCRIPT.md), este canal quedará protegido por
-// tokens temporales emitidos tras validar el JWT + PIN de voz por vecino.
 
 export const VOZ_CHUNK_EVENT = 'voz_chunk';
 export const VOZ_FIN_EVENT = 'voz_fin';
@@ -87,10 +80,28 @@ export const VOZ_FIN_EVENT = 'voz_fin';
  * Página B construya el Blob correcto al reproducir con <audio> nativo). */
 export const VOZ_INICIO_EVENT = 'voz_inicio';
 
+/**
+ * Instancia y asigna un cliente Ably REST dedicado para la sesión de voz,
+ * autenticado mediante el TokenRequest emitido por el backend.
+ */
+let vozClient: Ably.Rest | null = null;
+
+export function crearClienteAblyParaVoz(tokenRequest: unknown): Ably.Rest {
+  vozClient = new Ably.Rest({ token: tokenRequest as any });
+  return vozClient;
+}
+
+export function setClienteAblyParaVoz(client: Ably.Rest | null): void {
+  vozClient = client;
+}
+
 /** Anuncia el formato de audio que se transmitirá a continuación. */
-export function publicarInicioVoz(mimeType: string): void {
-  const client = getAblyRestClient();
-  if (!client) return;
+export function publicarInicioVoz(mimeType: string, clientOverride?: Ably.Rest | null): void {
+  const client = clientOverride || vozClient;
+  if (!client) {
+    console.warn('[Ably] No hay cliente de voz autenticado con token — no se enviará inicio de voz.');
+    return;
+  }
   client.channels
     .get(ALARMA_CHANNEL_NAME)
     .publish(VOZ_INICIO_EVENT, { mimeType, timestamp: Date.now() })
@@ -112,10 +123,14 @@ export function publicarInicioVoz(mimeType: string): void {
  * @param blob El fragmento de audio crudo, tal como lo entrega MediaRecorder.
  * @param seq  Número de secuencia de este fragmento (0, 1, 2, 3...), asignado
  *             por el llamador de forma síncrona, antes de esta función.
+ * @param clientOverride Cliente opcional con token firmado si no se usa el de módulo.
  */
-export function publicarChunkVoz(blob: Blob, seq: number): void {
-  const client = getAblyRestClient();
-  if (!client) return;
+export function publicarChunkVoz(blob: Blob, seq: number, clientOverride?: Ably.Rest | null): void {
+  const client = clientOverride || vozClient;
+  if (!client) {
+    console.warn('[Ably] No hay cliente de voz autenticado con token — chunk descartado.');
+    return;
+  }
   blob.arrayBuffer().then((buffer) => {
     // Empaquetar: 4 bytes de secuencia (Uint32 big-endian) + los bytes de
     // audio originales, sin modificar. Página B debe usar EXACTAMENTE este
@@ -132,9 +147,12 @@ export function publicarChunkVoz(blob: Blob, seq: number): void {
 }
 
 /** Señal de "dejé de hablar": Página B vacía su cola de reproducción. */
-export function publicarFinVoz(): void {
-  const client = getAblyRestClient();
-  if (!client) return;
+export function publicarFinVoz(clientOverride?: Ably.Rest | null): void {
+  const client = clientOverride || vozClient;
+  if (!client) {
+    console.warn('[Ably] No hay cliente de voz autenticado con token — no se enviará fin de voz.');
+    return;
+  }
   client.channels
     .get(ALARMA_CHANNEL_NAME)
     .publish(VOZ_FIN_EVENT, { timestamp: Date.now() })

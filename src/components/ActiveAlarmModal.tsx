@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ShieldAlert, Volume2, VolumeX, Check, CheckCircle, RefreshCw, X, Shield, Phone, Smartphone, Mic, MicOff, Loader2 } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
-import { publicarChunkVoz, publicarFinVoz, publicarInicioVoz, publicarEventoAlarma } from '../lib/ablyClient';
+import { publicarChunkVoz, publicarFinVoz, publicarInicioVoz, publicarEventoAlarma, crearClienteAblyParaVoz } from '../lib/ablyClient';
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWMU9bKHzy5SQoUP5p5rxSsH2KCx4ujVZ2Beh-M_LyY3UN1pYOFt8xKVHjOxsxz0mG/exec";
 
@@ -31,34 +31,6 @@ const COORDINATORS = [
  */
 const AUTO_DEACTIVATE_SECONDS = 90;
 
-// ═══════════════════════════════════════════════════════════════════════
-//  VOZ_PIN = '4555' — VALOR DE PRUEBA TEMPORAL (Fase 6)
-// ═══════════════════════════════════════════════════════════════════════
-//  ⚠ RIESGO CONOCIDO Y ACEPTADO (mismo criterio que COORDINATORS y el
-//    celular autorizado '12345678'):
-//    Este PIN se valida 100% EN EL CLIENTE, por lo que queda VISIBLE en el
-//    bundle público desplegado en GitHub Pages (verificado directamente por
-//    el dueño en el archivo fuente del repo). Cualquier persona puede leerlo
-//    con las herramientas de desarrollador. Se acepta temporalmente porque
-//    la mitigación real exige backend.
-//
-//  🔮 FASE BACKEND (Code.gs + Google Sheets):
-//    Cuando exista el backend, cada vecino tendrá un PIN de voz DISTINTO
-//    (columna opcional "PIN de voz 4 dígitos" en la hoja de autorizados),
-//    validado EN SERVIDOR por Apps Script antes de emitir un token temporal
-//    de publicación (Variante B del PLAN_SEGURIDAD_ABLY_APPS_SCRIPT.md,
-//    sección 9). Este valor fijo desaparecerá del frontend.
-//
-//  DECISIÓN EXPLÍCITA DEL DUEÑO: el botón de voz es INDEPENDIENTE de la
-//    activación de la alarma (no dispara sirena en ninguna página y solo
-//    aparece en step === 'enter_activation_phone', nunca junto a la sirena
-//    activa). Esto NO sigue la sección 9.1 del prompt original de la Fase 6;
-//    fue definido así por el dueño durante el desarrollo (ver informe
-//    "paso 7.5"). El botón aparece si el usuario teclea exactamente este
-//    PIN en el teclado digital.
-// ═══════════════════════════════════════════════════════════════════════
-const VOZ_PIN = '4555';
-
 export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmModalProps) {
   const [seconds, setSeconds] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
@@ -82,23 +54,20 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
   const [dispatchLogs, setDispatchLogs] = useState<string[]>([]);
 
-  // ---- Fase 6: Mensaje de voz en tiempo real ----
-  // `vozTransmitiendo`: true mientras se está grabando/enviando voz.
-  // `vozPermisoDenegado`: mensaje claro si el usuario denegó el micrófono.
+  // ---- Fase 6: Mensaje de voz en tiempo real con Token Seguro ----
   const [vozTransmitiendo, setVozTransmitiendo] = useState(false);
   const [vozError, setVozError] = useState<string | null>(null);
+  const [modoVoz, setModoVoz] = useState(false);
+  const [celularParaVoz, setCelularParaVoz] = useState('');
+  const [pinVoz, setPinVoz] = useState('');
+  const [isVerifyingVoz, setIsVerifyingVoz] = useState(false);
+  const [tokenVozAutorizado, setTokenVozAutorizado] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   // Contador de secuencia de los fragmentos de voz de la transmisión ACTUAL.
-  // Se asigna de forma SÍNCRONA en ondataavailable (antes de cualquier
-  // conversión asíncrona) para que el número refleje el orden real de
-  // creación de cada fragmento. Se reinicia a 0 en cada nueva transmisión
-  // (ver iniciarCapturaVoz). useRef, no useState: no debe causar re-render.
   const vozSeqRef = useRef<number>(0);
 
-  // Limpieza de la captura de voz al cerrar/desmontar el modal (no solo al
-  // soltar el botón): corta el stream del micrófono para que el ícono de
-  // "micrófono en uso" del navegador no quede encendido indefinidamente.
+  // Limpieza de la captura de voz al cerrar/desmontar el modal
   useEffect(() => {
     return () => {
       mediaRecorderRef.current?.stop();
@@ -108,9 +77,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
     };
   }, []);
 
-  // sirenId de la sesión de alarma actual. Se genera al ACTIVAR (Fase 3) y se
-  // reutiliza en el evento de DESACTIVAR para correlacionar ambos en Página B.
-  // useRef (no useState): no provoca re-render y sobrevive sin duplicarse.
+  // sirenId de la sesión de alarma actual.
   const sirenIdRef = useRef<string | null>(null);
 
   // Setup modal state on open
@@ -125,6 +92,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       setShowKeypadForDeactivation(false);
       setVozTransmitiendo(false);
       setVozError(null);
+      setModoVoz(false);
+      setCelularParaVoz('');
+      setPinVoz('');
+      setIsVerifyingVoz(false);
+      setTokenVozAutorizado(false);
       setIsVerifying(false);
       setActivationSuccess(false);
       if (activationTimerRef.current) {
@@ -264,22 +236,70 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const handleKeyPress = (num: string) => {
-    if (isVerifying || activationSuccess || deactivationSuccess) return;
-    // Actualiza el estado PRIMERO para respuesta visual inmediata,
-    // luego dispara el audio en el siguiente tick para no bloquear el render.
-    if (enteredPin.length < 15) {
-      setEnteredPin((prev) => prev + num);
-      setPinError(false);
-      setShowMissingPinAlert(false);
+    if (isVerifying || activationSuccess || deactivationSuccess || isVerifyingVoz) return;
+    if (modoVoz) {
+      if (tokenVozAutorizado) return;
+      if (pinVoz.length < 4) {
+        setPinVoz((prev) => prev + num);
+        setVozError(null);
+      }
+    } else {
+      if (enteredPin.length < 15) {
+        setEnteredPin((prev) => prev + num);
+        setPinError(false);
+        setShowMissingPinAlert(false);
+      }
     }
     setTimeout(() => playTone(1500, 35, 'square'), 0);
   };
 
   const handleBackspace = () => {
-    if (isVerifying || activationSuccess || deactivationSuccess) return;
-    setEnteredPin((prev) => prev.slice(0, -1));
-    setPinError(false);
+    if (isVerifying || activationSuccess || deactivationSuccess || isVerifyingVoz) return;
+    if (modoVoz) {
+      if (tokenVozAutorizado) return;
+      setPinVoz((prev) => prev.slice(0, -1));
+      setVozError(null);
+    } else {
+      setEnteredPin((prev) => prev.slice(0, -1));
+      setPinError(false);
+    }
     setTimeout(() => playTone(392, 80), 0);
+  };
+
+  const handleSolicitarTokenVoz = async () => {
+    if (isVerifyingVoz || pinVoz.length < 4) return;
+    setIsVerifyingVoz(true);
+    setVozError(null);
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          accion: 'solicitar_token_voz',
+          telefono: celularParaVoz,
+          pin: pinVoz,
+        }),
+      });
+
+      const data = await resp.json();
+
+      if (data && data.exito && data.tokenRequest) {
+        playTone(880, 250);
+        crearClienteAblyParaVoz(data.tokenRequest);
+        setTokenVozAutorizado(true);
+      } else {
+        playTone(220, 400);
+        setVozError(data.mensaje || 'Celular o PIN incorrecto.');
+        setPinVoz('');
+      }
+    } catch (err) {
+      console.error('[Voz] Error al solicitar token a Apps Script:', err);
+      playTone(220, 400);
+      setVozError('Error de conexión con el servidor. Intente nuevamente.');
+    } finally {
+      setIsVerifyingVoz(false);
+    }
   };
 
   const handleVerifyPhone = async () => {
@@ -685,22 +705,62 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
             <div className="mb-1 sm:mb-2">
               {step === 'enter_activation_phone' ? (
-                <div>
-                  <div className="hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5 mb-2">
-                    <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
+                modoVoz ? (
+                  <div>
+                    <div className="flex items-center justify-between bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-1 mb-2">
+                      <span className="text-[11px] text-[#FFD700] font-mono font-bold truncate">
+                        📞 Celular: {celularParaVoz}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setModoVoz(false);
+                          setVozError(null);
+                          setPinVoz('');
+                          playTone(400, 80);
+                        }}
+                        className="text-[10px] text-gray-400 hover:text-white uppercase font-mono ml-2 underline cursor-pointer"
+                      >
+                        Volver a Alarma
+                      </button>
+                    </div>
+                    <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0 text-center">
+                      {tokenVozAutorizado ? (
+                        <span className="text-[#22c55e] uppercase text-xs font-extrabold animate-pulse">
+                          ¡CANAL DE VOZ AUTORIZADO (10 MIN)!
+                        </span>
+                      ) : isVerifyingVoz ? (
+                        <span className="text-[#FFD700] uppercase text-xs font-extrabold animate-pulse">
+                          VERIFICANDO PIN EN BASE DE DATOS...
+                        </span>
+                      ) : pinVoz.length >= 4 ? (
+                        <span className="animate-typing text-white uppercase text-xs font-bold">
+                          AHORA PRESIONE AUTORIZAR MENSAJE DE VOZ
+                        </span>
+                      ) : (
+                        <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em]">
+                          DIGITE SU PIN DE VOZ (4 DÍGITOS)
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0">
-                    {activationSuccess ? (
-                      <span className="text-[#22c55e] uppercase text-xs font-extrabold animate-pulse">¡NÚMERO AUTORIZADO EN PADRÓN!</span>
-                    ) : enteredPin.length >= 8 ? (
-                      <span className="animate-typing text-white uppercase text-xs font-bold">AHORA PRESIONE ACTIVAR ALARMA</span>
-                    ) : enteredPin.length < 1 && !showMissingPinAlert ? (
-                      <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em] max-[319px]:block max-[319px]:w-full max-[319px]:tracking-[0.02em] max-[319px]:[text-align-last:justify]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
-                    ) : (
-                      <span className="whitespace-nowrap uppercase text-white text-[11.5px] tracking-[0.05em]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
-                    )}
+                ) : (
+                  <div>
+                    <div className="hidden sm:inline-block bg-[#FFD700]/10 border border-[#FFD700]/20 rounded px-2.5 py-0.5 mb-2">
+                      <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
+                    </div>
+                    <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0">
+                      {activationSuccess ? (
+                        <span className="text-[#22c55e] uppercase text-xs font-extrabold animate-pulse">¡NÚMERO AUTORIZADO EN PADRÓN!</span>
+                      ) : enteredPin.length >= 8 ? (
+                        <span className="animate-typing text-white uppercase text-xs font-bold">AHORA PRESIONE ACTIVAR ALARMA</span>
+                      ) : enteredPin.length < 1 && !showMissingPinAlert ? (
+                        <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em] max-[319px]:block max-[319px]:w-full max-[319px]:tracking-[0.02em] max-[319px]:[text-align-last:justify]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                      ) : (
+                        <span className="whitespace-nowrap uppercase text-white text-[11.5px] tracking-[0.05em]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )
               ) : showKeypadForDeactivation ? (
                 <div>
                   <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0">
@@ -740,16 +800,21 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               )}
               {/* Display de dígitos: alineado a la izquierda del teclado, cursor parpadeante */}
               <div className="alarm-keypad-display flex justify-start items-center mb-3 min-h-[2rem] max-w-[220px] mx-auto w-full px-1">
-                <span className={`font-mono font-bold text-[22px] sm:text-2xl tracking-[0.2em] ${pinError ? 'text-red-400' : 'text-white'}`}>
-                  {enteredPin}
+                <span className={`font-mono font-bold text-[22px] sm:text-2xl tracking-[0.2em] ${pinError || vozError ? 'text-red-400' : 'text-white'}`}>
+                  {modoVoz ? pinVoz : enteredPin}
                 </span>
-                {enteredPin.length < 12 && (
+                {(modoVoz ? pinVoz.length < 4 : enteredPin.length < 12) && (
                   <span className="font-mono font-bold text-[22px] sm:text-2xl text-[#FFD700] animate-pulse ml-0.5">|</span>
                 )}
               </div>
-              {pinError && (
+              {pinError && !modoVoz && (
                 <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
                   Número no válido. Intente nuevamente.
+                </p>
+              )}
+              {vozError && modoVoz && (
+                <p className="text-center text-red-400 text-xs mb-2 font-medium animate-pulse">
+                  {vozError}
                 </p>
               )}
 
@@ -769,7 +834,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 <button
                   onPointerDown={(e) => {
                     e.preventDefault();
-                    setEnteredPin('');
+                    if (modoVoz) {
+                      if (!tokenVozAutorizado) setPinVoz('');
+                    } else {
+                      setEnteredPin('');
+                    }
                     setTimeout(() => playTone(300, 100), 0);
                   }}
                   className="h-10 max-sm:tall:h-12 sm:h-10 rounded-xl bg-gradient-to-b from-white/[0.09] to-white/[0.03] hover:from-red-500/20 hover:to-red-500/5 active:from-red-500/30 active:to-red-500/10 border border-white/10 hover:border-red-500/30 text-gray-300 hover:text-red-400 transition-all active:scale-90 text-[10px] tall:text-[11px] sm:text-[11px] font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer select-none"
@@ -793,107 +862,168 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               </div>
             </div>
 
-            {/* Main Action Button - hidden when overlay with green button is active */}
-            {step !== 'flashing' || showKeypadForDeactivation ? (
-            <button
-              disabled={isVerifying || activationSuccess || deactivationSuccess}
-              onClick={() => {
-                if (isVerifying || activationSuccess || deactivationSuccess) return;
-                if (enteredPin.length < 8) {
-                  setShowMissingPinAlert(true);
-                  return;
-                }
-                handleVerifyPhone();
-              }}
-              className={`w-[90%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative ${
-                activationSuccess || deactivationSuccess
-                  ? 'bg-[#22c55e] text-white border-2 border-[#22c55e] shadow-[0_0_35px_rgba(34,197,94,0.4)] animate-pulse'
-                  : isVerifying
-                  ? 'bg-yellow-500/20 text-[#FFD700] border-2 border-[#FFD700]/50 cursor-wait'
-                  : step === 'enter_activation_phone'
-                  ? enteredPin.length >= 8
-                    ? 'bg-black/40 hover:bg-black/70 text-[#FFD700] font-extrabold border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)]'
-                    : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
-                  : enteredPin.length >= 8
-                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30'
-                    : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
-              }`}
-            >
-              {activationSuccess ? (
-                <div className="flex w-full items-center justify-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
-                  <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-white uppercase">
-                    ALARMA ACTIVADA CON ÉXITO
-                  </span>
-                </div>
-              ) : deactivationSuccess ? (
-                <div className="flex w-full items-center justify-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
-                  <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-white uppercase">
-                    ALARMA DESACTIVADA CON ÉXITO
-                  </span>
-                </div>
-              ) : isVerifying ? (
-                <div className="flex w-full items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-[#FFD700] flex-shrink-0" />
-                  <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-[#FFD700]">
-                    VERIFICANDO EN BASE DE DATOS...
-                  </span>
-                </div>
-              ) : step === 'enter_activation_phone' ? (
-                showMissingPinAlert ? (
-                  <div className="flex w-full items-center justify-center">
-                    <span className="text-[#FFD700] text-xs font-extrabold animate-pulse text-center">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
-                  </div>
-                ) : (
-                  <div className="flex w-full items-center justify-center gap-1.5 sm:gap-2">
-                    <span className="text-base sm:text-lg flex-shrink-0">🚨</span>
-                    <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">ACTIVAR ALARMA VECINAL</span>
-                  </div>
-                )
-              ) : (
-                <div className="flex w-full items-center justify-center gap-2">
-                  <Check className="w-4 h-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap text-center">DESACTIVAR ALARMA VECINAL 🔴</span>
-                </div>
-              )}
-            </button>
-            ) : null}
-
-            {/* Fase 6 — Botón "Mandar Mensaje de Voz" (solo si se tecleó el PIN secreto) */}
-            {step === 'enter_activation_phone' && enteredPin === VOZ_PIN && (
+            {/* BOTONES DE ACCIÓN: MODO VOZ vs MODO ALARMA */}
+            {modoVoz ? (
               <div className="w-[90%] mx-auto mt-3 space-y-2">
+                {!tokenVozAutorizado ? (
+                  <button
+                    disabled={isVerifyingVoz || pinVoz.length < 4}
+                    onClick={handleSolicitarTokenVoz}
+                    className={`w-full py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative ${
+                      isVerifyingVoz
+                        ? 'bg-yellow-500/20 text-[#FFD700] border-2 border-[#FFD700]/50 cursor-wait'
+                        : pinVoz.length >= 4
+                        ? 'bg-black/40 hover:bg-black/70 text-[#FFD700] font-extrabold border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)]'
+                        : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
+                    }`}
+                  >
+                    {isVerifyingVoz ? (
+                      <div className="flex w-full items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#FFD700] flex-shrink-0" />
+                        <span className="whitespace-nowrap tracking-wide text-xs sm:text-sm font-extrabold text-[#FFD700]">
+                          VALIDANDO PIN EN BASE DE DATOS...
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex w-full items-center justify-center gap-2">
+                        <Mic className="w-4 h-4 text-[#FFD700] flex-shrink-0" />
+                        <span className="whitespace-nowrap tracking-wide text-xs sm:text-sm font-extrabold text-[#FFD700]">
+                          AUTORIZAR MENSAJE DE VOZ
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    <button
+                      onClick={handleToggleVoz}
+                      className={`w-full py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer gap-1.5 sm:gap-2 border-2 ${
+                        vozTransmitiendo
+                          ? 'bg-red-500 hover:bg-red-600 text-white border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.25)] ring-4 ring-red-500/30'
+                          : 'bg-[#22c55e]/10 hover:bg-[#22c55e]/20 text-[#22c55e] border-[#22c55e]/50 shadow-[0_0_30px_rgba(34,197,94,0.15)]'
+                      }`}
+                    >
+                      {vozTransmitiendo ? (
+                        <>
+                          <MicOff className="w-4 h-4 flex-shrink-0 animate-pulse" />
+                          <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">DESACTIVAR MENSAJE DE VOZ</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mic className="w-4 h-4 flex-shrink-0" />
+                          <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">MANDAR MENSAJE DE VOZ</span>
+                        </>
+                      )}
+                    </button>
+                    {vozTransmitiendo && (
+                      <p className="text-center text-[#22c55e] text-[10px] uppercase tracking-wider animate-pulse">
+                        Transmitiendo voz en tiempo real...
+                      </p>
+                    )}
+                  </div>
+                )}
                 <button
-                  onClick={handleToggleVoz}
-                  className={`w-full py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer gap-1.5 sm:gap-2 border-2 ${
-                    vozTransmitiendo
-                      ? 'bg-red-500 hover:bg-red-600 text-white border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.25)] ring-4 ring-red-500/30'
-                      : 'bg-[#22c55e]/10 hover:bg-[#22c55e]/20 text-[#22c55e] border-[#22c55e]/50 shadow-[0_0_30px_rgba(34,197,94,0.15)]'
-                  }`}
+                  onClick={() => {
+                    setModoVoz(false);
+                    setVozError(null);
+                    setPinVoz('');
+                    playTone(400, 80);
+                  }}
+                  className="w-full py-1.5 text-center text-xs text-gray-400 hover:text-white uppercase font-mono tracking-wider transition-colors cursor-pointer"
                 >
-                  {vozTransmitiendo ? (
-                    <>
-                      <MicOff className="w-4 h-4 flex-shrink-0 animate-pulse" />
-                      <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">DESACTIVAR MENSAJE DE VOZ</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="w-4 h-4 flex-shrink-0" />
-                      <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">MANDAR MENSAJE DE VOZ</span>
-                    </>
-                  )}
+                  ← Volver al teclado de alarma
                 </button>
-                {vozTransmitiendo && (
-                  <p className="text-center text-[#22c55e] text-[10px] uppercase tracking-wider animate-pulse">
-                    Transmitiendo voz en tiempo real...
-                  </p>
-                )}
-                {vozError && (
-                  <p className="text-center text-red-400 text-[10px] uppercase tracking-wider">
-                    {vozError}
-                  </p>
-                )}
               </div>
+            ) : (
+              (step !== 'flashing' || showKeypadForDeactivation) ? (
+                <>
+                  <button
+                    disabled={isVerifying || activationSuccess || deactivationSuccess}
+                    onClick={() => {
+                      if (isVerifying || activationSuccess || deactivationSuccess) return;
+                      if (enteredPin.length < 8) {
+                        setShowMissingPinAlert(true);
+                        return;
+                      }
+                      handleVerifyPhone();
+                    }}
+                    className={`w-[90%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative ${
+                      activationSuccess || deactivationSuccess
+                        ? 'bg-[#22c55e] text-white border-2 border-[#22c55e] shadow-[0_0_35px_rgba(34,197,94,0.4)] animate-pulse'
+                        : isVerifying
+                        ? 'bg-yellow-500/20 text-[#FFD700] border-2 border-[#FFD700]/50 cursor-wait'
+                        : step === 'enter_activation_phone'
+                        ? enteredPin.length >= 8
+                          ? 'bg-black/40 hover:bg-black/70 text-[#FFD700] font-extrabold border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)]'
+                          : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
+                        : enteredPin.length >= 8
+                          ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20 hover:shadow-red-500/30 font-extrabold ring-4 ring-red-500/30'
+                          : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
+                    }`}
+                  >
+                    {activationSuccess ? (
+                      <div className="flex w-full items-center justify-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
+                        <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-white uppercase">
+                          ALARMA ACTIVADA CON ÉXITO
+                        </span>
+                      </div>
+                    ) : deactivationSuccess ? (
+                      <div className="flex w-full items-center justify-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
+                        <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-white uppercase">
+                          ALARMA DESACTIVADA CON ÉXITO
+                        </span>
+                      </div>
+                    ) : isVerifying ? (
+                      <div className="flex w-full items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#FFD700] flex-shrink-0" />
+                        <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-[#FFD700]">
+                          VERIFICANDO EN BASE DE DATOS...
+                        </span>
+                      </div>
+                    ) : step === 'enter_activation_phone' ? (
+                      showMissingPinAlert ? (
+                        <div className="flex w-full items-center justify-center">
+                          <span className="text-[#FFD700] text-xs font-extrabold animate-pulse text-center">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                        </div>
+                      ) : (
+                        <div className="flex w-full items-center justify-center gap-1.5 sm:gap-2">
+                          <span className="text-base sm:text-lg flex-shrink-0">🚨</span>
+                          <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center pr-1">ACTIVAR ALARMA VECINAL</span>
+                        </div>
+                      )
+                    ) : (
+                      <div className="flex w-full items-center justify-center gap-2">
+                        <Check className="w-4 h-4 flex-shrink-0" />
+                        <span className="whitespace-nowrap text-center">DESACTIVAR ALARMA VECINAL 🔴</span>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Acceso a Mensaje de Voz para vecinos autorizados */}
+                  {step === 'enter_activation_phone' && (
+                    <button
+                      onClick={() => {
+                        if (enteredPin.length < 8) {
+                          setShowMissingPinAlert(true);
+                          playTone(300, 100);
+                          return;
+                        }
+                        setCelularParaVoz(enteredPin);
+                        setPinVoz('');
+                        setVozError(null);
+                        setModoVoz(true);
+                        playTone(600, 100);
+                      }}
+                      className="w-[90%] mx-auto mt-2 py-2 px-2 rounded-xl font-bold font-sans text-xs transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer gap-2 bg-[#FFD700]/10 hover:bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30 shadow-sm"
+                    >
+                      <Mic className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="tracking-wide uppercase font-extrabold">Mandar Mensaje de Voz (Autorizados)</span>
+                    </button>
+                  )}
+                </>
+              ) : null
             )}
 
             {/* Pasos 1,2,3 — pegado al teclado y solo visible en modo de activación */}
