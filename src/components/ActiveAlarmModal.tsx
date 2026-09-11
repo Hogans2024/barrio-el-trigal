@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldAlert, Volume2, VolumeX, Check, RefreshCw, X, Shield, Phone, Smartphone, Mic, MicOff } from 'lucide-react';
+import { ShieldAlert, Volume2, VolumeX, Check, CheckCircle, RefreshCw, X, Shield, Phone, Smartphone, Mic, MicOff, Loader2 } from 'lucide-react';
 import { stopSiren, startSiren, playTone } from './AudioSiren';
 import { AlarmLog } from '../types.alarma';
-import { publicarEventoAlarma, publicarChunkVoz, publicarFinVoz, publicarInicioVoz } from '../lib/ablyClient';
+import { publicarChunkVoz, publicarFinVoz, publicarInicioVoz, publicarEventoAlarma } from '../lib/ablyClient';
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWMU9bKHzy5SQoUP5p5rxSsH2KCx4ujVZ2Beh-M_LyY3UN1pYOFt8xKVHjOxsxz0mG/exec";
 
 interface ActiveAlarmModalProps {
   isOpen: boolean;
@@ -68,7 +70,14 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   const [showUnregisteredModal, setShowUnregisteredModal] = useState(false);
   const [attemptedPhone, setAttemptedPhone] = useState('');
 
-  const autoDeactivateCountdown = Math.max(0, AUTO_DEACTIVATE_SECONDS - seconds);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [activationSuccess, setActivationSuccess] = useState(false);
+  const activationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [deactivationSuccess, setDeactivationSuccess] = useState(false);
+  const deactivationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [serverDuration, setServerDuration] = useState(AUTO_DEACTIVATE_SECONDS);
+
+  const autoDeactivateCountdown = Math.max(0, serverDuration - seconds);
   const [showKeypadForDeactivation, setShowKeypadForDeactivation] = useState(false);
 
   const [dispatchLogs, setDispatchLogs] = useState<string[]>([]);
@@ -116,6 +125,17 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
       setShowKeypadForDeactivation(false);
       setVozTransmitiendo(false);
       setVozError(null);
+      setIsVerifying(false);
+      setActivationSuccess(false);
+      if (activationTimerRef.current) {
+        clearTimeout(activationTimerRef.current);
+        activationTimerRef.current = null;
+      }
+      setDeactivationSuccess(false);
+      if (deactivationTimerRef.current) {
+        clearTimeout(deactivationTimerRef.current);
+        deactivationTimerRef.current = null;
+      }
       setDispatchLogs([
         'Iniciando secuencia de validación de identidad...',
         'Esperando ingreso de número de celular de 8 dígitos para activación...',
@@ -123,6 +143,14 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
     }
     return () => {
       stopSiren();
+      if (activationTimerRef.current) {
+        clearTimeout(activationTimerRef.current);
+        activationTimerRef.current = null;
+      }
+      if (deactivationTimerRef.current) {
+        clearTimeout(deactivationTimerRef.current);
+        deactivationTimerRef.current = null;
+      }
     };
   }, [isOpen]);
 
@@ -183,25 +211,43 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
     }
   }, [seconds, step]);
 
-  // Auto-deactivate when countdown reaches 0
+  // Auto-deactivate when countdown reaches 0: apaga Página A y apaga de inmediato Página B
   useEffect(() => {
     if (step !== 'flashing' || autoDeactivateCountdown > 0) return;
+    const currentSirenId = sirenIdRef.current;
+    const validPhone = activatedByPhone;
+
+    // 1. Apagar sirena local en Página A
     stopSiren();
-    // Fase 3 — desactivación automática por tiempo agotado: anunciar a Página B.
-    if (sirenIdRef.current) {
+
+    // 2. Apagar de inmediato Página B en Ably con la duración exacta configurada
+    if (currentSirenId) {
       publicarEventoAlarma('desactivar_alarma', {
         tipo: type,
-        activatedBy: activatedByPhone,
+        activatedBy: validPhone,
         timestamp: Date.now(),
-        sirenId: sirenIdRef.current,
+        sirenId: currentSirenId,
       });
-      sirenIdRef.current = null;
+
+      // 3. Notificar a Apps Script para limpiar el trigger pendiente en el servidor
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          accion: 'desactivar_alarma_manual',
+          telefono: validPhone,
+          tipo: type,
+          sirenId: currentSirenId,
+        }),
+      }).catch((err) => console.error('[Alarma] Error al cancelar temporizador en auto-desactivación:', err));
     }
+
+    sirenIdRef.current = null;
     onClose({
       id: `log-${Date.now()}`,
       timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
       type: type,
-      user: `Celular Autorizado (${activatedByPhone})`,
+      user: `Celular Autorizado (${validPhone})`,
       status: 'resolved',
       resolvedBy: 'Auto-desactivacion',
       resolutionTime: formatTime(seconds),
@@ -218,6 +264,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const handleKeyPress = (num: string) => {
+    if (isVerifying || activationSuccess || deactivationSuccess) return;
     // Actualiza el estado PRIMERO para respuesta visual inmediata,
     // luego dispara el audio en el siguiente tick para no bloquear el render.
     if (enteredPin.length < 15) {
@@ -229,59 +276,162 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
   };
 
   const handleBackspace = () => {
+    if (isVerifying || activationSuccess || deactivationSuccess) return;
     setEnteredPin((prev) => prev.slice(0, -1));
     setPinError(false);
     setTimeout(() => playTone(392, 80), 0);
   };
 
-  const handleVerifyPhone = () => {
-    // Permite activar con el celular por defecto '12345678' o cualquier celular de los coordinadores
-    const isAuthorized = enteredPin === '12345678' || COORDINATORS.some(c => c.phone === enteredPin);
-    if (isAuthorized) {
-      playTone(880, 250);
+  const handleVerifyPhone = async () => {
+    if (isVerifying) return;
+    setIsVerifying(true);
+
+    try {
       if (step === 'enter_activation_phone') {
-        setActivatedByPhone(enteredPin);
-        setEnteredPin('');
-        setStep('flashing');
-        // Fase 3 — anunciar a Página B que la alarma quedó activa.
-        // El sirenId correlaciona este evento con el de desactivación posterior.
-        const nuevoSirenId = crypto.randomUUID();
-        sirenIdRef.current = nuevoSirenId;
-        publicarEventoAlarma('activar_alarma', {
-          tipo: type,
-          activatedBy: enteredPin,
-          timestamp: Date.now(),
-          sirenId: nuevoSirenId,
+        // Paso 1: Validar únicamente el contacto en Google Sheets (Apps Script).
+        // NO dispara Ably todavía; Página B permanece en silencio total.
+        const resp = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            accion: 'validar_contacto',
+            telefono: enteredPin,
+          }),
         });
-      } else {
-        stopSiren();
-        const durationStr = formatTime(seconds);
-        // Fase 3 — desactivación manual con PIN: anunciar a Página B antes de cerrar.
-        if (sirenIdRef.current) {
-          publicarEventoAlarma('desactivar_alarma', {
-            tipo: type,
-            activatedBy: activatedByPhone,
-            timestamp: Date.now(),
-            sirenId: sirenIdRef.current,
-          });
-          sirenIdRef.current = null;
+
+        const data = await resp.json();
+
+        if (data && data.exito) {
+          playTone(880, 250);
+          if (data.duracion && Number(data.duracion) > 0) {
+            setServerDuration(Number(data.duracion));
+          }
+          const validPhone = enteredPin;
+          setActivatedByPhone(validPhone);
+          if (data.nombreVecino) {
+            setDispatchLogs((prev) => [
+              ...prev,
+              `Vecino validado en base de datos: ${data.nombreVecino} (${validPhone})`,
+              `Tiempo de activación programado por servidor: ${data.duracion || AUTO_DEACTIVATE_SECONDS} segundos.`,
+            ]);
+          }
+
+          // Notificación visual inmediata en el botón: ALARMA ACTIVADA CON ÉXITO
+          // Página B todavía NO suena; el vecino lee la confirmación con total claridad.
+          setIsVerifying(false);
+          setActivationSuccess(true);
+
+          // Pausa de 2.9 segundos para que el usuario visualice la confirmación.
+          // RECIÉN cuando termina este tiempo, se activa la alarma en Página B y Página A.
+          activationTimerRef.current = setTimeout(() => {
+            const nuevoSirenId = crypto.randomUUID();
+            sirenIdRef.current = nuevoSirenId;
+
+            // 1. Activar sonido en Página B vía Ably de forma inmediata
+            publicarEventoAlarma('activar_alarma', {
+              tipo: type,
+              activatedBy: validPhone,
+              timestamp: Date.now(),
+              sirenId: nuevoSirenId,
+            });
+
+            // 2. Programar apagado automático en el servidor (Apps Script)
+            fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({
+                accion: 'activar_alarma',
+                telefono: validPhone,
+                tipo: type,
+                sirenId: nuevoSirenId,
+              }),
+            }).catch((err) => console.error('[Alarma] Error al programar apagado en servidor:', err));
+
+            // 3. Activar sirena local en Página A y pasar a pantalla activa
+            setActivationSuccess(false);
+            setEnteredPin('');
+            setStep('flashing');
+          }, 2900);
+
+          return;
+        } else {
+          // No autorizado o número no registrado
+          playTone(220, 400); // Error buzz
+          setAttemptedPhone(enteredPin);
+          setShowUnregisteredModal(true);
+          setEnteredPin('');
         }
-        onClose({
-          id: `log-${Date.now()}`,
-          timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-          type: type,
-          user: `Celular Autorizado (${activatedByPhone})`,
-          status: 'resolved',
-          resolvedBy: `Vecino (${enteredPin})`,
-          resolutionTime: durationStr,
+      } else {
+        // Desactivación manual — Paso 1: Solo validar el número en Sheets,
+        // SIN publicar a Ably todavía. Página B sigue sonando en este punto.
+        const validPhone = enteredPin;
+        const resp = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            accion: 'validar_contacto',
+            telefono: validPhone,
+          }),
         });
+
+        const data = await resp.json();
+
+        if (data && data.exito) {
+          playTone(880, 250);
+
+          // Notificación visual inmediata: ALARMA DESACTIVADA CON ÉXITO
+          // Página B todavía SUENA; el vecino lee la confirmación con claridad.
+          setIsVerifying(false);
+          setDeactivationSuccess(true);
+
+          const durationStr = formatTime(seconds);
+          const currentSirenId = sirenIdRef.current;
+
+          // Pausa de 2.9 s para que el usuario vea la confirmación.
+          // RECIÉN cuando termina, se apaga Página A primero y se envía la petición al backend en Apps Script
+          // para que sea Google quien envíe la petición a los servidores de Ably y apague Página B.
+          deactivationTimerRef.current = setTimeout(() => {
+            // 1. Apagar sirena local en Página A
+            stopSiren();
+
+            // 2. Enviar petición a Apps Script para que Google publique en Ably y apague Página B
+            fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({
+                accion: 'desactivar_alarma_manual',
+                telefono: validPhone,
+                tipo: type,
+                sirenId: currentSirenId || '',
+              }),
+            }).catch((err) => console.error('[Alarma] Error al enviar desactivación a Apps Script:', err));
+
+            // 3. Limpiar estado y cerrar modal
+            sirenIdRef.current = null;
+            setDeactivationSuccess(false);
+            onClose({
+              id: `log-${Date.now()}`,
+              timestamp: 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+              type: type,
+              user: `Celular Autorizado (${activatedByPhone})`,
+              status: 'resolved',
+              resolvedBy: `Vecino (${validPhone})`,
+              resolutionTime: durationStr,
+            });
+          }, 2900);
+
+          return;
+        } else {
+          playTone(220, 400);
+          setPinError(true);
+        }
       }
-    } else {
-      // Unregistered cell phone number
-      playTone(220, 400); // Error buzz
-      setAttemptedPhone(enteredPin);
-      setShowUnregisteredModal(true);
-      setEnteredPin('');
+    } catch (err) {
+      console.error('[Alarma] Error al conectar con Apps Script:', err);
+      playTone(220, 400);
+      alert('Error de conexión con el servidor de alarma. Verifique su conexión.');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -540,13 +690,27 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     <span className="text-[11px] text-[#FFD700] font-mono font-bold">Vecino Autorizado: 12345678</span>
                   </div>
                   <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0">
-                    {enteredPin.length >= 8 ? (
-                  <span className="animate-typing text-white uppercase text-xs font-bold">AHORA PRESIONE ACTIVAR ALARMA</span>
-                ) : enteredPin.length < 1 && !showMissingPinAlert ? (
-                  <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em] max-[319px]:block max-[319px]:w-full max-[319px]:tracking-[0.02em] max-[319px]:[text-align-last:justify]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
-                ) : (
-                  <span className="whitespace-nowrap uppercase text-white text-[11.5px] tracking-[0.05em]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
-                )}
+                    {activationSuccess ? (
+                      <span className="text-[#22c55e] uppercase text-xs font-extrabold animate-pulse">¡NÚMERO AUTORIZADO EN PADRÓN!</span>
+                    ) : enteredPin.length >= 8 ? (
+                      <span className="animate-typing text-white uppercase text-xs font-bold">AHORA PRESIONE ACTIVAR ALARMA</span>
+                    ) : enteredPin.length < 1 && !showMissingPinAlert ? (
+                      <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em] max-[319px]:block max-[319px]:w-full max-[319px]:tracking-[0.02em] max-[319px]:[text-align-last:justify]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                    ) : (
+                      <span className="whitespace-nowrap uppercase text-white text-[11.5px] tracking-[0.05em]">PRIMERO DIGITE SU NUMERO DE CELULAR</span>
+                    )}
+                  </div>
+                </div>
+              ) : showKeypadForDeactivation ? (
+                <div>
+                  <div className="w-[90%] mx-auto flex items-center justify-center text-gray-400 text-[11px] leading-normal px-0">
+                    {deactivationSuccess ? (
+                      <span className="text-[#22c55e] uppercase text-xs font-extrabold animate-pulse">¡DESACTIVACIÓN CONFIRMADA!</span>
+                    ) : enteredPin.length >= 8 ? (
+                      <span className="animate-typing text-white uppercase text-xs font-bold">AHORA PRESIONE DESACTIVAR ALARMA</span>
+                    ) : (
+                      <span className="whitespace-nowrap uppercase text-[#FFD700] animate-pulse text-[11.5px] tracking-[0.05em]">DIGITE SU CELULAR PARA DESACTIVAR</span>
+                    )}
                   </div>
                 </div>
               ) : null}
@@ -632,7 +796,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             {/* Main Action Button - hidden when overlay with green button is active */}
             {step !== 'flashing' || showKeypadForDeactivation ? (
             <button
+              disabled={isVerifying || activationSuccess || deactivationSuccess}
               onClick={() => {
+                if (isVerifying || activationSuccess || deactivationSuccess) return;
                 if (enteredPin.length < 8) {
                   setShowMissingPinAlert(true);
                   return;
@@ -640,7 +806,11 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 handleVerifyPhone();
               }}
               className={`w-[90%] mx-auto mt-3 py-2.5 tall:py-3 sm:py-2.5 px-2 rounded-xl font-bold font-sans text-sm tall:text-base sm:text-sm transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative ${
-                step === 'enter_activation_phone'
+                activationSuccess || deactivationSuccess
+                  ? 'bg-[#22c55e] text-white border-2 border-[#22c55e] shadow-[0_0_35px_rgba(34,197,94,0.4)] animate-pulse'
+                  : isVerifying
+                  ? 'bg-yellow-500/20 text-[#FFD700] border-2 border-[#FFD700]/50 cursor-wait'
+                  : step === 'enter_activation_phone'
                   ? enteredPin.length >= 8
                     ? 'bg-black/40 hover:bg-black/70 text-[#FFD700] font-extrabold border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)]'
                     : 'bg-gray-600/20 text-gray-500 border border-white/5 cursor-not-allowed'
@@ -649,7 +819,28 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                     : 'bg-red-500/40 text-white/50 border border-red-500/30 cursor-not-allowed'
               }`}
             >
-              {step === 'enter_activation_phone' ? (
+              {activationSuccess ? (
+                <div className="flex w-full items-center justify-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
+                  <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-white uppercase">
+                    ALARMA ACTIVADA CON ÉXITO
+                  </span>
+                </div>
+              ) : deactivationSuccess ? (
+                <div className="flex w-full items-center justify-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
+                  <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-white uppercase">
+                    ALARMA DESACTIVADA CON ÉXITO
+                  </span>
+                </div>
+              ) : isVerifying ? (
+                <div className="flex w-full items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#FFD700] flex-shrink-0" />
+                  <span className="whitespace-nowrap tracking-normal sm:tracking-wide text-center text-xs sm:text-sm font-extrabold text-[#FFD700]">
+                    VERIFICANDO EN BASE DE DATOS...
+                  </span>
+                </div>
+              ) : step === 'enter_activation_phone' ? (
                 showMissingPinAlert ? (
                   <div className="flex w-full items-center justify-center">
                     <span className="text-[#FFD700] text-xs font-extrabold animate-pulse text-center">PRIMERO DIGITE SU NUMERO DE CELULAR</span>

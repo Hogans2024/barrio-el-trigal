@@ -17,5 +17,23 @@ GS code funcionak.txt
 # El repo es publico, asi que NUNCA subir este archivo.
 # Los datos alimentan el sitio via Apps Script -> public/data.json.
 Datos_Afiliacion.xlsx
+*.xls
+*.xlsx
 
 *.zip
+
+# Protegidos 2026-09-11 — pedido del dueno: nunca subir a GitHub.
+# No afectan a GitHub Pages (el deploy solo usa ./dist).
+# Evitan que `git add .` los arrastre por accidente.
+.agents/
+clasp-backend/
+Code.gs Nuevo/
+Code.gs
+PlanMaestroCodeGs.md
+implemetacion para activar sonido de la pagina B y valiadacion de contactos por Apps Script.md
+xl/
+# Plan de seguridad Ably: NO subir ni exponer llaves/PINes a GitHub.
+# NOTA: este archivo YA esta rastreado en GitHub (tiene historial),
+# asi que .gitignore NO lo oculta. La proteccion real es NO hacer
+# commit de sus cambios locales. Jamas ira en `git add` manual.
+PLAN_SEGURIDAD_ABLY_APPS_SCRIPT.md
