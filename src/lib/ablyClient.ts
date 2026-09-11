@@ -82,12 +82,13 @@ export const VOZ_INICIO_EVENT = 'voz_inicio';
 
 /**
  * Instancia y asigna un cliente Ably REST dedicado para la sesión de voz,
- * autenticado mediante el TokenRequest emitido por el backend.
+ * autenticado mediante el token STRING emitido por el backend (Code.gs
+ * canjea el TokenRequest en Ably y devuelve `token`).
  */
 let vozClient: Ably.Rest | null = null;
 
-export function crearClienteAblyParaVoz(tokenRequest: unknown): Ably.Rest {
-  vozClient = new Ably.Rest({ token: tokenRequest as any });
+export function crearClienteAblyParaVoz(token: string): Ably.Rest {
+  vozClient = new Ably.Rest({ token });
   return vozClient;
 }
 

@@ -284,9 +284,9 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
       const data = await resp.json();
 
-      if (data && data.exito && data.tokenRequest) {
+      if (data && data.exito && data.token) {
         playTone(880, 250);
-        crearClienteAblyParaVoz(data.tokenRequest);
+        crearClienteAblyParaVoz(data.token);
         setTokenVozAutorizado(true);
       } else {
         playTone(220, 400);
