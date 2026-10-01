@@ -31,9 +31,13 @@ export const CAROUSEL_SLIDES: CarouselSlide[] = [
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4XugJ9BIYQQZSg5uxfx5pzjvcDkgddseLUGZn3B9ZCi-tE8P8xDMB209MVF_syGebJdC7ga453TGJAhLFOD2G0vKv8CGEPGD8qQDLI34h4MMGJV6EWbT9OgO2r989XTOIxMD4ytoaKnjAL2F2WyXjq08PvMDHyFFkdwbDm-4ICI8sCqDIzlDXT_GAiGUiCSaI72mNtde2EmKOo33RBNN9QmUjOcgNs2bXa-muBjFKcWkeXjMn5K89SpwuHy6eMDQ586AKn5i0p9XS',
   },
   {
+    // v0.2.24k: líneas intercambiadas solo en este slide (pedido del dueño):
+    // arriba-blanco "Siempre a la mano", abajo-amarillo "Números de emergencia"
+    // ("emergencia" en minúscula; el overlay lo normaliza a tipo oración).
+    // Los slides 1 y 2 no se tocan. Afecta también al caption de desktop.
     id: 3,
-    title: 'Números de Emergencia',
-    subtitle: 'Siempre a la mano',
+    title: 'Siempre a la mano',
+    subtitle: 'Números de Emergencia',
     description: 'Comunícate directamente con la Policía, Serenazgo o Bomberos de Tarija a través de nuestro botón directo de llamadas.',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLLi0wMnjixDes2z-aGzTDRo5Y_zlUtP8Tv96OYHOpDW16MxU4Xmd6SePoNM9wjAf34ZOWrtd0I2rw_IR8lD9xx6zdBCuwoGccYhexSkqhEWHWPXosYZnyKZNbh-kpJcGrDKmH_xTr20jIwah0onFlDA2SpWk2_FvDRf2F5AWl3G4lH2XDLiQM0n8pR536Aov7vGjas0c4LkMhro3yEpkLxHzfN4oge031Hp0JG9EchWM4otYgCoM4mM7yYQ3BlljhUhxMc9GopdIZ',
   },

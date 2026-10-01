@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  ChevronLeft,
   ChevronRight,
   Search,
   Shield,
@@ -144,11 +143,25 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
         }}
         >
           {/* Mobile Title Overlay (dentro del slide show en la parte superior izquierda) */}
-        <div className="md:hidden absolute top-1.5 left-8 z-20 flex items-center space-x-1">
-          <div className="p-1 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/20 flex items-center justify-center backdrop-blur-md">
-            <Shield className="w-3.5 h-3.5 text-[#FFD700]" />
+          {/* v0.2.24: el texto fijo "Central de Alarma Vecinal" se elimina; aquí rotan
+              el título/subtítulo de cada slide (misma data del caption inferior).
+              Se conserva el escudo. key={carouselIndex} re-dispara el fade. */}
+        {/* v0.2.24j: sin flechas ni escudo; textos separados del borde
+            izquierdo (left-3) y casi al ras inferior (bottom-2), sin exagerar. */}
+        <div className="md:hidden absolute bottom-2 left-3 right-2 z-20 flex items-center">
+          {/* v0.2.24o: Comfortaa 11px al 90% de opacidad (pedido del dueño).
+              Ambas líneas iguales salvo el color. */}
+          <div key={carouselIndex} className="flex flex-col leading-tight min-w-0 animate-fade-in">
+            <span className="text-[11px] font-light tracking-[0.08em] font-['Comfortaa',sans-serif] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] truncate">{CAROUSEL_SLIDES[carouselIndex].title}</span>
+            {/* Subtítulo idéntico al título, solo cambia el color a amarillo.
+                Tipo oración (1ª mayúscula, resto minúsculas). */}
+            <span className="text-[11px] font-light tracking-[0.08em] font-['Comfortaa',sans-serif] text-[#FFD700]/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] truncate">
+              {(() => {
+                const s = CAROUSEL_SLIDES[carouselIndex].subtitle;
+                return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+              })()}
+            </span>
           </div>
-          <h2 className="text-base font-bold font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Central de Alarma Vecinal</h2>
         </div>
 
         <img
@@ -158,10 +171,12 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
         />
         {/* Dark overlay vignette gradient below left arrow */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col justify-end pl-7 pr-4 tall:pl-9 tall:pr-6 sm:pl-13 sm:pr-10 pb-2 tall:pb-3 sm:pb-4">
-          <h2 className="text-base font-light text-white leading-tight">
+          {/* v0.2.24: título/subtítulo visibles solo en md+ (en móvil rotan arriba).
+              La descripción ya era solo sm+. */}
+          <h2 className="hidden md:block text-base font-light text-white leading-tight">
             {CAROUSEL_SLIDES[carouselIndex].title}
           </h2>
-          <h3 className="text-sm font-bold text-[#FFD700] mb-0.5 sm:mb-1 font-sans uppercase tracking-tight">
+          <h3 className="hidden md:block text-sm font-bold text-[#FFD700] mb-0.5 sm:mb-1 font-sans uppercase tracking-tight">
             {CAROUSEL_SLIDES[carouselIndex].subtitle}
           </h3>
           <p className="hidden sm:block text-gray-300 max-w-xl text-base leading-relaxed font-sans">
@@ -169,19 +184,9 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
           </p>
         </div>
 
-        {/* Carousel Arrow Controls */}
-        <button
-          onClick={handlePrevSlide}
-          className="absolute left-1.5 sm:left-3 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
-        >
-          <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-        </button>
-        <button
-          onClick={handleNextSlide}
-          className="absolute right-1.5 sm:right-3 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 border border-white/5 flex items-center justify-center text-white transition-all active:scale-90 z-10"
-        >
-          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-        </button>
+        {/* v0.2.24i: flechas eliminadas (pedido del dueño). El carrusel rota solo
+            (8s) + swipe táctil + indicadores. handlePrev/Next siguen en uso
+            por el swipe, por eso se conservan las funciones. */}
 
         {/* Carousel Page Indicators */}
         <div className="absolute bottom-1.5 right-2 sm:bottom-2.5 sm:right-3 flex space-x-1.5 z-10">
