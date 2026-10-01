@@ -39,30 +39,42 @@ export const CAROUSEL_SLIDES: CarouselSlide[] = [
   },
 ];
 
+// ─── CMS_PENDING (mock permanente Alarma — NUNCA conectar al CMS) ───────────────
+// Accesos rápidos con iconos SVG locales (public/iconos_accesos_rapidos/).
+// Eventos/Mascotas/Negocios: de la carpeta local "Iconos cortados/" (NO
+// versionada). Cada archivo trae la tira completa del diseño; su viewBox
+// original ya encuadra 1 icono. Saneado al copiar: fill #000000 → #FFD700
+// (los <img> NO heredan currentColor de la página, por eso va hardcodeado).
+// Farmacias: geometría exacta del componente IconFarmacias del dueño
+// (cápsula rotada -40° + línea media + cruz), convertida 1:1 de
+// react-native-svg a SVG web. viewBox 0 0 78 78 (la cápsula rotada con
+// esquinas rx=10 sobresale del 64 original). stroke-width 3 para igualar
+// el grosor visual de los otros 3 iconos a 28px de alto.
+// ─────────────────────────────────────────────────────────────────────────────
 export const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   {
     id: 'eventos',
     title: 'Eventos',
     subtitle: 'Actividades y reuniones',
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4XugJ9BIYQQZSg5uxfx5pzjvcDkgddseLUGZn3B9ZCi-tE8P8xDMB209MVF_syGebJdC7ga453TGJAhLFOD2G0vKv8CGEPGD8qQDLI34h4MMGJV6EWbT9OgO2r989XTOIxMD4ytoaKnjAL2F2WyXjq08PvMDHyFFkdwbDm-4ICI8sCqDIzlDXT_GAiGUiCSaI72mNtde2EmKOo33RBNN9QmUjOcgNs2bXa-muBjFKcWkeXjMn5K89SpwuHy6eMDQ586AKn5i0p9XS',
+    imageUrl: `${import.meta.env.BASE_URL}iconos_accesos_rapidos/eventos.svg`,
   },
   {
     id: 'farmacias',
     title: 'Farmacias',
     subtitle: 'Farmacias abiertas hoy',
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLLi0wMnjixDes2z-aGzTDRo5Y_zlUtP8Tv96OYHOpDW16MxU4Xmd6SePoNM9wjAf34ZOWrtd0I2rw_IR8lD9xx6zdBCuwoGccYhexSkqhEWHWPXosYZnyKZNbh-kpJcGrDKmH_xTr20jIwah0onFlDA2SpWk2_FvDRf2F5AWl3G4lH2XDLiQM0n8pR536Aov7vGjas0c4LkMhro3yEpkLxHzfN4oge031Hp0JG9EchWM4otYgCoM4mM7yYQ3BlljhUhxMc9GopdIZ',
+    imageUrl: `${import.meta.env.BASE_URL}iconos_accesos_rapidos/farmacias.svg`,
   },
   {
     id: 'mascotas',
     title: 'Mascotas',
     subtitle: 'Encuentra tu mascota',
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDWlRFvOVbyE46T_PxhfmeaTMbsGIVIrs5e09wMO6SmdL3ez06-QxSKpfLQKNuKKWl7jljqUYcKxNQuWfYfc7JtwDlwfN56SpiKM5wjKsgz3L9dULSoAxjVOlPQD3A-LFBUGmI24jzjoG6CjElEoQyUJGcAQy4b4SU1XM6FJ82ntuf6HjwLZ2KeTCRWWr_f2Yootk7MbHr-aQb-HPH17dg5yJIipnPs8HItt1H_puu1S4IEYyqkiMp9mTVGd1iCvLHrxdXScGIuLsMd',
+    imageUrl: `${import.meta.env.BASE_URL}iconos_accesos_rapidos/mascotas.svg`,
   },
   {
     id: 'negocios',
     title: 'Negocios',
     subtitle: 'Guía comercial local',
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCsXQdNB42VoD1ozLGWcvwvdSPVux24IdKofkveCTXV7CyzP2h8KMazQ7eOJFvzlf0NjjXBZowTGS_duAkSXG12Y5UFu25f2WRXcCRA2Yr9kG7MrtYvwsG8GcvI5npQl5PjHRa3it-ld9YEBAFwmzkZ0uWxYgKgA6N6fZ9XBnStgefxyyVtz09MeE4Y-22ZDjDAzW4cwMZZ7-l5Xdd3wU5h5Ndzd0SgJ3wB1al5QArnJiO9j9PDB15W_4J9jWDA6crhM3sMH3LHCQVr',
+    imageUrl: `${import.meta.env.BASE_URL}iconos_accesos_rapidos/negocios.svg`,
   },
 ];
 

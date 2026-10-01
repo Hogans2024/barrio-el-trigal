@@ -268,23 +268,24 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
         </div>
       )}
 
-      {/* ============ 3. ACCESOS RÁPIDOS (grid mock → DetailModal) ============ */}
+      {/* ============ 3. ACCESOS RÁPIDOS (tiles SVG locales) ============ */}
+      {/* Rediseño v0.2.23: las foto-cards remotas se reemplazan por tiles de icono
+          centrado. Los 4 usan SVG locales (public/iconos_accesos_rapidos/,
+          fill #FFD700): calendario, cápsula+cruz del dueño, perro+gato, tienda. */}
       <section className="grid grid-cols-2 tall:grid-cols-4 sm:grid-cols-4 gap-[5px] tall:gap-[9px] sm:gap-[13px] select-none shrink-0 -mt-[3px]">
         {QUICK_ACCESS_ITEMS.map((item) => (
           <div
             key={item.id}
             onClick={() => { playTone(600, 80); onNavigate(item.id); }}
-            className="group relative rounded-xl overflow-hidden border border-white/5 hover:border-[#FFD700]/30 cursor-pointer h-16 tall:h-20 sm:h-20 transition-all duration-300 hover:shadow-lg flex animate-fade-in"
+            className="group relative rounded-xl overflow-hidden border border-white/5 hover:border-[#FFD700]/30 cursor-pointer h-16 tall:h-20 sm:h-20 transition-all duration-300 hover:shadow-lg flex flex-col items-center justify-center gap-1 bg-white/[0.02] p-2 animate-fade-in"
           >
             <img
               alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover opacity-45 group-hover:scale-105 transition-transform duration-500"
+              className={`${item.id === 'farmacias' ? 'h-8 tall:h-9' : 'h-7 tall:h-8'} w-auto max-w-[90%] object-contain shrink-0 group-hover:scale-105 transition-transform duration-300`}
               src={item.imageUrl}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-black/30 p-2 sm:p-3 flex flex-col justify-end items-center text-center w-full">
-              <h4 className="font-bold text-[11px] sm:text-xs text-white group-hover:text-[#FFD700] transition-colors leading-tight">{item.title}</h4>
-              <p className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 leading-none hidden sm:block">{item.subtitle}</p>
-            </div>
+            <h4 className="font-bold text-[11px] sm:text-xs text-white group-hover:text-[#FFD700] transition-colors leading-tight text-center">{item.title}</h4>
+            <p className="text-[9px] sm:text-[10px] text-gray-400 leading-none hidden sm:block text-center">{item.subtitle}</p>
           </div>
         ))}
       </section>
