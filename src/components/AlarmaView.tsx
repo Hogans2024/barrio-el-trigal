@@ -8,12 +8,13 @@ import {
   Lock,
   Users,
   FileText,
-  Volume2,
-  X,
   Siren,
+  X,
   Activity,
   HeartPulse,
   Wrench,
+  Flame,
+  type LucideIcon,
 } from 'lucide-react';
 
 import { CAROUSEL_SLIDES, QUICK_ACCESS_ITEMS, ALARM_LOGS } from '../data.alarma';
@@ -61,12 +62,25 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
   const touchStartX = useRef(0);
 
   // Tipos de alarma seleccionables (panic / suspicious / test / medical)
-  const ALARM_TYPES: { id: 'panic' | 'suspicious' | 'test' | 'medical'; label: string; icon: React.ReactNode; color: string }[] = [
-    { id: 'panic', label: 'Pánico', icon: <Siren className="w-4 h-4" />, color: 'text-red-400 border-red-500/40 bg-red-500/10' },
-    { id: 'suspicious', label: 'Sospechoso', icon: <Search className="w-4 h-4" />, color: 'text-[#FFD700] border-[#FFD700]/40 bg-[#FFD700]/10' },
-    { id: 'medical', label: 'Médica', icon: <HeartPulse className="w-4 h-4" />, color: 'text-blue-400 border-blue-500/40 bg-blue-500/10' },
-    { id: 'test', label: 'Prueba', icon: <Wrench className="w-4 h-4" />, color: 'text-gray-300 border-white/20 bg-white/5' },
+  // v0.2.25d: iconos +20% (16px → 19px), solo los 4 tipos (pedido del dueño).
+  // v0.2.25f: orden visual (izq: Pánico/Evento, der: Médica/Incendio). Las
+  // columnas son slice(0,2) y slice(2,4), por eso 'test' va 2º y 'suspicious'
+  // 4º. Ids y lógica intactos.
+  // v0.2.26: se guarda el COMPONENTE (Icon) en vez del nodo, para renderizarlo
+  // chico en los botones laterales y grande en el botón circular según el tipo
+  // activo (pedido del dueño).
+  const ALARM_TYPES: { id: 'panic' | 'suspicious' | 'test' | 'medical'; label: string; Icon: LucideIcon; color: string }[] = [
+    { id: 'panic', label: 'Pánico', Icon: Siren, color: 'text-red-400 border-red-500/40 bg-red-500/10' },
+    // v0.2.25c: etiqueta "Prueba" → "Evento" (solo etiqueta, pedido del dueño;
+    // icono Wrench e id 'test' intactos).
+    { id: 'test', label: 'Evento', Icon: Wrench, color: 'text-[#22c55e] border-[#22c55e]/40 bg-[#22c55e]/10' },
+    { id: 'medical', label: 'Médica', Icon: HeartPulse, color: 'text-blue-400 border-blue-500/40 bg-blue-500/10' },
+    // v0.2.25b/c: "Sospechoso" → "Bomberos" → "Incendio" (solo etiqueta, pedido
+    // del dueño; icono Flame intacto). El id interno 'suspicious' se conserva
+    // para no romper AlarmLog, ActiveAlarmModal ni la bitácora.
+    { id: 'suspicious', label: 'Incendio', Icon: Flame, color: 'text-[#FFD700] border-[#FFD700]/40 bg-[#FFD700]/10' },
   ];
+  const ActiveTypeIcon = (ALARM_TYPES.find((t) => t.id === activeAlarmType) ?? ALARM_TYPES[0]).Icon;
 
   // Notify App.tsx when ActiveAlarmModal opens/closes
   useEffect(() => {
@@ -289,7 +303,8 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
               className={`${item.id === 'farmacias' ? 'h-8 tall:h-9' : 'h-7 tall:h-8'} w-auto max-w-[90%] object-contain shrink-0 group-hover:scale-105 transition-transform duration-300`}
               src={item.imageUrl}
             />
-            <h4 className="font-bold text-[11px] sm:text-xs text-white group-hover:text-[#FFD700] transition-colors leading-tight text-center">{item.title}</h4>
+            {/* v0.2.27b: títulos blancos al 70% (−30% opacidad, pedido del dueño). */}
+            <h4 className="font-bold text-[11px] sm:text-xs text-white/70 group-hover:text-[#FFD700] transition-colors leading-tight text-center">{item.title}</h4>
             <p className="text-[9px] sm:text-[10px] text-gray-400 leading-none hidden sm:block text-center">{item.subtitle}</p>
           </div>
         ))}
@@ -326,12 +341,13 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
                       <button
                         key={t.id}
                         onClick={() => { playTone(700, 60); setActiveAlarmType(t.id); }}
-                        className={`flex flex-col items-center justify-center gap-1 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border text-[9px] sm:text-[10px] font-bold transition-all active:scale-95 shadow-md ${
+                        className={`flex flex-col items-center justify-center gap-1 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border text-[10px] sm:text-[11px] font-bold transition-all active:scale-95 shadow-md ${
                           isSelected ? t.color : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
                         }`}
                       >
-                        {t.icon}
-                        <span className="text-center leading-tight">{t.label}</span>
+                        {/* v0.2.25: +15% brillo en icono y texto (pedido del dueño). */}
+                        <span className="brightness-[1.15] flex items-center"><t.Icon className="w-[19px] h-[19px]" /></span>
+                        <span className="text-center leading-tight brightness-[1.15]">{t.label}</span>
                       </button>
                     );
                   })}
@@ -344,8 +360,13 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
                     className="w-28 h-28 tall:w-32 tall:h-32 sm:w-36 sm:h-36 rounded-full border-4 border-[#FFD700] flex flex-col items-center justify-center bg-black/40 hover:bg-black/70 transition-all duration-300 group shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_45px_rgba(255,215,0,0.25)] relative active:scale-95 shrink-0 mx-1 sm:mx-0 z-10"
                   >
                     <span className="absolute inset-0 rounded-full border border-[#FFD700]/30 animate-ping pointer-events-none" />
-                    <Volume2 className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFD700] mb-1 sm:mb-1.5 group-hover:scale-110 transition-transform" />
-                    <span className="text-[8px] sm:text-[9px] font-black text-[#FFD700] tracking-widest text-center uppercase leading-tight">
+                    {/* v0.2.26: icono del tipo activo (Pánico=Siren, Incendio=Flame,
+                        Médica=HeartPulse, Evento=Wrench). */}
+                    <ActiveTypeIcon className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFD700] mb-1 sm:mb-1.5 group-hover:scale-110 transition-transform" />
+                    {/* v0.2.25g/h/i (PENDIENTE CONFIRMAR — sin build aún):
+                        tamaño +20%,+10%,−4% (10.2px/11.4px) + tracking 0.25em
+                        + Marcellus (premium, OFL libre) solo aquí. */}
+                    <span className="text-[10.2px] sm:text-[11.4px] font-normal font-['Marcellus',serif] text-[#FFD700] tracking-[0.25em] text-center uppercase leading-tight">
                       Activar<br />Alarma<br />Vecinal
                     </span>
                   </button>
@@ -362,12 +383,13 @@ export default function AlarmaView({ onNavigate, onShowNotification, onKeypadOpe
                       <button
                         key={t.id}
                         onClick={() => { playTone(700, 60); setActiveAlarmType(t.id); }}
-                        className={`flex flex-col items-center justify-center gap-1 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border text-[9px] sm:text-[10px] font-bold transition-all active:scale-95 shadow-md ${
+                        className={`flex flex-col items-center justify-center gap-1 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border text-[10px] sm:text-[11px] font-bold transition-all active:scale-95 shadow-md ${
                           isSelected ? t.color : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
                         }`}
                       >
-                        {t.icon}
-                        <span className="text-center leading-tight">{t.label}</span>
+                        {/* v0.2.25: +15% brillo en icono y texto (pedido del dueño). */}
+                        <span className="brightness-[1.15] flex items-center"><t.Icon className="w-[19px] h-[19px]" /></span>
+                        <span className="text-center leading-tight brightness-[1.15]">{t.label}</span>
                       </button>
                     );
                   })}
