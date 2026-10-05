@@ -206,9 +206,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
-          accion: 'desactivar_alarma_manual',
-          telefono: validPhone,
-          tipo: type,
+          accion: 'apagar_alarma_tiempo',
           sirenId: currentSirenId,
         }),
       }).catch((err) => console.error('[Alarma] Error al cancelar temporizador en auto-desactivación:', err));
@@ -308,14 +306,15 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
     try {
       if (step === 'enter_activation_phone') {
-        // Paso 1: Validar únicamente el contacto en Google Sheets (Apps Script).
+        // Paso 1: Validar el contacto en Google Sheets (Apps Script) y obtener token de acción.
         // NO dispara Ably todavía; Página B permanece en silencio total.
         const resp = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            accion: 'validar_contacto',
+            accion: 'solicitar_token_alarma',
             telefono: enteredPin,
+            origen: 'web',
           }),
         });
 
@@ -327,6 +326,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             setServerDuration(Number(data.duracion));
           }
           const validPhone = enteredPin;
+          const tokenAccion = data.token;
           setActivatedByPhone(validPhone);
           if (data.nombreVecino) {
             setDispatchLogs((prev) => [
@@ -355,7 +355,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
               sirenId: nuevoSirenId,
             });
 
-            // 2. Programar apagado automático en el servidor (Apps Script)
+            // 2. Programar apagado automático y registrar activación en el servidor (Apps Script)
             fetch(APPS_SCRIPT_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -364,6 +364,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 telefono: validPhone,
                 tipo: type,
                 sirenId: nuevoSirenId,
+                token: tokenAccion,
               }),
             }).catch((err) => console.error('[Alarma] Error al programar apagado en servidor:', err));
 
@@ -382,15 +383,16 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
           setEnteredPin('');
         }
       } else {
-        // Desactivación manual — Paso 1: Solo validar el número en Sheets,
+        // Desactivación manual — Paso 1: Solicitar token de acción para autorizar la desactivación en Sheets.
         // SIN publicar a Ably todavía. Página B sigue sonando en este punto.
         const validPhone = enteredPin;
         const resp = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            accion: 'validar_contacto',
+            accion: 'solicitar_token_alarma',
             telefono: validPhone,
+            origen: 'web',
           }),
         });
 
@@ -406,6 +408,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
 
           const durationStr = formatTime(seconds);
           const currentSirenId = sirenIdRef.current;
+          const tokenDesactivacion = data.token;
 
           // Pausa de 2.9 s para que el usuario vea la confirmación.
           // RECIÉN cuando termina, se apaga Página A primero y se envía la petición al backend en Apps Script
@@ -414,7 +417,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
             // 1. Apagar sirena local en Página A
             stopSiren();
 
-            // 2. Enviar petición a Apps Script para que Google publique en Ably y apague Página B
+            // 2. Enviar petición a Apps Script con token para que Google publique en Ably y apague Página B
             fetch(APPS_SCRIPT_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -423,6 +426,7 @@ export default function ActiveAlarmModal({ isOpen, onClose, type }: ActiveAlarmM
                 telefono: validPhone,
                 tipo: type,
                 sirenId: currentSirenId || '',
+                token: tokenDesactivacion,
               }),
             }).catch((err) => console.error('[Alarma] Error al enviar desactivación a Apps Script:', err));
 
